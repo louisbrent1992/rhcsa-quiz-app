@@ -79,19 +79,21 @@ jobs:
       - name: Test
         run: flutter test
 
-      # --config-only writes Generated.xcconfig without building; the Flutter
-      # code is then compiled by the Runner target's build phase during the
-      # archive below, which is what makes the archive signable.
+      # A full unsigned build first, because the repo has no ios/Podfile: the
+      # Flutter tool generates it (and runs pod install) only during a real
+      # build, and xcodebuild cannot open Runner.xcworkspace without the Pods
+      # project. This also writes Generated.xcconfig for the archive.
       #
-      # --no-codesign is required even though this build IS signed: this step
-      # only writes config, and without it Flutter aborts on an up-front
-      # "no valid code signing certificates" check. Signing happens in the
-      # archive step, where the API key lets Xcode mint the certificate and
-      # profile via cloud-managed signing.
+      # --no-codesign is required even though the archive IS signed: the
+      # keychain is still empty here, and Flutter aborts up front on "no valid
+      # code signing certificates". Signing happens in the archive step, where
+      # the API key lets Xcode mint the certificate and profile via
+      # cloud-managed signing.
       - name: Prepare Xcode project
         run: |
-          flutter build ios --release --config-only --no-codesign
-          cd ios && pod install
+          flutter build ios --release --no-codesign
+          test -f ios/Podfile || { echo "::error::ios/Podfile was not generated"; exit 1; }
+          ls ios/Pods >/dev/null
 
       - name: Archive
         run: |
