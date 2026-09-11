@@ -61,6 +61,20 @@ jobs:
             exit 1
           fi
 
+          # Shape checks. These values are all non-secret identifiers whose
+          # formats differ, so a swap between them is catchable up front --
+          # Apple only ever answers a mismatch with an opaque 401.
+          echo "APPLE_TEAM_ID    length ${#TEAM_ID}   (expect 10)"
+          echo "KEY_ID           length ${#KEY_ID}   (expect 10)"
+          echo "ISSUER_ID        length ${#ISSUER_ID}   (expect 36, a UUID)"
+
+          echo "$ISSUER_ID" | grep -Eq '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$' \
+            || { echo "::error::APP_STORE_CONNECT_ISSUER_ID is not a UUID. It is the 'Issuer ID' shown above the key table on App Store Connect > Users and Access > Integrations -- not the Team ID."; exit 1; }
+          echo "$KEY_ID" | grep -Eq '^[A-Z0-9]{10}$' \
+            || { echo "::error::APP_STORE_CONNECT_KEY_ID should be the 10-character Key ID that also appears in the AuthKey_<KEY_ID>.p8 filename."; exit 1; }
+          [ "$KEY_ID" != "$TEAM_ID" ] \
+            || { echo "::error::APP_STORE_CONNECT_KEY_ID and APPLE_TEAM_ID are the same value; one of them is wrong."; exit 1; }
+
       # xcodebuild looks for the key by name in ~/private_keys. CryptoKit's PEM
       # parser is strict: a stray CR or a missing trailing newline is enough
       # for "invalidPEMDocument", so normalise before writing.
