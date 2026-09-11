@@ -1,0 +1,65 @@
+# Builds an unsigned iOS IPA on a macOS runner, since an IPA cannot be
+# produced on Linux. Run it from the Actions tab or with:
+#
+#   gh workflow run ios-build.yml --ref main
+#   gh run watch && gh run download -n ipa
+#
+# The result is UNSIGNED: this project has no DEVELOPMENT_TEAM set and no
+# Apple signing assets in the repo. An unsigned IPA installs via a re-signing
+# tool (Sideloadly, AltStore, MobAI) with a free Apple ID; it cannot go to
+# TestFlight or the App Store. To produce a signed build, add the certificate
+# and provisioning profile as secrets and swap --no-codesign for an
+# ExportOptions.plist archive step.
+name: iOS build
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build unsigned IPA
+    runs-on: macos-15
+    timeout-minutes: 45
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.47.1
+          channel: stable
+          cache: true
+
+      - name: Show toolchain
+        run: |
+          flutter --version
+          xcodebuild -version
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Analyze
+        run: flutter analyze
+
+      - name: Test
+        run: flutter test
+
+      - name: Build iOS (release, unsigned)
+        run: flutter build ios --release --no-codesign
+
+      # `flutter build ipa` needs a signing identity, so package the .app by
+      # hand: an IPA is just a zip with the bundle under Payload/.
+      - name: Package IPA
+        run: |
+          cd build/ios/iphoneos
+          mkdir -p Payload
+          cp -R Runner.app Payload/
+          zip -qry rhcsa-quiz-unsigned.ipa Payload
+          ls -lh rhcsa-quiz-unsigned.ipa
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ipa
+          path: build/ios/iphoneos/rhcsa-quiz-unsigned.ipa
+          if-no-files-found: error
+          retention-days: 30
