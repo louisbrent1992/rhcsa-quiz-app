@@ -227,17 +227,25 @@ jobs:
 
       - name: Archive
         run: |
+          # -destination generic/platform=iOS stops xcodebuild from resolving a
+          # concrete destination: without it the runner host is treated as a
+          # target device ("Device ... isn't registered in your developer
+          # account") and Xcode looks for a development profile. The explicit
+          # Apple Distribution identity keeps the archive on the App Store
+          # signing path rather than the development one.
           xcodebuild archive \
             -workspace ios/Runner.xcworkspace \
             -scheme Runner \
             -configuration Release \
+            -destination 'generic/platform=iOS' \
             -archivePath build/ios/Runner.xcarchive \
             -allowProvisioningUpdates \
             -authenticationKeyPath "$HOME/private_keys/AuthKey_${KEY_ID}.p8" \
             -authenticationKeyID "$KEY_ID" \
             -authenticationKeyIssuerID "$ISSUER_ID" \
             DEVELOPMENT_TEAM="$TEAM_ID" \
-            CODE_SIGN_STYLE=Automatic
+            CODE_SIGN_STYLE=Automatic \
+            CODE_SIGN_IDENTITY="Apple Distribution"
 
       - name: Export IPA
         run: |
