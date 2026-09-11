@@ -61,14 +61,29 @@ jobs:
             exit 1
           fi
 
-      # xcodebuild looks for the key by name in ~/private_keys.
+      # xcodebuild looks for the key by name in ~/private_keys. CryptoKit's PEM
+      # parser is strict: a stray CR or a missing trailing newline is enough
+      # for "invalidPEMDocument", so normalise before writing.
       - name: Install App Store Connect API key
         run: |
+          key="$HOME/private_keys/AuthKey_${KEY_ID}.p8"
           mkdir -p "$HOME/private_keys"
-          printf '%s\n' "$PRIVATE_KEY" > "$HOME/private_keys/AuthKey_${KEY_ID}.p8"
-          chmod 600 "$HOME/private_keys/AuthKey_${KEY_ID}.p8"
-          head -1 "$HOME/private_keys/AuthKey_${KEY_ID}.p8" | grep -q "BEGIN PRIVATE KEY" \
-            || { echo "::error::APP_STORE_CONNECT_PRIVATE_KEY is not a .p8 private key"; exit 1; }
+          printf '%s\n' "$PRIVATE_KEY" | tr -d '\r' | sed -e 's/[[:space:]]*$//' > "$key"
+          chmod 600 "$key"
+
+          # Diagnostics only -- shape of the key, never its contents.
+          echo "lines:        $(wc -l < "$key" | tr -d ' ')"
+          echo "first line:   $(head -1 "$key")"
+          echo "last line:    $(tail -1 "$key")"
+          echo "body chars:   $(sed '1d;$d' "$key" | tr -d '\n' | wc -c | tr -d ' ')"
+
+          head -1 "$key" | grep -q -- "-----BEGIN PRIVATE KEY-----" \
+            || { echo "::error::APP_STORE_CONNECT_PRIVATE_KEY does not start with -----BEGIN PRIVATE KEY-----. Set it from the .p8 file itself: gh secret set APP_STORE_CONNECT_PRIVATE_KEY < AuthKey_XXXXXXXXXX.p8"; exit 1; }
+          tail -1 "$key" | grep -q -- "-----END PRIVATE KEY-----" \
+            || { echo "::error::APP_STORE_CONNECT_PRIVATE_KEY is missing its -----END PRIVATE KEY----- line"; exit 1; }
+          openssl pkey -in "$key" -noout \
+            || { echo "::error::The key is not a valid PKCS#8 private key. Re-download or re-copy the .p8 from App Store Connect."; exit 1; }
+          echo "openssl: key parses as a valid PKCS#8 private key"
 
       - name: Install dependencies
         run: flutter pub get
