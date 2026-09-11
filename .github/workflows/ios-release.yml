@@ -293,9 +293,36 @@ jobs:
           if-no-files-found: error
           retention-days: 30
 
-      - name: Upload to TestFlight
+      # Uploading via a second -exportArchive with destination=upload rather
+      # than `xcrun altool --upload-app`: altool's notarization side is already
+      # deprecated in favour of notarytool and Apple steers uploads toward
+      # Transporter/iTMSTransporter, whereas exportArchive is first-party and
+      # reuses the signing credentials already proven above. The archive is
+      # exported twice -- once to disk for the artifact, once to Apple -- so a
+      # failed upload still leaves a downloadable IPA.
+      - name: Upload to App Store Connect
         if: ${{ inputs.upload }}
         run: |
-          ipa=$(ls build/ios/ipa/*.ipa | head -1)
-          xcrun altool --upload-app -f "$ipa" -t ios \
-            --apiKey "$KEY_ID" --apiIssuer "$ISSUER_ID"
+          cat > "$RUNNER_TEMP/ExportOptions-upload.plist" <<PLIST
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+            <key>method</key><string>app-store-connect</string>
+            <key>teamID</key><string>${TEAM_ID}</string>
+            <key>signingStyle</key><string>automatic</string>
+            <key>uploadSymbols</key><true/>
+            <key>destination</key><string>upload</string>
+            <key>manageAppVersionAndBuildNumber</key><false/>
+          </dict>
+          </plist>
+          PLIST
+          xcodebuild -exportArchive \
+            -archivePath build/ios/Runner.xcarchive \
+            -exportOptionsPlist "$RUNNER_TEMP/ExportOptions-upload.plist" \
+            -exportPath "$RUNNER_TEMP/upload" \
+            -allowProvisioningUpdates \
+            -authenticationKeyPath "$HOME/private_keys/AuthKey_${KEY_ID}.p8" \
+            -authenticationKeyID "$KEY_ID" \
+            -authenticationKeyIssuerID "$ISSUER_ID"
+          echo "Uploaded. App Store Connect processes the build for a few minutes before it appears in TestFlight."
