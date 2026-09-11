@@ -1,0 +1,152 @@
+# Builds a signed, App Store-ready IPA on a macOS runner and optionally
+# ships it to TestFlight.
+#
+# Signing uses an App Store Connect API key rather than a .p12 + profile:
+# Xcode creates and renews the provisioning profile itself via
+# -allowProvisioningUpdates, so there is nothing to rotate when a certificate
+# would otherwise expire.
+#
+# Required repository secrets:
+#   APPLE_TEAM_ID                 10-character Team ID (Apple Developer →
+#                                 Membership details)
+#   APP_STORE_CONNECT_KEY_ID      Key ID of the API key
+#   APP_STORE_CONNECT_ISSUER_ID   Issuer ID shown above the key list
+#   APP_STORE_CONNECT_PRIVATE_KEY Full contents of the AuthKey_*.p8 file,
+#                                 including the BEGIN/END lines
+#
+# The key needs the App Manager role to create profiles and upload builds.
+#
+#   gh workflow run ios-release.yml --ref main
+#   gh workflow run ios-release.yml --ref main -f upload=true   # + TestFlight
+name: iOS release (signed)
+
+on:
+  workflow_dispatch:
+    inputs:
+      upload:
+        description: Upload the signed build to TestFlight
+        type: boolean
+        default: false
+
+jobs:
+  build:
+    name: Build signed IPA
+    runs-on: macos-15
+    timeout-minutes: 60
+
+    env:
+      TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+      KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+      ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+      PRIVATE_KEY: ${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.47.1
+          channel: stable
+          cache: true
+
+      - name: Check required secrets
+        run: |
+          missing=""
+          [ -n "$TEAM_ID" ] || missing="$missing APPLE_TEAM_ID"
+          [ -n "$KEY_ID" ] || missing="$missing APP_STORE_CONNECT_KEY_ID"
+          [ -n "$ISSUER_ID" ] || missing="$missing APP_STORE_CONNECT_ISSUER_ID"
+          [ -n "$PRIVATE_KEY" ] || missing="$missing APP_STORE_CONNECT_PRIVATE_KEY"
+          if [ -n "$missing" ]; then
+            echo "::error::Missing repository secrets:$missing"
+            exit 1
+          fi
+
+      # xcodebuild looks for the key by name in ~/private_keys.
+      - name: Install App Store Connect API key
+        run: |
+          mkdir -p "$HOME/private_keys"
+          printf '%s\n' "$PRIVATE_KEY" > "$HOME/private_keys/AuthKey_${KEY_ID}.p8"
+          chmod 600 "$HOME/private_keys/AuthKey_${KEY_ID}.p8"
+          head -1 "$HOME/private_keys/AuthKey_${KEY_ID}.p8" | grep -q "BEGIN PRIVATE KEY" \
+            || { echo "::error::APP_STORE_CONNECT_PRIVATE_KEY is not a .p8 private key"; exit 1; }
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Analyze
+        run: flutter analyze
+
+      - name: Test
+        run: flutter test
+
+      # --config-only writes Generated.xcconfig without building; the Flutter
+      # code is then compiled by the Runner target's build phase during the
+      # archive below, which is what makes the archive signable.
+      - name: Prepare Xcode project
+        run: |
+          flutter build ios --release --config-only
+          cd ios && pod install
+
+      - name: Archive
+        run: |
+          xcodebuild archive \
+            -workspace ios/Runner.xcworkspace \
+            -scheme Runner \
+            -configuration Release \
+            -archivePath build/ios/Runner.xcarchive \
+            -allowProvisioningUpdates \
+            -authenticationKeyPath "$HOME/private_keys/AuthKey_${KEY_ID}.p8" \
+            -authenticationKeyID "$KEY_ID" \
+            -authenticationKeyIssuerID "$ISSUER_ID" \
+            DEVELOPMENT_TEAM="$TEAM_ID" \
+            CODE_SIGN_STYLE=Automatic
+
+      - name: Export IPA
+        run: |
+          cat > "$RUNNER_TEMP/ExportOptions.plist" <<PLIST
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+            <key>method</key><string>app-store-connect</string>
+            <key>teamID</key><string>${TEAM_ID}</string>
+            <key>signingStyle</key><string>automatic</string>
+            <key>uploadSymbols</key><true/>
+            <key>destination</key><string>export</string>
+            <key>manageAppVersionAndBuildNumber</key><false/>
+          </dict>
+          </plist>
+          PLIST
+          xcodebuild -exportArchive \
+            -archivePath build/ios/Runner.xcarchive \
+            -exportOptionsPlist "$RUNNER_TEMP/ExportOptions.plist" \
+            -exportPath build/ios/ipa \
+            -allowProvisioningUpdates \
+            -authenticationKeyPath "$HOME/private_keys/AuthKey_${KEY_ID}.p8" \
+            -authenticationKeyID "$KEY_ID" \
+            -authenticationKeyIssuerID "$ISSUER_ID"
+          ls -lh build/ios/ipa
+
+      - name: Verify signature
+        run: |
+          ipa=$(ls build/ios/ipa/*.ipa | head -1)
+          work="$RUNNER_TEMP/verify"
+          rm -rf "$work" && mkdir -p "$work"
+          unzip -q "$ipa" -d "$work"
+          app=$(ls -d "$work"/Payload/*.app | head -1)
+          codesign -dv --verbose=4 "$app" 2>&1 | grep -E "Authority|TeamIdentifier|Identifier"
+          codesign --verify --deep --strict "$app" && echo "signature verifies"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ipa-signed
+          path: build/ios/ipa/*.ipa
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Upload to TestFlight
+        if: ${{ inputs.upload }}
+        run: |
+          ipa=$(ls build/ios/ipa/*.ipa | head -1)
+          xcrun altool --upload-app -f "$ipa" -t ios \
+            --apiKey "$KEY_ID" --apiIssuer "$ISSUER_ID"
