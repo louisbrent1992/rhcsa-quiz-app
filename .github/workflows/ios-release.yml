@@ -77,10 +77,25 @@ jobs:
           echo "last line:    $(tail -1 "$key")"
           echo "body chars:   $(sed '1d;$d' "$key" | tr -d '\n' | wc -c | tr -d ' ')"
 
+          hint="Set the secret from the file so newlines survive:  gh secret set APP_STORE_CONNECT_PRIVATE_KEY --repo \$GITHUB_REPOSITORY < AuthKey_${KEY_ID}.p8  -- pasting a multi-line key into an interactive prompt stores only its first line."
+
           head -1 "$key" | grep -q -- "-----BEGIN PRIVATE KEY-----" \
-            || { echo "::error::APP_STORE_CONNECT_PRIVATE_KEY does not start with -----BEGIN PRIVATE KEY-----. Set it from the .p8 file itself: gh secret set APP_STORE_CONNECT_PRIVATE_KEY < AuthKey_XXXXXXXXXX.p8"; exit 1; }
+            || { echo "::error::APP_STORE_CONNECT_PRIVATE_KEY does not start with -----BEGIN PRIVATE KEY-----. $hint"; exit 1; }
           tail -1 "$key" | grep -q -- "-----END PRIVATE KEY-----" \
-            || { echo "::error::APP_STORE_CONNECT_PRIVATE_KEY is missing its -----END PRIVATE KEY----- line"; exit 1; }
+            || { echo "::error::APP_STORE_CONNECT_PRIVATE_KEY is truncated: no -----END PRIVATE KEY----- line. $hint"; exit 1; }
+
+          # Tolerate a key whose base64 body arrived on one line: rebuild the
+          # PEM with the 64-column wrapping CryptoKit expects.
+          if [ "$(grep -c '' "$key")" -le 3 ]; then
+            body=$(sed -e 's/-----BEGIN PRIVATE KEY-----//' -e 's/-----END PRIVATE KEY-----//' "$key" \
+                   | tr -d ' \t\n\r')
+            { echo "-----BEGIN PRIVATE KEY-----"
+              echo "$body" | fold -w 64
+              echo "-----END PRIVATE KEY-----"; } > "$key.wrapped"
+            mv "$key.wrapped" "$key"
+            chmod 600 "$key"
+            echo "rewrapped single-line key body to $(grep -c '' "$key") lines"
+          fi
           openssl pkey -in "$key" -noout \
             || { echo "::error::The key is not a valid PKCS#8 private key. Re-download or re-copy the .p8 from App Store Connect."; exit 1; }
           echo "openssl: key parses as a valid PKCS#8 private key"
