@@ -1,20 +1,19 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:rhcsa_quiz/app_scope.dart';
 import 'package:rhcsa_quiz/data/repository.dart';
-import 'package:rhcsa_quiz/screens/home_screen.dart';
+import 'package:rhcsa_quiz/main.dart';
 import 'package:rhcsa_quiz/services/progress_store.dart';
-import 'package:rhcsa_quiz/theme.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-/// Boots the real widget tree over the real asset bundle.
+/// Boots the real app root over the real asset bundle.
 ///
-/// NOTE: only ONE widget test can live in this file. On this machine the first
-/// `testWidgets` in a file passes in milliseconds and every subsequent one
-/// hangs until the 10-minute timeout, whatever it does — a flutter_tester
-/// problem, not an app one. So bank content is asserted far more cheaply in
-/// bank_test.dart (plain Dart, no widget tree), and layout at phone sizes is
-/// verified against the desktop build instead:
+/// Assets are read inside `tester.runAsync` and handed to the app as a
+/// pre-resolved boot future: `rootBundle` reads are real I/O, and real I/O
+/// never completes inside the fake-async zone a widget test runs in. Loading
+/// them from inside the widget tree instead makes the boot FutureBuilder spin
+/// on its progress indicator until pumpAndSettle times out — which is what
+/// used to limit this file to a single test.
+///
+/// Layout at phone sizes is verified against the desktop build:
 ///
 ///   flutter build linux --debug
 ///   RHCSA_WINDOW_SIZE=320x568 ./build/linux/x64/debug/bundle/rhcsa_quiz
@@ -23,20 +22,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 /// was run at 320x568 and reported zero overflow markers.
 Future<Repository> _boot(WidgetTester tester) async {
   SharedPreferences.setMockInitialValues({});
-  final repository = await Repository.load();
-  final progress = await ProgressStore.load();
-  await tester.pumpWidget(
-    MaterialApp(
-      theme: buildTheme(Brightness.light),
-      home: AppScope(
-        repository: repository,
-        progress: progress,
-        child: const HomeScreen(),
-      ),
-    ),
-  );
+  final data = await tester.runAsync(() async {
+    return (await Repository.load(), await ProgressStore.load());
+  });
+  await tester.pumpWidget(RhcsaQuizApp(boot: Future.value(data!)));
   await tester.pumpAndSettle();
-  return repository;
+  return data.$1;
 }
 
 void main() {

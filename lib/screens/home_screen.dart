@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
 import '../app_scope.dart';
+import '../data/quiz_builder.dart';
 import '../models/quiz.dart';
+import 'quiz_screen.dart';
 import 'quiz_setup_screen.dart';
 import 'stats_screen.dart';
 import 'syllabus_screen.dart';
@@ -88,8 +90,8 @@ class _PracticeTab extends StatelessWidget {
           _QuickCard(
             icon: Icons.bolt,
             title: 'Quick 20',
-            subtitle: 'Mixed questions from every chapter',
-            onTap: () => _start(
+            subtitle: 'Straight into 20 mixed questions',
+            onTap: () => _startNow(
               context,
               const QuizConfig(questionCount: 20),
               'Quick 20',
@@ -117,7 +119,7 @@ class _PracticeTab extends StatelessWidget {
             icon: Icons.timer_outlined,
             title: 'Mock exam',
             subtitle: '40 questions · 60 minutes · feedback at the end',
-            onTap: () => _start(
+            onTap: () => _startNow(
               context,
               const QuizConfig(
                 questionCount: 40,
@@ -145,10 +147,30 @@ class _PracticeTab extends StatelessWidget {
     );
   }
 
+  /// Opens the setup screen so the session can be narrowed before it starts.
   void _start(BuildContext context, QuizConfig config, String title) {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (_) => QuizSetupScreen(initial: config, title: title),
+      ),
+    );
+  }
+
+  /// Draws the questions here and goes straight to the quiz. Used by presets
+  /// whose whole point is that there is nothing to configure.
+  void _startNow(BuildContext context, QuizConfig config, String title) {
+    final scope = AppScope.of(context);
+    final items = QuizBuilder(scope.repository.questions)
+        .build(config, missed: scope.notifier!.missedIds);
+    if (items.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No questions available.')),
+      );
+      return;
+    }
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => QuizScreen(items: items, config: config, label: title),
       ),
     );
   }
