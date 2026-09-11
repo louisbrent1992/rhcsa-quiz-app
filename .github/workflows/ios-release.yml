@@ -84,8 +84,9 @@ jobs:
 
           echo "$KEY_ID" | grep -Eq '^[A-Z0-9]{10}$' \
             || { echo "::error::APP_STORE_CONNECT_KEY_ID should be the 10-character Key ID that also appears in the AuthKey_<KEY_ID>.p8 filename."; exit 1; }
-          [ "$KEY_ID" != "$TEAM_ID" ] \
-            || { echo "::error::APP_STORE_CONNECT_KEY_ID and APPLE_TEAM_ID are the same value; one of them is wrong."; exit 1; }
+          if [ "$KEY_ID" = "$TEAM_ID" ]; then
+            echo "::warning::APPLE_TEAM_ID holds the same value as the Key ID. The next step asks Apple for the real Team ID."
+          fi
 
       # xcodebuild looks for the key by name in ~/private_keys. CryptoKit's PEM
       # parser is strict: a stray CR or a missing trailing newline is enough
@@ -169,6 +170,37 @@ jobs:
               print("  -", a["attributes"].get("bundleId"))
           if not any(a["attributes"].get("bundleId") == "com.app.rhcsa-quiz" for a in apps):
               print("::warning::No app record for com.app.rhcsa-quiz yet. The archive can still create the bundle ID, but a TestFlight upload needs the record to exist.")
+
+          # A bundle ID record carries seedId, which IS the Team ID. Use it to
+          # confirm or correct APPLE_TEAM_ID: the Team ID and the Key ID are
+          # both 10 characters, so a swap is invisible until signing fails.
+          req = urllib.request.Request(
+              "https://api.appstoreconnect.apple.com/v1/bundleIds?limit=200",
+              headers={"Authorization": f"Bearer {token}"},
+          )
+          try:
+              bundles = json.load(urllib.request.urlopen(req)).get("data", [])
+          except urllib.error.HTTPError as e:
+              print(f"::warning::Could not list bundle IDs (HTTP {e.code}); leaving APPLE_TEAM_ID as given.")
+              bundles = []
+
+          seeds = {b["attributes"].get("seedId") for b in bundles if b["attributes"].get("seedId")}
+          print(f"registered bundle IDs: {len(bundles)}, team IDs seen: {sorted(seeds) or 'none'}")
+          for b in bundles:
+              print("  *", b["attributes"].get("identifier"), "->", b["attributes"].get("seedId"))
+
+          team = os.environ["TEAM_ID"]
+          if seeds and team not in seeds:
+              if len(seeds) == 1:
+                  real = seeds.pop()
+                  print(f"::warning::APPLE_TEAM_ID is wrong. Apple reports this account's Team ID as {real}; using it for this build. Update the secret: gh secret set APPLE_TEAM_ID")
+                  with open(os.environ["GITHUB_ENV"], "a") as fh:
+                      fh.write(f"TEAM_ID={real}\n")
+              else:
+                  print(f"::error::APPLE_TEAM_ID is not one of this account's team IDs {sorted(seeds)}; set it to the right one.")
+                  raise SystemExit(1)
+          elif seeds:
+              print("APPLE_TEAM_ID matches Apple's records.")
           PY
 
       - name: Install dependencies
