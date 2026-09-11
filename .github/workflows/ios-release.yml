@@ -100,6 +100,48 @@ jobs:
             || { echo "::error::The key is not a valid PKCS#8 private key. Re-download or re-copy the .p8 from App Store Connect."; exit 1; }
           echo "openssl: key parses as a valid PKCS#8 private key"
 
+      # Ask App Store Connect directly before spending four minutes on a build
+      # that will fail: Xcode reports key problems only as an opaque 401 from
+      # listTeams.action, while the API returns the actual reason.
+      - name: Verify API key against App Store Connect
+        run: |
+          python3 -m pip install --quiet --disable-pip-version-check pyjwt cryptography
+          python3 - <<'PY'
+          import json, os, time, urllib.error, urllib.request
+          import jwt
+
+          key_id, issuer = os.environ["KEY_ID"], os.environ["ISSUER_ID"]
+          key = open(os.path.expanduser(f"~/private_keys/AuthKey_{key_id}.p8")).read()
+          now = int(time.time())
+          token = jwt.encode(
+              {"iss": issuer, "iat": now, "exp": now + 600, "aud": "appstoreconnect-v1"},
+              key,
+              algorithm="ES256",
+              headers={"kid": key_id, "typ": "JWT"},
+          )
+          req = urllib.request.Request(
+              "https://api.appstoreconnect.apple.com/v1/apps?limit=200",
+              headers={"Authorization": f"Bearer {token}"},
+          )
+          try:
+              body = json.load(urllib.request.urlopen(req))
+          except urllib.error.HTTPError as e:
+              detail = e.read().decode()[:1000]
+              print(f"::error::App Store Connect rejected the API key (HTTP {e.code}). {detail}")
+              if e.code == 401:
+                  print("::error::A 401 means the Key ID, the Issuer ID, or the .p8 do not belong together, or the key was revoked. Check APP_STORE_CONNECT_KEY_ID matches the AuthKey_<ID>.p8 filename and APP_STORE_CONNECT_ISSUER_ID is the UUID at the top of the Integrations page.")
+              if e.code == 403:
+                  print("::error::A 403 means the key authenticated but lacks the role. It needs App Manager or Admin to create profiles and upload builds.")
+              raise SystemExit(1)
+
+          apps = body.get("data", [])
+          print(f"API key accepted. {len(apps)} app record(s) visible:")
+          for a in apps:
+              print("  -", a["attributes"].get("bundleId"))
+          if not any(a["attributes"].get("bundleId") == "com.app.rhcsa-quiz" for a in apps):
+              print("::warning::No app record for com.app.rhcsa-quiz yet. The archive can still create the bundle ID, but a TestFlight upload needs the record to exist.")
+          PY
+
       - name: Install dependencies
         run: flutter pub get
 
