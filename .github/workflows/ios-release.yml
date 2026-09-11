@@ -105,8 +105,11 @@ jobs:
       # listTeams.action, while the API returns the actual reason.
       - name: Verify API key against App Store Connect
         run: |
-          python3 -m pip install --quiet --disable-pip-version-check pyjwt cryptography
-          python3 - <<'PY'
+          # A venv, because the runner's Homebrew python refuses global installs
+          # with "externally-managed-environment".
+          python3 -m venv "$RUNNER_TEMP/ascvenv"
+          "$RUNNER_TEMP/ascvenv/bin/pip" install --quiet --disable-pip-version-check pyjwt cryptography
+          "$RUNNER_TEMP/ascvenv/bin/python" - <<'PY'
           import json, os, time, urllib.error, urllib.request
           import jwt
 
