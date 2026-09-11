@@ -65,8 +65,8 @@ as collection, so "No data collected" is the accurate answer.
 - Full description (4000 chars max): draft below.
 
 Graphics required before you can publish:
-- App icon: 512x512 PNG, 32-bit
-- Feature graphic: 1024x500 PNG or JPG
+- App icon: store/play_icon_512.png (512x512, no alpha)
+- Feature graphic: store/feature_graphic_1024x500.png
 - Phone screenshots: at least 2 (16:9 or 9:16, min 320px on the short side)
 
 ### Full description draft
@@ -79,7 +79,7 @@ with explanations, and track which topics you have covered. Everything runs
 entirely on your device.
 
 FEATURES
-- Practice questions grouped by exam objective
+- 478 practice questions across all 22 chapters
 - Answer explanations so a missed question teaches you something
 - Local progress tracking across sessions
 - Works completely offline — no account, no sign-up
@@ -93,6 +93,6 @@ for official Red Hat training.
 ## Known blockers before rollout
 - [ ] Privacy policy URL live and reachable
 - [ ] All App content sections green
-- [ ] Store listing graphics uploaded
+- [ ] Store listing graphics uploaded (icon + feature graphic generated; screenshots supplied manually)
 - [ ] `android:label` and pubspec description set to real values
 - [ ] Version bumped in pubspec.yaml for each upload
