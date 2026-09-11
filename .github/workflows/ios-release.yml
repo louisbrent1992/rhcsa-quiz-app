@@ -82,9 +82,15 @@ jobs:
       # --config-only writes Generated.xcconfig without building; the Flutter
       # code is then compiled by the Runner target's build phase during the
       # archive below, which is what makes the archive signable.
+      #
+      # --no-codesign is required even though this build IS signed: this step
+      # only writes config, and without it Flutter aborts on an up-front
+      # "no valid code signing certificates" check. Signing happens in the
+      # archive step, where the API key lets Xcode mint the certificate and
+      # profile via cloud-managed signing.
       - name: Prepare Xcode project
         run: |
-          flutter build ios --release --config-only
+          flutter build ios --release --config-only --no-codesign
           cd ios && pod install
 
       - name: Archive
