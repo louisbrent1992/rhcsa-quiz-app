@@ -1,0 +1,916 @@
+{
+ "edition": "RHCSA Red Hat Enterprise Linux 10 (EX200), 4th Edition \u2014 Asghar Ghori",
+ "chapters": [
+  {
+   "num": 1,
+   "title": "Local Installation",
+   "topics": [
+    "Explain Linux, Open Source, and the Red Hat Ecosystem",
+    "Plan Your RHCSA Lab Environment: A Step-by-Step Guide",
+    "Describe the RHEL Installer Program",
+    "Monitor the Installation: Logs and Consoles",
+    "Install VirtualBox and Create Virtual Machine",
+    "Perform a Custom RHEL Installation",
+    "Access Your New RHEL System Locally and Remotely"
+   ],
+   "objectives": [
+    4
+   ]
+  },
+  {
+   "num": 2,
+   "title": "Initial System Interaction",
+   "topics": [
+    "Navigate the GNOME Desktop and Wayland Display Protocol",
+    "Explain the Linux Filesystem Hierarchy Standard",
+    "Identify and Describe the Top-Level RHEL Directories",
+    "Describe Command-Line Fundamentals",
+    "Use Core Linux Commands for Navigation and Inspection",
+    "Access Help using Native Tools and Documentation"
+   ],
+   "objectives": [
+    1,
+    11
+   ]
+  },
+  {
+   "num": 3,
+   "title": "File Management and Editing",
+   "topics": [
+    "Identify Common Linux File Types",
+    "Compress and Uncompress Files",
+    "Create and Manage Archives",
+    "Edit Text Files using the vim Editor",
+    "Perform Essential File and Directory Operations",
+    "Create Hard and Soft Links",
+    "Differentiate between Copying and Linking"
+   ],
+   "objectives": [
+    6,
+    7,
+    8,
+    9
+   ]
+  },
+  {
+   "num": 4,
+   "title": "File Permissions and Searching",
+   "topics": [
+    "Interpret and Modify File and Directory Permissions",
+    "Apply Permissions with Symbolic and Octal Notations",
+    "Change Access Rights for the Owner, Group, and Public",
+    "Configure Default Permissions for New Files and Directories",
+    "Locate Files and Directories using a Variety of Ways"
+   ],
+   "objectives": [
+    10,
+    40,
+    56
+   ]
+  },
+  {
+   "num": 5,
+   "title": "Basic User and Group Management",
+   "topics": [
+    "Monitor Current and Past User Logins",
+    "Inspect System Reboot History",
+    "Query User and Group Identity Information",
+    "Decode the Structure of the Local User Authentication Files",
+    "Manage the User Lifecycle: Creating, Modifying, and Deleting Local User Accounts",
+    "Assign and Change User Passwords",
+    "Create Non-Login User Accounts"
+   ],
+   "objectives": [
+    51,
+    52
+   ]
+  },
+  {
+   "num": 6,
+   "title": "Advanced User and Group Management",
+   "topics": [
+    "Enforce Password Security Policies with Aging Attributes",
+    "Lock and Unlock User Accounts to Control System Access",
+    "Manage Group Memberships and Properties",
+    "Switch User Identities",
+    "Delegate Administrative Privileges",
+    "Change File and Directory Owning User and Owning Group"
+   ],
+   "objectives": [
+    5,
+    52,
+    53,
+    54
+   ]
+  },
+  {
+   "num": 7,
+   "title": "The Bash Shell",
+   "topics": [
+    "Navigate and Interact with the System Efficiently",
+    "Manage Shell and Environment Variables",
+    "Use Command and Variable Substitutions",
+    "Leverage Shell Features such as Tab Completion, Command History, Quick Navigation and Editing at the Command Line, Tilde Substitution, and Alias Substitution",
+    "Utilize Metacharacters in Redirections, Piping, and Quoting Mechanisms",
+    "Perform Pattern Matching using Filename Globbing",
+    "Implement Pattern Matching using Regular Expressions",
+    "Configure System-Wide and Per-User Shell Environments"
+   ],
+   "objectives": [
+    2,
+    3
+   ]
+  },
+  {
+   "num": 8,
+   "title": "Bash Shell Scripting",
+   "topics": [
+    "Explain the Purpose of Scripts and How to Create them",
+    "Build Your First Scripts: Display System Data, Use Variables, and Process Command-Line Arguments",
+    "Execute Scripts and Implement Debugging Techniques",
+    "Implement Logic with Exit Codes and Tests",
+    "Control Script Flow with Conditional Statements",
+    "Automate Repetitive Tasks with Looping Constructs"
+   ],
+   "objectives": [
+    16,
+    17,
+    18,
+    19
+   ]
+  },
+  {
+   "num": 9,
+   "title": "Process Management and Job Scheduling",
+   "topics": [
+    "View and Identify Processes to Monitor System Activity",
+    "Inspect Process States and Understand How Execution Priority is Determined",
+    "Adjust Process Niceness to Influence CPU Scheduling",
+    "Terminate, Pause, and Restart Programs with Signals",
+    "Run Commands in the Future without Manual Intervention",
+    "Control Which Users can Schedule Tasks",
+    "Schedule and Manage One-Time Jobs",
+    "Describe the Crontab Syntax to Automate Routine Tasks",
+    "Schedule and Manage Recurring Jobs"
+   ],
+   "objectives": [
+    23,
+    24,
+    41
+   ]
+  },
+  {
+   "num": 10,
+   "title": "Basic Package Management",
+   "topics": [
+    "Explain the Structure, Naming Conventions, and Management Tools for Red Hat Packages",
+    "Describe the Concepts of Package Dependencies and the RPM Database",
+    "Query, Install, Upgrade, Freshen, Overwrite, and Remove Packages",
+    "Extract Files from Installable Packages",
+    "Validate Package Integrity and Authenticity",
+    "View GPG Keys and Verify Package and File Attributes",
+    "Perform Comprehensive Package Management Using the rpm Command"
+   ],
+   "objectives": [
+    12,
+    13,
+    45
+   ]
+  },
+  {
+   "num": 11,
+   "title": "Advanced Package and Repository Management",
+   "topics": [
+    "Describe Package Groups",
+    "Configure and Access Software Repositories",
+    "Perform Software Management Operations using dnf",
+    "List, Install, Update, and Remove Individual Packages and Package Groups",
+    "Display Detailed Package Information and Search Metadata",
+    "Examine the Contents and Details of Available Package Groups"
+   ],
+   "objectives": [
+    12,
+    13,
+    45
+   ]
+  },
+  {
+   "num": 12,
+   "title": "Flatpak Application Management",
+   "topics": [
+    "Explore the Flatpak Application Framework and its Containerized Approach",
+    "Explain the Core Architecture, including Sandboxing and OSTree Storage",
+    "Compare and Contrast Flatpak Applications with Traditional RPM Packages",
+    "Configure and Manage Flatpak Remotes (Repositories)",
+    "Search for, Install, Run, Update, and Remove Flatpak Applications and Runtimes",
+    "Manage Application Permissions"
+   ],
+   "objectives": [
+    14,
+    15
+   ]
+  },
+  {
+   "num": 13,
+   "title": "Boot Process, GRUB2, and the Linux Kernel",
+   "topics": [
+    "Explain the Linux Boot Process: Firmware, Bootloader, Kernel, and Initialization",
+    "Interact with GRUB2 to Interrupt the Boot Process and Modify Boot Parameters",
+    "Manage GRUB2 Configuration to Persistently Change Boot Settings",
+    "Boot the System Into Specific Targets for Troubleshooting or Testing",
+    "Recover System Access by Resetting a Lost or Forgotten root Password",
+    "Analyze the Linux Kernel, including its Package Composition, Version Anatomy, and Critical Directories",
+    "Update the Kernel by Downloading and Installing a New Version without Removing the Old One"
+   ],
+   "objectives": [
+    22,
+    46
+   ]
+  },
+  {
+   "num": 14,
+   "title": "System Initialization, Message Logging, and System Tuning",
+   "topics": [
+    "Explain the Concepts of systemd Units and Targets",
+    "Manage systemd Services and Targets",
+    "Display and Configure Default System Boot Target",
+    "Switch to Non-Default Targets for Testing or Troubleshooting",
+    "Analyze System Log Configuration File",
+    "Examine Log Rotation Settings",
+    "Record Custom Messages in System Log File",
+    "Retrieve, Filter, and Scrutinize Log Messages from systemd Journal",
+    "Configure Persistent Journal Storage to Maintain Log Data Across System Reboots",
+    "Apply and Manage Tuning Profiles to Enhance System Performance"
+   ],
+   "objectives": [
+    20,
+    21,
+    25,
+    26,
+    27,
+    28,
+    42,
+    43,
+    49
+   ]
+  },
+  {
+   "num": 15,
+   "title": "Storage Management",
+   "topics": [
+    "Compare and Contrast Partition Tables: Master Boot Record (MBR) vs. GUID Partition Table (GPT)",
+    "Identify Disks and Disk Partitions",
+    "Create and Delete Partitions on MBR and GPT Disks",
+    "Implement Thin Provisioning to Optimize Storage Allocation",
+    "Describe Logical Volume Manager (LVM) and its Core Components",
+    "Perform LVM Administration: Creating, Extending, Reducing, Renaming, and Removing all LVM Components",
+    "Deconstruct LVM Configuration Non-Destructively and Return Disks to their Raw State"
+   ],
+   "objectives": [
+    30,
+    31,
+    32,
+    33,
+    35,
+    39
+   ]
+  },
+  {
+   "num": 16,
+   "title": "Local File Systems and Swap Space",
+   "topics": [
+    "Describe and Differentiate Key File System Types: Ext4, XFS, VFAT, and ISO9660",
+    "Configure Persistent File System Mounting Using Device Names, UUIDs, and Labels",
+    "Create, Mount, and Resize File Systems in Partitions and Logical Volumes",
+    "Monitor Storage Utilization and Calculate Disk Usage",
+    "Implement and Manage Swap Space in Partitions and Logical Volumes"
+   ],
+   "objectives": [
+    34,
+    35,
+    36,
+    39
+   ]
+  },
+  {
+   "num": 17,
+   "title": "Networking Essentials and Network Connections",
+   "topics": [
+    "Define Fundamental Networking Concepts: Hostnames, Protocols, Ports, and Ethernet Addresses",
+    "Change System Hostname Persistently Using Multiple Methods",
+    "Compare IPv4 and IPv6 Addressing",
+    "Explain Classful and Classless Network Addressing, and Subnetting",
+    "Describe Consistent Device Naming",
+    "Differentiate Between Physical Network Device and Logical Connection Profile",
+    "Analyze the Structure of a Network Connection Profile",
+    "Manage Network Interfaces and Connections",
+    "Configure Static IP Addresses",
+    "Utilize the hosts Table for Hostname-to-IP Resolution",
+    "Verify Network Configuration and Test Connectivity"
+   ],
+   "objectives": [
+    47
+   ]
+  },
+  {
+   "num": 18,
+   "title": "Network File System and AutoFS",
+   "topics": [
+    "Describe the Core Concepts and Architecture of the Network File System (NFS) Service",
+    "Explain the Advantages of NFS and the Difference Between its Versions",
+    "Configure an NFS Server to Share a Directory with Specific Clients",
+    "Mount an NFS Share on a Client Manually and Persistently",
+    "Discover the AutoFS Service: Learn How it Works, its Benefits over Static Mounts, and Key Components",
+    "Analyze AutoFS Maps to Control Automount Behavior",
+    "Mount NFS Shares On-Demand Using Direct and Indirect Mapping Techniques",
+    "Configure NFS and AutoFS to Centrally Store and Automatically Mount User Home Directories"
+   ],
+   "objectives": [
+    37,
+    38
+   ]
+  },
+  {
+   "num": 19,
+   "title": "Hostname Resolution and Time Synchronization",
+   "topics": [
+    "Explain the Domain Name System (DNS) and its Role in Hostname Resolution",
+    "Identify the Different Roles a System can Play in a DNS Architecture",
+    "Analyze Entries in Resolver Configuration Files",
+    "Employ a Suite of Lookup Tools to Test and Troubleshoot Name Resolution",
+    "Describe the Importance of Time Synchronization and the Network Time Protocol (NTP)",
+    "Characterize Key NTP Concepts: Time Sources, NTP Roles, and Stratum Levels",
+    "Examine the Structure of the Chrony Configuration File and its Key Directives",
+    "Configure NTP/Chrony Client and Verify its Synchronization Status",
+    "View, Set, and Adjust the Date and Time"
+   ],
+   "objectives": [
+    44,
+    48
+   ]
+  },
+  {
+   "num": 20,
+   "title": "The Secure Shell Service",
+   "topics": [
+    "Describe the OpenSSH Service, its Versions, and Supported Algorithms",
+    "Examine Core Encryption Techniques and Authentication Methods",
+    "Explain OpenSSH Configuration Files",
+    "Use OpenSSH Administration Commands",
+    "Implement Public/Private Key-Based Authentication for Enhanced Security",
+    "Run Commands on Remote Linux Systems",
+    "Transfer Files Security between Linux Systems"
+   ],
+   "objectives": [
+    4,
+    29,
+    54,
+    57
+   ]
+  },
+  {
+   "num": 21,
+   "title": "The Linux Firewall",
+   "topics": [
+    "Implement Host-Based Security Control with the Linux Firewall",
+    "Describe the firewalld Service and its Purpose",
+    "Explain the Concepts of firewalld Zones and Services",
+    "Analyze the Structure of Zone and Service Configuration Files",
+    "Control Access to Network Services and Ports Using firewalld",
+    "Manage Firewall Rules with the firewall-cmd Command"
+   ],
+   "objectives": [
+    50,
+    55
+   ]
+  },
+  {
+   "num": 22,
+   "title": "Security Enhanced Linux",
+   "topics": [
+    "Describe Security Enhanced Linux (SELinux) and its Key Terminology",
+    "Explain SELinux Contexts for Users, Processes, Files, and Network Ports",
+    "Copy, Move, and Archive Files with and without SELinux Context",
+    "Describe How Domain Transitioning Works",
+    "Define SELinux Booleans",
+    "Query and Manage SELinux Using Command-Line Tools",
+    "Modify SELinux Contexts for Files and Network Ports",
+    "Add New SELinux Rules to the Policy Database",
+    "View and Analyze SELinux Alert Messages"
+   ],
+   "objectives": [
+    58,
+    59,
+    60,
+    61,
+    62
+   ]
+  }
+ ],
+ "objectives": [
+  {
+   "id": 1,
+   "section": "Understand and Use Essential Tools",
+   "text": "Access a shell prompt and issue commands with correct syntax",
+   "chapters": [
+    2
+   ]
+  },
+  {
+   "id": 2,
+   "section": "Understand and Use Essential Tools",
+   "text": "Use input-output redirection (>, >>, |, 2>, etc)",
+   "chapters": [
+    7
+   ]
+  },
+  {
+   "id": 3,
+   "section": "Understand and Use Essential Tools",
+   "text": "Use grep and regular expressions to analyze text",
+   "chapters": [
+    7
+   ]
+  },
+  {
+   "id": 4,
+   "section": "Understand and Use Essential Tools",
+   "text": "Access remote systems using ssh",
+   "chapters": [
+    1,
+    20
+   ]
+  },
+  {
+   "id": 5,
+   "section": "Understand and Use Essential Tools",
+   "text": "Log in and switch users in multiuser targets",
+   "chapters": [
+    6
+   ]
+  },
+  {
+   "id": 6,
+   "section": "Understand and Use Essential Tools",
+   "text": "Archive, compress, unpack, and uncompress files using tar, gzip, and bzip2",
+   "chapters": [
+    3
+   ]
+  },
+  {
+   "id": 7,
+   "section": "Understand and Use Essential Tools",
+   "text": "Create and edit text files",
+   "chapters": [
+    3
+   ]
+  },
+  {
+   "id": 8,
+   "section": "Understand and Use Essential Tools",
+   "text": "Create, delete, copy, and move files and directories",
+   "chapters": [
+    3
+   ]
+  },
+  {
+   "id": 9,
+   "section": "Understand and Use Essential Tools",
+   "text": "Create hard and soft links",
+   "chapters": [
+    3
+   ]
+  },
+  {
+   "id": 10,
+   "section": "Understand and Use Essential Tools",
+   "text": "List, set, and change standard ugo/rwx permissions",
+   "chapters": [
+    4
+   ]
+  },
+  {
+   "id": 11,
+   "section": "Understand and Use Essential Tools",
+   "text": "Locate, read, and use system documentation including man, info, and files in /usr/share/doc",
+   "chapters": [
+    2
+   ]
+  },
+  {
+   "id": 12,
+   "section": "Manage Software",
+   "text": "Configure access to RPM repositories",
+   "chapters": [
+    10,
+    11
+   ]
+  },
+  {
+   "id": 13,
+   "section": "Manage Software",
+   "text": "Install and remove RPM software packages",
+   "chapters": [
+    10,
+    11
+   ]
+  },
+  {
+   "id": 14,
+   "section": "Manage Software",
+   "text": "Configure access to Flatpak repositories",
+   "chapters": [
+    12
+   ]
+  },
+  {
+   "id": 15,
+   "section": "Manage Software",
+   "text": "Install and remove Flatpak software packages",
+   "chapters": [
+    12
+   ]
+  },
+  {
+   "id": 16,
+   "section": "Create Simple Shell Scripts",
+   "text": "Conditionally execute code (use of: if, test, [], etc.)",
+   "chapters": [
+    8
+   ]
+  },
+  {
+   "id": 17,
+   "section": "Create Simple Shell Scripts",
+   "text": "Use looping constructs (for, etc.) to process file, command line input",
+   "chapters": [
+    8
+   ]
+  },
+  {
+   "id": 18,
+   "section": "Create Simple Shell Scripts",
+   "text": "Process script inputs ($1, $2, etc.)",
+   "chapters": [
+    8
+   ]
+  },
+  {
+   "id": 19,
+   "section": "Create Simple Shell Scripts",
+   "text": "Processing output of shell commands within a script",
+   "chapters": [
+    8
+   ]
+  },
+  {
+   "id": 20,
+   "section": "Operate Running Systems",
+   "text": "Boot, reboot, and shut down a system normally",
+   "chapters": [
+    14
+   ]
+  },
+  {
+   "id": 21,
+   "section": "Operate Running Systems",
+   "text": "Boot systems into different targets manually",
+   "chapters": [
+    14
+   ]
+  },
+  {
+   "id": 22,
+   "section": "Operate Running Systems",
+   "text": "Interrupt the boot process in order to gain access to a system",
+   "chapters": [
+    13
+   ]
+  },
+  {
+   "id": 23,
+   "section": "Operate Running Systems",
+   "text": "Identify CPU/memory intensive processes and kill processes",
+   "chapters": [
+    9
+   ]
+  },
+  {
+   "id": 24,
+   "section": "Operate Running Systems",
+   "text": "Adjust process scheduling",
+   "chapters": [
+    9
+   ]
+  },
+  {
+   "id": 25,
+   "section": "Operate Running Systems",
+   "text": "Manage tuning profiles",
+   "chapters": [
+    14
+   ]
+  },
+  {
+   "id": 26,
+   "section": "Operate Running Systems",
+   "text": "Locate and interpret system log files and journals",
+   "chapters": [
+    14
+   ]
+  },
+  {
+   "id": 27,
+   "section": "Operate Running Systems",
+   "text": "Preserve system journals",
+   "chapters": [
+    14
+   ]
+  },
+  {
+   "id": 28,
+   "section": "Operate Running Systems",
+   "text": "Start, stop, and check the status of network services",
+   "chapters": [
+    14
+   ]
+  },
+  {
+   "id": 29,
+   "section": "Operate Running Systems",
+   "text": "Securely transfer files between systems",
+   "chapters": [
+    20
+   ]
+  },
+  {
+   "id": 30,
+   "section": "Configure Local Storage",
+   "text": "List, create, and delete partitions on MBR and GPT disks",
+   "chapters": [
+    15
+   ]
+  },
+  {
+   "id": 31,
+   "section": "Configure Local Storage",
+   "text": "Create and remove physical volumes",
+   "chapters": [
+    15
+   ]
+  },
+  {
+   "id": 32,
+   "section": "Configure Local Storage",
+   "text": "Assign physical volumes to volume groups",
+   "chapters": [
+    15
+   ]
+  },
+  {
+   "id": 33,
+   "section": "Configure Local Storage",
+   "text": "Create and delete logical volumes",
+   "chapters": [
+    15
+   ]
+  },
+  {
+   "id": 34,
+   "section": "Configure Local Storage",
+   "text": "Configure systems to mount file systems at boot by UUID or label",
+   "chapters": [
+    16
+   ]
+  },
+  {
+   "id": 35,
+   "section": "Configure Local Storage",
+   "text": "Add new partitions and logical volumes, and swap to a system non-destructively",
+   "chapters": [
+    15,
+    16
+   ]
+  },
+  {
+   "id": 36,
+   "section": "Create and Configure File Systems",
+   "text": "Create, mount, unmount, and use vfat, ext4, and xfs file systems",
+   "chapters": [
+    16
+   ]
+  },
+  {
+   "id": 37,
+   "section": "Create and Configure File Systems",
+   "text": "Mount and unmount network file systems using NFS",
+   "chapters": [
+    18
+   ]
+  },
+  {
+   "id": 38,
+   "section": "Create and Configure File Systems",
+   "text": "Configure autofs",
+   "chapters": [
+    18
+   ]
+  },
+  {
+   "id": 39,
+   "section": "Create and Configure File Systems",
+   "text": "Extend existing logical volumes",
+   "chapters": [
+    15,
+    16
+   ]
+  },
+  {
+   "id": 40,
+   "section": "Create and Configure File Systems",
+   "text": "Diagnose and correct file permission problems",
+   "chapters": [
+    4
+   ]
+  },
+  {
+   "id": 41,
+   "section": "Deploy, Configure, and Maintain Systems",
+   "text": "Schedule tasks using at and cron",
+   "chapters": [
+    9
+   ]
+  },
+  {
+   "id": 42,
+   "section": "Deploy, Configure, and Maintain Systems",
+   "text": "Start and stop services and configure services to start automatically at boot",
+   "chapters": [
+    14
+   ]
+  },
+  {
+   "id": 43,
+   "section": "Deploy, Configure, and Maintain Systems",
+   "text": "Configure systems to boot into a specific target automatically",
+   "chapters": [
+    14
+   ]
+  },
+  {
+   "id": 44,
+   "section": "Deploy, Configure, and Maintain Systems",
+   "text": "Configure time service clients",
+   "chapters": [
+    19
+   ]
+  },
+  {
+   "id": 45,
+   "section": "Deploy, Configure, and Maintain Systems",
+   "text": "Install and update software packages from Red Hat Network, a remote repository, or from the local file system",
+   "chapters": [
+    10,
+    11
+   ]
+  },
+  {
+   "id": 46,
+   "section": "Deploy, Configure, and Maintain Systems",
+   "text": "Modify the system bootloader",
+   "chapters": [
+    13
+   ]
+  },
+  {
+   "id": 47,
+   "section": "Manage Basic Networking",
+   "text": "Configure IPv4 and IPv6 addresses",
+   "chapters": [
+    17
+   ]
+  },
+  {
+   "id": 48,
+   "section": "Manage Basic Networking",
+   "text": "Configure hostname resolution",
+   "chapters": [
+    19
+   ]
+  },
+  {
+   "id": 49,
+   "section": "Manage Basic Networking",
+   "text": "Configure network services to start automatically at boot",
+   "chapters": [
+    14
+   ]
+  },
+  {
+   "id": 50,
+   "section": "Manage Basic Networking",
+   "text": "Restrict network access using firewall-cmd/firewall",
+   "chapters": [
+    21
+   ]
+  },
+  {
+   "id": 51,
+   "section": "Manage Users and Groups",
+   "text": "Create, delete, and modify local user accounts",
+   "chapters": [
+    5
+   ]
+  },
+  {
+   "id": 52,
+   "section": "Manage Users and Groups",
+   "text": "Change passwords and adjust password aging for local user accounts",
+   "chapters": [
+    5,
+    6
+   ]
+  },
+  {
+   "id": 53,
+   "section": "Manage Users and Groups",
+   "text": "Create, delete, and modify local groups and group memberships",
+   "chapters": [
+    6
+   ]
+  },
+  {
+   "id": 54,
+   "section": "Manage Users and Groups",
+   "text": "Configure superuser access",
+   "chapters": [
+    6,
+    20
+   ]
+  },
+  {
+   "id": 55,
+   "section": "Manage Security",
+   "text": "Configure firewall settings using firewall-cmd/firewalld",
+   "chapters": [
+    21
+   ]
+  },
+  {
+   "id": 56,
+   "section": "Manage Security",
+   "text": "Manage default file permissions",
+   "chapters": [
+    4
+   ]
+  },
+  {
+   "id": 57,
+   "section": "Manage Security",
+   "text": "Configure key-based authentication for SSH",
+   "chapters": [
+    20
+   ]
+  },
+  {
+   "id": 58,
+   "section": "Manage Security",
+   "text": "Set enforcing and permissive modes for SELinux",
+   "chapters": [
+    22
+   ]
+  },
+  {
+   "id": 59,
+   "section": "Manage Security",
+   "text": "List and identify SELinux file and process context",
+   "chapters": [
+    22
+   ]
+  },
+  {
+   "id": 60,
+   "section": "Manage Security",
+   "text": "Restore default file contexts",
+   "chapters": [
+    22
+   ]
+  },
+  {
+   "id": 61,
+   "section": "Manage Security",
+   "text": "Manage SELinux port labels",
+   "chapters": [
+    22
+   ]
+  },
+  {
+   "id": 62,
+   "section": "Manage Security",
+   "text": "Use Boolean settings to modify system SELinux settings",
+   "chapters": [
+    22
+   ]
+  }
+ ]
+}

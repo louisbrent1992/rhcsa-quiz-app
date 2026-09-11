@@ -1,0 +1,96 @@
+[
+{"id":"ch19-q01","chapter":19,"topic":"Explain the Domain Name System (DNS) and its Role in Hostname Resolution","objectives":[48],"type":"mcq","difficulty":2,
+ "prompt":"What is the root of the DNS name space represented by, and what sits directly below it?","options":["A period (.); the top-level domains such as .com, .net and .org","A slash (/); the second-level domains","The string 'root'; the country domains","An asterisk (*); the reverse lookup zones"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"redhat.com is a second-level domain under .com, and bugzilla.redhat.com a third-level domain under it. A name with a trailing period, such as net01.travel.gc.ca., is a Fully Qualified Domain Name."},
+
+{"id":"ch19-q02","chapter":19,"topic":"Identify the Different Roles a System can Play in a DNS Architecture","objectives":[48],"type":"mcq","difficulty":2,
+ "prompt":"What distinguishes a primary DNS server from a secondary one?","options":["The primary holds the master database where all changes are made; the secondary keeps an updated copy for redundancy","The secondary holds the master database; the primary caches it","The primary serves internal clients and the secondary external ones","Only the primary can answer reverse lookups"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"Each domain must have one primary server. Secondaries are optional but recommended — they keep answering queries if the primary becomes unreachable, and spread the load. A DNS server is also called a nameserver."},
+
+{"id":"ch19-q03","chapter":19,"topic":"Analyze Entries in Resolver Configuration Files","objectives":[48],"type":"mcq","difficulty":2,
+ "prompt":"Which file lists the DNS servers a client queries, and which directive names them?","options":["/etc/resolv.conf, using the nameserver directive","/etc/hosts, using the server directive","/etc/nsswitch.conf, using the dns directive","/etc/named.conf, using the nameserver directive"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"Nameservers are queried one at a time in the listed order. The other two directives are domain (the default domain) and search (up to six domains, the first being the local one). NetworkManager populates this file automatically."},
+
+{"id":"ch19-q04","chapter":19,"topic":"Analyze Entries in Resolver Configuration Files","objectives":[48],"type":"mcq","difficulty":3,
+ "prompt":"What does the entry `hosts: files dns` in /etc/nsswitch.conf mean?","options":["Consult /etc/hosts first; if the name is not found there, query DNS","Query DNS first, then fall back to /etc/hosts","Consult both simultaneously and use the faster answer","Use /etc/hosts only; dns is a comment"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"nsswitch.conf sets the sources and their order. Writing `hosts: files [notfound=return] dns` stops the lookup at /etc/hosts, preventing DNS from being consulted when the name is absent there."},
+
+{"id":"ch19-q05","chapter":19,"topic":"Analyze Entries in Resolver Configuration Files","objectives":[48],"type":"multi","difficulty":3,
+ "prompt":"Which nsswitch.conf status keywords control what happens after querying a source? (Select all that apply.)","options":["success — return, do not try the next source","notfound — continue to the next source","unavail — continue to the next source","tryagain — continue to the next source","timeout — abort the lookup"],"answer":[0,1,2,3],"accept":[],"canonical":null,
+ "explanation":"There is no timeout keyword. unavail means the source is down or not configured; tryagain means it is busy and should be retried later."},
+
+{"id":"ch19-q06","chapter":19,"topic":"Employ a Suite of Lookup Tools to Test and Troubleshoot Name Resolution","objectives":[48],"type":"multi","difficulty":2,
+ "prompt":"Which commands perform DNS name resolution lookups? (Select all that apply.)","options":["dig","host","nslookup","getent hosts","ping -n"],"answer":[0,1,2,3],"accept":[],"canonical":null,
+ "explanation":"dig is the most verbose and best for troubleshooting; host is the terser equivalent; nslookup can take a nameserver on the command line; getent reads whatever sources nsswitch.conf defines for the hosts database."},
+
+{"id":"ch19-q07","chapter":19,"topic":"Employ a Suite of Lookup Tools to Test and Troubleshoot Name Resolution","objectives":[48],"type":"command","difficulty":3,
+ "prompt":"Perform a reverse DNS lookup on the address 52.200.142.250 using dig.","options":[],"answer":[],
+ "accept":["dig -x 52\\.200\\.142\\.250"],"canonical":"dig -x 52.200.142.250",
+ "explanation":"-x asks dig for the name that corresponds to an address. Without a nameserver argument, dig uses whatever /etc/resolv.conf lists."},
+
+{"id":"ch19-q08","chapter":19,"topic":"Employ a Suite of Lookup Tools to Test and Troubleshoot Name Resolution","objectives":[48],"type":"command","difficulty":3,
+ "prompt":"Resolve redhat.com using the specific nameserver 8.8.8.8 rather than the one in resolv.conf, with nslookup.","options":[],"answer":[],
+ "accept":["nslookup redhat\\.com 8\\.8\\.8\\.8"],"canonical":"nslookup redhat.com 8.8.8.8",
+ "explanation":"Naming the server after the query overrides the resolver configuration — useful for confirming whether a problem is with your configured nameserver or with the record itself."},
+
+{"id":"ch19-q09","chapter":19,"topic":"Describe the Importance of Time Synchronization and the Network Time Protocol (NTP)","objectives":[44],"type":"mcq","difficulty":2,
+ "prompt":"Which NTP implementation ships with RHEL 10, and on which protocol and port does it operate?","options":["Chrony, over UDP port 123","ntpd, over TCP port 123","Chrony, over TCP port 323","systemd-timesyncd, over UDP port 37"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"Chrony suits machines that are intermittently connected, on busy networks, not running continuously, or subject to temperature-related clock drift."},
+
+{"id":"ch19-q10","chapter":19,"topic":"Characterize Key NTP Concepts: Time Sources, NTP Roles, and Stratum Levels","objectives":[44],"type":"mcq","difficulty":3,
+ "prompt":"What operates at stratum level 0, and how many stratum levels exist above it?","options":["Reference clocks (atomic, radio, GPS); fifteen levels, 1 through 15","Public time servers; seven levels","The local system clock; three levels","Peer servers; sixteen levels"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"A stratum 0 device cannot be used on the network directly — it attaches to a computer that then operates at stratum 1. Each level down synchronises from the one above it."},
+
+{"id":"ch19-q11","chapter":19,"topic":"Characterize Key NTP Concepts: Time Sources, NTP Roles, and Stratum Levels","objectives":[44],"type":"mcq","difficulty":3,
+ "prompt":"What is a peer in NTP terms?","options":["A server at the same stratum level that both provides and receives time","A client that never provides time","A stratum 0 reference clock","A backup for a failed primary server"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"The four roles are primary server, secondary server, peer and client. Peers exchange time reciprocally at the same stratum to improve accuracy and reliability."},
+
+{"id":"ch19-q12","chapter":19,"topic":"Characterize Key NTP Concepts: Time Sources, NTP Roles, and Stratum Levels","objectives":[44],"type":"mcq","difficulty":2,
+ "prompt":"Why is using the local system clock as a time source the least recommended option?","options":["It has no way to synchronise itself with a more accurate external source","It cannot be read by chronyd","It drifts only when the system is idle","It requires a GPS receiver"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"It needs manual correction. Public Internet time servers are preferred, and a radio clock — GPS, WWVB or DCF77 — is the most accurate option since it takes time straight from an atomic clock."},
+
+{"id":"ch19-q13","chapter":19,"topic":"Characterize Key NTP Concepts: Time Sources, NTP Roles, and Stratum Levels","objectives":[44],"type":"mcq","difficulty":3,
+ "prompt":"On what basis does NTP select among configured time sources?","options":["Delay, jitter and clock stability","Physical distance from the client","Alphabetical order of hostname","The size of the response packet"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"The best server is the one that responds most reliably, which may not be the closest one geographically. The client records its clock drift rate in a drift file so Chrony can compensate for systematic inaccuracy."},
+
+{"id":"ch19-q14","chapter":19,"topic":"Examine the Structure of the Chrony Configuration File and its Key Directives","objectives":[44],"type":"mcq","difficulty":2,
+ "prompt":"Which file configures the Chrony daemon?","options":["/etc/chrony.conf","/etc/ntp.conf","/etc/chrony/chronyd.conf","/etc/sysconfig/chrony"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"chronyd reads it at startup to learn its time sources, drift file and log directory. Edit it by hand and restart the service to apply changes."},
+
+{"id":"ch19-q15","chapter":19,"topic":"Examine the Structure of the Chrony Configuration File and its Key Directives","objectives":[44],"type":"mcq","difficulty":3,
+ "prompt":"What is the difference between the pool and server directives in chrony.conf?","options":["pool names a set of servers and Chrony switches between them on failure; server names a single time server","server names a set; pool names one","pool is for IPv6 and server for IPv4","They are interchangeable"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"A pool name such as 2.rhel.pool.ntp.org is backed by many volunteer servers. peer names a server at the same stratum, and driftfile sets where the clock drift rate is recorded."},
+
+{"id":"ch19-q16","chapter":19,"topic":"Examine the Structure of the Chrony Configuration File and its Key Directives","objectives":[44],"type":"mcq","difficulty":3,
+ "prompt":"What does the iburst option do on a pool or server line?","options":["Sends the first four requests two seconds apart so the clock converges quickly at startup","Bursts traffic continuously to keep the link warm","Ignores the server until the next reboot","Forces an immediate step of the clock"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"Chrony normally slews the clock gradually rather than stepping it abruptly; iburst just accelerates the initial convergence at service start."},
+
+{"id":"ch19-q17","chapter":19,"topic":"Configure NTP/Chrony Client and Verify its Synchronization Status","objectives":[44],"type":"command","difficulty":2,
+ "prompt":"Show the current time sources Chrony is using and their reachability.","options":[],"answer":[],
+ "accept":["chronyc sources( -v)?"],"canonical":"chronyc sources",
+ "explanation":"^ marks a server and * marks the source currently synchronised with. Reach 377 means every recent poll got a valid response, and Poll 6 means a 64-second polling interval."},
+
+{"id":"ch19-q18","chapter":19,"topic":"Configure NTP/Chrony Client and Verify its Synchronization Status","objectives":[44],"type":"command","difficulty":3,
+ "prompt":"Display Chrony's clock synchronisation and performance statistics, including the reference ID and system time offset.","options":[],"answer":[],
+ "accept":["chronyc tracking"],"canonical":"chronyc tracking",
+ "explanation":"tracking reports the current reference source, its stratum, the last measurement time, the local offset from NTP time and the frequency correction applied for drift."},
+
+{"id":"ch19-q19","chapter":19,"topic":"Configure NTP/Chrony Client and Verify its Synchronization Status","objectives":[44],"type":"command","difficulty":2,
+ "prompt":"Start chronyd now and configure it to start automatically at boot, in one command.","options":[],"answer":[],
+ "accept":["systemctl enable --now chronyd(\\.service)?","systemctl --now enable chronyd(\\.service)?"],"canonical":"systemctl enable --now chronyd",
+ "explanation":"On the exam there is no outside network, so comment out the default pool and server lines and add a single `server <hostname>` pointing at the NTP server provided on the exam network."},
+
+{"id":"ch19-q20","chapter":19,"topic":"View, Set, and Adjust the Date and Time","objectives":[44],"type":"command","difficulty":2,
+ "prompt":"Display the local time, universal time, RTC time, time zone and NTP status.","options":[],"answer":[],
+ "accept":["timedatectl( status)?"],"canonical":"timedatectl",
+ "explanation":"RTC time comes from the battery-backed hardware clock on the system board. timedatectl also sets the date, time and time zone."},
+
+{"id":"ch19-q21","chapter":19,"topic":"View, Set, and Adjust the Date and Time","objectives":[44],"type":"mcq","difficulty":3,
+ "prompt":"You try to set the date manually with timedatectl and it refuses. What is the likely cause?","options":["NTP synchronisation is active and must be turned off first","The command requires the chronyd service to be running","The RTC is read-only","The time zone has not been set"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"Run `timedatectl set-ntp false` to disable synchronisation, make the manual adjustment, then `timedatectl set-ntp true` to hand the clock back to Chrony."},
+
+{"id":"ch19-q22","chapter":19,"topic":"View, Set, and Adjust the Date and Time","objectives":[44],"type":"command","difficulty":3,
+ "prompt":"Turn off NTP synchronisation so the clock can be set manually.","options":[],"answer":[],
+ "accept":["timedatectl set-ntp (?:false|0|no|off)"],"canonical":"timedatectl set-ntp false",
+ "explanation":"Re-enable it afterwards with `timedatectl set-ntp true`, which lets Chrony resume disciplining the clock."}
+]

@@ -1,0 +1,86 @@
+[
+{"id":"ch02-q01","chapter":2,"topic":"Navigate the GNOME Desktop and Wayland Display Protocol","objectives":[],"type":"mcq","difficulty":1,
+ "prompt":"Which display protocol does RHEL 10 use for its graphical environment?","options":["Wayland","X.Org / X11","Mir","VNC"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"Wayland is the default and the only display protocol in RHEL 10. It lays the groundwork on which the display manager and desktop environment both start."},
+
+{"id":"ch02-q02","chapter":2,"topic":"Navigate the GNOME Desktop and Wayland Display Protocol","objectives":[],"type":"mcq","difficulty":2,
+ "prompt":"What is the default display manager in RHEL 10, and what does it do?","options":["GDM — presents the graphical login screen","GNOME — presents the desktop after login","Wayland — draws application windows","LightDM — manages user sessions"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"The GNOME Display Manager (GDM) shows the graphical login screen and validates credentials; once they are accepted it starts the GNOME desktop environment. Do not confuse the display manager (login) with the desktop environment (session)."},
+
+{"id":"ch02-q03","chapter":2,"topic":"Explain the Linux Filesystem Hierarchy Standard","objectives":[],"type":"mcq","difficulty":2,
+ "prompt":"Into which three categories are Linux file systems grouped?","options":["Disk-based, network-based, and memory-based","Static, dynamic, and hybrid","Journaled, non-journaled, and virtual","Local, remote, and encrypted"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"Disk-based file systems live on physical media, network-based ones are disk-based file systems shared over the network, and memory-based (virtual) ones are built at boot and destroyed at shutdown. Only the first two persist across reboots."},
+
+{"id":"ch02-q04","chapter":2,"topic":"Explain the Linux Filesystem Hierarchy Standard","objectives":[],"type":"multi","difficulty":2,
+ "prompt":"Which of these are virtual (memory-based) file systems whose contents do not survive a reboot? (Select all that apply.)","options":["/proc","/sys","/run","/boot","/home"],"answer":[0,1,2],"accept":[],"canonical":null,
+ "explanation":"/proc (procfs), /sys (sysfs) and /run are all created in memory and torn down at shutdown, as is /dev. /boot and /home are disk-based and persistent."},
+
+{"id":"ch02-q05","chapter":2,"topic":"Identify and Describe the Top-Level RHEL Directories","objectives":[],"type":"mcq","difficulty":2,
+ "prompt":"Which directory holds administration commands that require root privileges and is not in a normal user's default search path?","options":["/usr/sbin","/usr/bin","/usr/local/bin","/usr/lib64"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"/usr/sbin contains system administration commands needed at boot or requiring root. /usr/bin holds general user executables and is on every user's PATH."},
+
+{"id":"ch02-q06","chapter":2,"topic":"Identify and Describe the Top-Level RHEL Directories","objectives":[],"type":"mcq","difficulty":3,
+ "prompt":"Files in /tmp and /var/tmp are cleaned up automatically. After how long are unused files removed from each?","options":["/tmp after 10 days, /var/tmp after 30 days","/tmp after 30 days, /var/tmp after 10 days","Both after 10 days","/tmp at every reboot, /var/tmp after 10 days"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"Both directories survive reboots. Files in /tmp are deleted if untouched for 10 days; /var/tmp is meant for longer-lived temporary data and uses a 30-day threshold."},
+
+{"id":"ch02-q07","chapter":2,"topic":"Identify and Describe the Top-Level RHEL Directories","objectives":[],"type":"mcq","difficulty":2,
+ "prompt":"Which service dynamically creates and removes device files under /dev as hardware appears and disappears?","options":["systemd-udevd","systemd-journald","NetworkManager","kmod"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"systemd-udevd is the device manager that populates /dev. Device files come in two flavours: character devices (serial, byte-at-a-time) and block devices (fixed-size blocks, random access)."},
+
+{"id":"ch02-q08","chapter":2,"topic":"Identify and Describe the Top-Level RHEL Directories","objectives":[],"type":"multi","difficulty":3,
+ "prompt":"Which statements about /usr subdirectories are correct? (Select all that apply.)","options":["/usr/share holds manual pages and documentation","/usr/local is the administrator's repository for locally obtained tools","/usr/lib64 contains 64-bit shared libraries","/usr/src stores system log files","/usr/include holds systemd unit files"],"answer":[0,1,2],"accept":[],"canonical":null,
+ "explanation":"/usr/src stores source code, not logs — logs live in /var/log. /usr/include holds C header files; systemd unit files are under /etc/systemd and /usr/lib/systemd."},
+
+{"id":"ch02-q09","chapter":2,"topic":"Describe Command-Line Fundamentals","objectives":[1],"type":"mcq","difficulty":1,
+ "prompt":"In the default shell prompt [user1@server1 ~]$, what does the trailing $ signify?","options":["The session belongs to a normal, unprivileged user","The shell is waiting for a variable name","The current directory is the home directory","The command ran successfully"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"The prompt ends in $ for normal users and # for root. Inside the brackets are the username, the hostname, and the current directory (~ meaning the home directory)."},
+
+{"id":"ch02-q10","chapter":2,"topic":"Describe Command-Line Fundamentals","objectives":[1],"type":"mcq","difficulty":2,
+ "prompt":"How many separate options does `ls -al` supply?","options":["Two — a and l","One — the option 'al'","Three — a, l, and the implied directory","None; -al is an argument"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"In short-option format a single hyphen may be followed by several letters, each of which is its own option, so -al means -a and -l. Long-option format uses two hyphens and the whole word is one option, e.g. --all."},
+
+{"id":"ch02-q11","chapter":2,"topic":"Use Core Linux Commands for Navigation and Inspection","objectives":[1],"type":"command","difficulty":1,
+ "prompt":"Show the current working directory as an absolute path.","options":[],"answer":[],
+ "accept":["pwd"],"canonical":"pwd",
+ "explanation":"pwd (print working directory) always returns the absolute path of where you are, which is how you tell an absolute path from a relative one — absolute paths begin with /."},
+
+{"id":"ch02-q12","chapter":2,"topic":"Use Core Linux Commands for Navigation and Inspection","objectives":[1],"type":"command","difficulty":2,
+ "prompt":"List everything in the current directory, including hidden files, in long format with human-readable sizes.","options":[],"answer":[],
+ "accept":["ls -(?:alh|ahl|lah|lha|hal|hla)","ls -a -l -h","ls -l -a -h","ls -h -a -l"],"canonical":"ls -alh",
+ "explanation":"-a includes dot files, -l gives the long listing, and -h renders sizes as K/M/G. The letters can be given in any order or as separate options."},
+
+{"id":"ch02-q13","chapter":2,"topic":"Use Core Linux Commands for Navigation and Inspection","objectives":[1],"type":"command","difficulty":3,
+ "prompt":"Show the long listing of the directory /etc itself — its own attributes, not the files inside it.","options":[],"answer":[],
+ "accept":["ls -(?:ld|dl) /etc","ls -l -d /etc","ls -d -l /etc"],"canonical":"ls -ld /etc",
+ "explanation":"-d makes ls treat the directory as the target rather than descending into it, so -ld prints one line describing /etc. Without -d you get a listing of its contents."},
+
+{"id":"ch02-q14","chapter":2,"topic":"Use Core Linux Commands for Navigation and Inspection","objectives":[1],"type":"mcq","difficulty":2,
+ "prompt":"You are in /home/user1 and run `cd -`. What happens?","options":["You switch to whichever directory you were in previously","You move up one level to /home","You return to your home directory","The command fails; - is not valid for cd"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"cd - toggles between the current and the previous directory. cd with no argument (or cd ~) returns to your home directory, and cd .. moves one level up."},
+
+{"id":"ch02-q15","chapter":2,"topic":"Use Core Linux Commands for Navigation and Inspection","objectives":[1],"type":"multi","difficulty":2,
+ "prompt":"Which commands report the full path of an executable such as uptime? (Select all that apply.)","options":["which","whereis","type","whatis","locate"],"answer":[0,1,2],"accept":[],"canonical":null,
+ "explanation":"which, whereis and type all resolve uptime to /usr/bin/uptime. whatis prints a one-line description from the manual database, not a path."},
+
+{"id":"ch02-q16","chapter":2,"topic":"Use Core Linux Commands for Navigation and Inspection","objectives":[1],"type":"command","difficulty":2,
+ "prompt":"Display the kernel name, hostname, kernel release, build date and hardware architecture in one line.","options":[],"answer":[],
+ "accept":["uname -a","uname --all"],"canonical":"uname -a",
+ "explanation":"uname -a prints everything, including the kernel build date — which is how you answer 'when was the kernel built'. Individual facts come from -s, -n, -r, -v, -m and -o."},
+
+{"id":"ch02-q17","chapter":2,"topic":"Use Core Linux Commands for Navigation and Inspection","objectives":[1],"type":"mcq","difficulty":2,
+ "prompt":"The uptime command reports a load average of 4.00 on a system with 4 CPU cores. What does that indicate?","options":["Full utilisation — roughly one runnable process per core","A 400% overload","Utilisation of 4% over the last minute","Four users are logged in"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"Load average is the average number of processes running or waiting for resources over 1, 5 and 15 minutes. Divide by the core count to judge utilisation, so 4.00 on 4 cores is full but not oversubscribed."},
+
+{"id":"ch02-q18","chapter":2,"topic":"Access Help using Native Tools and Documentation","objectives":[11],"type":"command","difficulty":3,
+ "prompt":"Open the manual page for the /etc/passwd configuration file rather than the passwd command.","options":[],"answer":[],
+ "accept":["man 5 passwd","man -s ?5 passwd"],"canonical":"man 5 passwd",
+ "explanation":"man searches section 1 first, so a bare `man passwd` shows the command. Naming the section forces the right page: section 1 is user commands, 4 device files, 5 file formats, 8 administrator commands."},
+
+{"id":"ch02-q19","chapter":2,"topic":"Access Help using Native Tools and Documentation","objectives":[11],"type":"mcq","difficulty":3,
+ "prompt":"On a fresh RHEL 10 install, `man -k xfs` returns nothing useful. What must be done first?","options":["Run mandb as root to build the manual page index","Install the man-pages package","Set the MANPATH variable","Run makewhatis --rebuild in /usr/share/man"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"Keyword searching relies on an indexed database of manual pages. Running mandb as root builds it, after which man -k and apropos (which are equivalent) work."},
+
+{"id":"ch02-q20","chapter":2,"topic":"Access Help using Native Tools and Documentation","objectives":[11],"type":"mcq","difficulty":2,
+ "prompt":"Which pair of commands produce identical output?","options":["whatis passwd and man -f passwd","whatis passwd and man -k passwd","apropos passwd and man -f passwd","whatis passwd and passwd --help"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"whatis and man -f both print the short description of matching manual entries. The keyword search pairing is apropos and man -k — those two are equivalent to each other, not to whatis."}
+]

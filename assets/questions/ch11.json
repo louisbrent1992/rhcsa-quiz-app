@@ -1,0 +1,89 @@
+[
+{"id":"ch11-q01","chapter":11,"topic":"Describe Package Groups","objectives":[],"type":"mcq","difficulty":2,
+ "prompt":"Which two core repositories ship with RHEL 10?","options":["BaseOS and AppStream","BaseOS and Extras","Core and Optional","Server and Workstation"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"BaseOS carries the kernel, modules, bootloader and other foundational packages in traditional rpm format. AppStream carries applications, development tools and runtimes."},
+
+{"id":"ch11-q02","chapter":11,"topic":"Describe Package Groups","objectives":[],"type":"mcq","difficulty":3,
+ "prompt":"What is the main benefit of separating BaseOS from AppStream?","options":["Applications and the core OS can be updated independently of each other","It halves the size of the installation media","It removes the need for dependency resolution","It allows packages to be installed without GPG signatures"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"Before RHEL 8 an OS update pulled the kernel, services and applications forward together, which risked version incompatibilities. Detaching the two lets you update either without destabilising the other."},
+
+{"id":"ch11-q03","chapter":11,"topic":"Describe Package Groups","objectives":[],"type":"mcq","difficulty":2,
+ "prompt":"What is the difference between an environment group and a package group?","options":["Environment groups are the base selections offered during installation; package groups are smaller themed collections","Package groups are chosen at install time; environment groups afterwards","Environment groups contain only RPMs; package groups only Flatpaks","They are two names for the same thing"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"Environment groups are Server, Server with GUI, Minimal Install, Workstation, Virtualization Host and Custom Operating System. Package groups are collections such as container management, security tools or network servers."},
+
+{"id":"ch11-q04","chapter":11,"topic":"Configure and Access Software Repositories","objectives":[12],"type":"mcq","difficulty":2,
+ "prompt":"In which directory are repository definition files stored, and what extension must they have?","options":["/etc/yum.repos.d, with a .repo extension","/etc/dnf/repos.d, with a .conf extension","/var/lib/dnf, with a .repo extension","/etc/repos, with a .list extension"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"Each repository gets its own .repo file in /etc/yum.repos.d. The global dnf settings live separately in /etc/dnf/dnf.conf."},
+
+{"id":"ch11-q05","chapter":11,"topic":"Configure and Access Software Repositories","objectives":[12],"type":"multi","difficulty":3,
+ "prompt":"Which directives must a repository definition contain as a minimum? (Select all that apply.)","options":["A unique ID in square brackets","A name description","A baseurl location","gpgcheck","enabled"],"answer":[0,1,2],"accept":[],"canonical":null,
+ "explanation":"The ID, name and baseurl are mandatory; enabled and gpgcheck are set as required. A definition looks like [BaseOS_RHEL_10] / name=... / baseurl=... / enabled=1 / gpgcheck=0."},
+
+{"id":"ch11-q06","chapter":11,"topic":"Configure and Access Software Repositories","objectives":[12],"type":"mcq","difficulty":3,
+ "prompt":"Which baseurl correctly points at the local directory /mnt/BaseOS?","options":["file:///mnt/BaseOS","file://mnt/BaseOS","file:/mnt/BaseOS","local:///mnt/BaseOS"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"Three slashes: file:// is the URL scheme and the third slash begins the absolute path. Network sources use two slashes — ftp://hostname/path or http(s)://hostname/path — with a resolvable hostname or IP."},
+
+{"id":"ch11-q07","chapter":11,"topic":"Configure and Access Software Repositories","objectives":[12],"type":"command","difficulty":2,
+ "prompt":"List the repositories that are currently enabled.","options":[],"answer":[],
+ "accept":["dnf repolist","yum repolist","dnf repolist --?enabled","dnf -y repolist"],"canonical":"dnf repolist",
+ "explanation":"repolist shows each enabled repository's ID, name, and package count. Add the repository ID to `dnf list --repo <id>` to restrict a package listing to one source."},
+
+{"id":"ch11-q08","chapter":11,"topic":"Configure and Access Software Repositories","objectives":[12],"type":"mcq","difficulty":2,
+ "prompt":"Which file holds the global dnf settings such as gpgcheck and installonly_limit?","options":["/etc/dnf/dnf.conf","/etc/yum.repos.d/dnf.conf","/etc/dnf.conf","/var/lib/dnf/config"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"Its [main] section applies globally. gpgcheck defaults to 1, installonly_limit to 3, debuglevel to 2, keepcache to 0, and logdir to /var/log."},
+
+{"id":"ch11-q09","chapter":11,"topic":"Perform Software Management Operations using dnf","objectives":[13],"type":"mcq","difficulty":2,
+ "prompt":"What is the primary advantage of dnf over rpm?","options":["dnf resolves and installs dependencies automatically","dnf can query installed packages, which rpm cannot","dnf does not require root privileges","dnf works without any repository configured"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"dnf identifies and pulls in every prerequisite package, drawing from whichever configured repository has it. It calls rpm behind the scenes to do the actual installation."},
+
+{"id":"ch11-q10","chapter":11,"topic":"List, Install, Update, and Remove Individual Packages and Package Groups","objectives":[13],"type":"command","difficulty":1,
+ "prompt":"Install the package zsh, answering yes to the confirmation prompt automatically.","options":[],"answer":[],
+ "accept":["dnf install -y zsh","dnf -y install zsh","yum install -y zsh","yum -y install zsh","dnf install zsh -y"],"canonical":"dnf install -y zsh",
+ "explanation":"-y assumes yes to all prompts. dnf install also serves as an upgrade when the package is already present."},
+
+{"id":"ch11-q11","chapter":11,"topic":"List, Install, Update, and Remove Individual Packages and Package Groups","objectives":[13],"type":"command","difficulty":2,
+ "prompt":"Remove the package zsh together with any dependencies no longer needed.","options":[],"answer":[],
+ "accept":["dnf remove -y zsh","dnf -y remove zsh","yum remove -y zsh","yum -y remove zsh","dnf remove zsh -y","dnf remove zsh"],"canonical":"dnf remove -y zsh",
+ "explanation":"dnf remove takes the dependencies with it when clean_requirements_on_remove is enabled in dnf.conf."},
+
+{"id":"ch11-q12","chapter":11,"topic":"List, Install, Update, and Remove Individual Packages and Package Groups","objectives":[45],"type":"command","difficulty":2,
+ "prompt":"Update every installed package to the latest version available from the enabled repositories.","options":[],"answer":[],
+ "accept":["dnf (?:upgrade|update) -y","dnf -y (?:upgrade|update)","yum (?:upgrade|update) -y","yum -y (?:upgrade|update)","dnf (?:upgrade|update)"],"canonical":"dnf upgrade -y",
+ "explanation":"dnf upgrade brings everything current. To see what is pending without acting, use dnf check-update."},
+
+{"id":"ch11-q13","chapter":11,"topic":"List, Install, Update, and Remove Individual Packages and Package Groups","objectives":[13],"type":"mcq","difficulty":2,
+ "prompt":"In `dnf list installed` output, what does @anaconda in the third column mean?","options":["The package was installed during the original RHEL installation","The package is owned by the anaconda repository and cannot be removed","The package is scheduled for removal","The package came from a Flatpak remote"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"The third column names the source repository, and an @ prefix marks the package as installed. @anaconda specifically identifies packages laid down by the installer."},
+
+{"id":"ch11-q14","chapter":11,"topic":"Display Detailed Package Information and Search Metadata","objectives":[],"type":"multi","difficulty":3,
+ "prompt":"Match the dnf subcommands to what they do. Which are correct? (Select all that apply.)","options":["provides — finds which package supplies a given file or feature","search — searches package metadata for a string","info — shows the details of a package","history — shows previous dnf transactions","clean — lists cached packages"],"answer":[0,1,2,3],"accept":[],"canonical":null,
+ "explanation":"clean REMOVES cached data rather than listing it. dnf history reads its record from /var/lib/dnf/history."},
+
+{"id":"ch11-q15","chapter":11,"topic":"Display Detailed Package Information and Search Metadata","objectives":[],"type":"command","difficulty":2,
+ "prompt":"Find out which package provides the file /etc/chrony.conf, using dnf.","options":[],"answer":[],
+ "accept":["dnf provides /etc/chrony\\.conf","yum provides /etc/chrony\\.conf","dnf whatprovides /etc/chrony\\.conf","yum whatprovides /etc/chrony\\.conf"],"canonical":"dnf provides /etc/chrony.conf",
+ "explanation":"Unlike rpm -qf, which only knows about installed packages, dnf provides can search the repositories for a file you have not installed yet."},
+
+{"id":"ch11-q16","chapter":11,"topic":"Display Detailed Package Information and Search Metadata","objectives":[],"type":"command","difficulty":2,
+ "prompt":"Check whether updates are available for installed packages, without installing anything.","options":[],"answer":[],
+ "accept":["dnf check-update","yum check-update"],"canonical":"dnf check-update",
+ "explanation":"check-update reports pending updates and exits. dnf list --upgrades gives similar information in list form."},
+
+{"id":"ch11-q17","chapter":11,"topic":"Examine the Contents and Details of Available Package Groups","objectives":[13],"type":"command","difficulty":2,
+ "prompt":"List the package groups available from the enabled repositories.","options":[],"answer":[],
+ "accept":["dnf group list","yum group list","dnf grouplist","yum grouplist"],"canonical":"dnf group list",
+ "explanation":"The group subcommands are list, info, install and remove. They let you treat a themed collection of packages as one unit."},
+
+{"id":"ch11-q18","chapter":11,"topic":"Examine the Contents and Details of Available Package Groups","objectives":[13],"type":"command","difficulty":3,
+ "prompt":"Install the package group named \"Security Tools\", answering yes automatically.","options":[],"answer":[],
+ "accept":["dnf (?:group install|groupinstall) -y [\"']Security Tools[\"']","dnf -y (?:group install|groupinstall) [\"']Security Tools[\"']","yum (?:group install|groupinstall) -y [\"']Security Tools[\"']","dnf (?:group install|groupinstall) [\"']Security Tools[\"'] -y"],"canonical":"dnf group install -y \"Security Tools\"",
+ "explanation":"Quote a group name containing spaces so the shell passes it as one argument. dnf group info shows what a group contains before you commit to installing it."},
+
+{"id":"ch11-q19","chapter":11,"topic":"Perform Software Management Operations using dnf","objectives":[45],"type":"mcq","difficulty":3,
+ "prompt":"Which dnf subcommand reinstalls the exact version of an already-installed package?","options":["reinstall","install --force","upgrade --same","refresh"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"dnf reinstall lays the same version down again — the dnf counterpart of rpm --replacepkgs, useful when you suspect a packaged file has been damaged."},
+
+{"id":"ch11-q20","chapter":11,"topic":"Perform Software Management Operations using dnf","objectives":[12],"type":"mcq","difficulty":3,
+ "prompt":"Which dnf.conf directive lets dnf keep running by disabling a repository it cannot reach?","options":["skip_if_unavailable","best","obsoletes","keepcache"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"Without it, an unreachable repository aborts the whole transaction. best controls whether the newest version is required, and obsoletes removes superseded dependent packages during installs and updates."}
+]

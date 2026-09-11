@@ -1,0 +1,99 @@
+[
+{"id":"ch17-q01","chapter":17,"topic":"Define Fundamental Networking Concepts: Hostnames, Protocols, Ports, and Ethernet Addresses","objectives":[],"type":"mcq","difficulty":2,
+ "prompt":"In which file is the system hostname stored on RHEL?","options":["/etc/hostname","/etc/sysconfig/network","/etc/hosts","/etc/NetworkManager/hostname"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"A hostname may be up to 63 alphanumeric characters including hyphens. It can be viewed with hostname, hostnamectl, uname or nmcli, or by reading /etc/hostname directly."},
+
+{"id":"ch17-q02","chapter":17,"topic":"Define Fundamental Networking Concepts: Hostnames, Protocols, Ports, and Ethernet Addresses","objectives":[],"type":"mcq","difficulty":2,
+ "prompt":"How many bits is an Ethernet (MAC) address, and which protocol maps a known IP address to it?","options":["48 bits; ARP","32 bits; ARP","64 bits; NDP","128 bits; DHCP"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"The Ethernet address — also called the hardware, physical, link-layer or MAC address — is 48 bits. Address Resolution Protocol discovers the hardware address for a known IPv4 address; IPv6 uses Neighbor Discovery Protocol instead."},
+
+{"id":"ch17-q03","chapter":17,"topic":"Change System Hostname Persistently Using Multiple Methods","objectives":[],"type":"command","difficulty":2,
+ "prompt":"Persistently set the system hostname to server10.example.com using hostnamectl.","options":[],"answer":[],
+ "accept":["hostnamectl set-hostname server10\\.example\\.com","hostnamectl hostname server10\\.example\\.com"],"canonical":"hostnamectl set-hostname server10.example.com",
+ "explanation":"hostnamectl set-hostname writes /etc/hostname and applies the change immediately, so it survives reboots."},
+
+{"id":"ch17-q04","chapter":17,"topic":"Compare IPv4 and IPv6 Addressing","objectives":[47],"type":"mcq","difficulty":1,
+ "prompt":"How many bits are IPv4 and IPv6 addresses respectively?","options":["32 and 128","32 and 64","64 and 128","16 and 32"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"IPv4's 32 bits give roughly 4.3 billion addresses, largely exhausted. IPv6's 128 bits give about 340 undecillion. IPv6 is enabled by default on all configured connections in RHEL 10."},
+
+{"id":"ch17-q05","chapter":17,"topic":"Compare IPv4 and IPv6 Addressing","objectives":[47],"type":"mcq","difficulty":2,
+ "prompt":"How is an IPv6 address written?","options":["Eight colon-separated 16-bit hexadecimal hextets","Four dot-separated decimal octets","Sixteen colon-separated decimal fields","Six hyphen-separated hexadecimal pairs"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"Leading zeros within a hextet may be dropped, and one contiguous run of all-zero hextets may be collapsed to a double colon (::). IPv4 uses four dot-separated octets."},
+
+{"id":"ch17-q06","chapter":17,"topic":"Compare IPv4 and IPv6 Addressing","objectives":[47],"type":"mcq","difficulty":2,
+ "prompt":"What are the loopback addresses for IPv4 and IPv6?","options":["127.0.0.1 and ::1","0.0.0.0 and ::","192.168.0.1 and fe80::1","255.255.255.255 and ffff::"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"The loopback interface is named lo. The whole 127.0.0.0/8 range is reserved for loopback testing and cannot be assigned to nodes."},
+
+{"id":"ch17-q07","chapter":17,"topic":"Explain Classful and Classless Network Addressing, and Subnetting","objectives":[],"type":"mcq","difficulty":2,
+ "prompt":"What is the default subnet mask for a class C network, and how many hosts does it support?","options":["255.255.255.0; 254 hosts","255.255.0.0; 65,534 hosts","255.0.0.0; about 16 million hosts","255.255.255.128; 126 hosts"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"Class A uses 255.0.0.0 with ~16 million hosts, class B 255.255.0.0 with 65,534, and class C 255.255.255.0 with 254. Class D is reserved for multicast and class E for experimental use."},
+
+{"id":"ch17-q08","chapter":17,"topic":"Explain Classful and Classless Network Addressing, and Subnetting","objectives":[],"type":"multi","difficulty":3,
+ "prompt":"Which statements about subnetting are correct? (Select all that apply.)","options":["It borrows bits from the node portion of the address","It reduces the number of usable node addresses","All devices in a subnet share the same subnet mask","The first and last addresses of a subnet are reserved","Subnets can communicate with each other without a router"],"answer":[0,1,2,3],"accept":[],"canonical":null,
+ "explanation":"Each subnet is an independent network and needs a router to reach another. The first address identifies the subnet itself and the last is its broadcast address."},
+
+{"id":"ch17-q09","chapter":17,"topic":"Explain Classful and Classless Network Addressing, and Subnetting","objectives":[47],"type":"mcq","difficulty":2,
+ "prompt":"What subnet mask does the CIDR notation 192.168.1.10/24 correspond to?","options":["255.255.255.0","255.255.0.0","255.255.255.224","255.0.0.0"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"The prefix length counts the network bits, so /24 means 24 ones — 255.255.255.0. A /27 is 255.255.255.224, giving subnets of 32 addresses each."},
+
+{"id":"ch17-q10","chapter":17,"topic":"Explain Classful and Classless Network Addressing, and Subnetting","objectives":[],"type":"mcq","difficulty":3,
+ "prompt":"What problem was CIDR designed to solve?","options":["Fixed class boundaries wasted addresses and bloated routing tables","IPv4 addresses were too short to route globally","Subnet masks could not be expressed in decimal","Classful addressing did not support multicast"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"CIDR lets the network/node split occur at any bit rather than at 8, 16 or 24, so address blocks can be sized to fit. Its prefix notation carries over to IPv6."},
+
+{"id":"ch17-q11","chapter":17,"topic":"Describe Consistent Device Naming","objectives":[],"type":"mcq","difficulty":3,
+ "prompt":"Why did RHEL move away from eth0-style interface names?","options":["Numbering was assigned at boot detection order and could change between boots","The names were too short for modern hardware","They conflicted with Windows naming conventions","The kernel no longer supports them"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"Since RHEL 7, systemd-udevd names interfaces from physical location, topology and firmware settings — giving stable names such as enp0s3 and ens160 that survive hardware rescans and card changes."},
+
+{"id":"ch17-q12","chapter":17,"topic":"Differentiate Between Physical Network Device and Logical Connection Profile","objectives":[47],"type":"mcq","difficulty":3,
+ "prompt":"What is the relationship between a network device and a connection profile?","options":["A device can have several profiles attached, but only one may be active at a time","A profile can be attached to several devices simultaneously","They are the same thing under two names","A device must have exactly one profile"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"The device is the physical or virtual interface; the profile is the software configuration — IP, gateway, DNS and so on — applied to it. Each profile has a unique name."},
+
+{"id":"ch17-q13","chapter":17,"topic":"Analyze the Structure of a Network Connection Profile","objectives":[47],"type":"mcq","difficulty":2,
+ "prompt":"Where are NetworkManager connection profiles stored, and what extension do they use?","options":["/etc/NetworkManager/system-connections, with .nmconnection","/etc/sysconfig/network-scripts, with ifcfg- prefixes","/etc/NetworkManager/conf.d, with .conf","/var/lib/NetworkManager, with .profile"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"Files are named after the connection, e.g. enp0s3.nmconnection. The old ifcfg- files under /etc/sysconfig/network-scripts, along with ifup, ifdown and ifconfig, are deprecated."},
+
+{"id":"ch17-q14","chapter":17,"topic":"Analyze the Structure of a Network Connection Profile","objectives":[47],"type":"mcq","difficulty":3,
+ "prompt":"In a connection profile, what must the ipv4 method property be set to for a static address to take effect?","options":["manual","static","fixed","none"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"With method=manual, the address1 property supplies the static IP and prefix (e.g. /24). Setting it to auto makes the connection use DHCP instead."},
+
+{"id":"ch17-q15","chapter":17,"topic":"Manage Network Interfaces and Connections","objectives":[47],"type":"mcq","difficulty":2,
+ "prompt":"Which service manages network interfaces and connections in RHEL 10?","options":["NetworkManager","network.service","systemd-networkd","wicked"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"Its command-line tool is nmcli; nmtui is the text UI and nm-connection-editor the graphical one. The NetworkManager daemon keeps interfaces and connections active."},
+
+{"id":"ch17-q16","chapter":17,"topic":"Manage Network Interfaces and Connections","objectives":[47],"type":"command","difficulty":2,
+ "prompt":"List all NetworkManager connection profiles with their devices, UUIDs and types.","options":[],"answer":[],
+ "accept":["nmcli (?:c|con|connection) (?:s|show)"],"canonical":"nmcli connection show",
+ "explanation":"Object categories and subcommands may be abbreviated — nmcli c s works identically. Use `nmcli device status` to see devices and which profile each carries."},
+
+{"id":"ch17-q17","chapter":17,"topic":"Manage Network Interfaces and Connections","objectives":[47],"type":"command","difficulty":2,
+ "prompt":"Show the status of all network devices known to NetworkManager.","options":[],"answer":[],
+ "accept":["nmcli (?:d|dev|device) (?:s|status)"],"canonical":"nmcli device status",
+ "explanation":"The output lists each device's type, state and attached connection profile. The loopback interface is not managed by NetworkManager."},
+
+{"id":"ch17-q18","chapter":17,"topic":"Manage Network Interfaces and Connections","objectives":[47],"type":"command","difficulty":2,
+ "prompt":"Activate the connection profile named enp0s8.","options":[],"answer":[],
+ "accept":["nmcli (?:c|con|connection) up enp0s8"],"canonical":"nmcli connection up enp0s8",
+ "explanation":"up activates and down deactivates. After editing a profile file by hand, run `nmcli connection reload` so NetworkManager re-reads it."},
+
+{"id":"ch17-q19","chapter":17,"topic":"Configure Static IP Addresses","objectives":[47],"type":"command","difficulty":3,
+ "prompt":"Create an Ethernet connection profile named enp0s8 on device enp0s8 with static address 172.10.10.110/24, gateway 172.10.10.1 and DNS 172.10.10.1.","options":[],"answer":[],
+ "accept":["nmcli (?:c|con|connection) (?:a|add) type ethernet ifname enp0s8 con-name enp0s8 ip4 172\\.10\\.10\\.110/24 gw4 172\\.10\\.10\\.1 ipv4\\.dns 172\\.10\\.10\\.1","nmcli (?:c|con|connection) (?:a|add) type ethernet con-name enp0s8 ifname enp0s8 ip4 172\\.10\\.10\\.110/24 gw4 172\\.10\\.10\\.1 ipv4\\.dns 172\\.10\\.10\\.1"],"canonical":"nmcli connection add type ethernet ifname enp0s8 con-name enp0s8 ip4 172.10.10.110/24 gw4 172.10.10.1 ipv4.dns 172.10.10.1",
+ "explanation":"nmcli add attaches and activates the profile and writes enp0s8.nmconnection into /etc/NetworkManager/system-connections. ip4 takes CIDR notation and gw4 the gateway."},
+
+{"id":"ch17-q20","chapter":17,"topic":"Configure Static IP Addresses","objectives":[47],"type":"mcq","difficulty":3,
+ "prompt":"Which nmcli subcommand changes one property of an existing connection without recreating it?","options":["modify","edit --replace","update","set"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"nmcli connection modify adjusts individual properties. edit opens an interactive editor, add creates a new profile, and delete removes one."},
+
+{"id":"ch17-q21","chapter":17,"topic":"Verify Network Configuration and Test Connectivity","objectives":[47],"type":"command","difficulty":1,
+ "prompt":"Display the IP addresses currently assigned to all network interfaces.","options":[],"answer":[],
+ "accept":["ip a(ddr)?( show| s)?","ip -4 a(ddr)?"],"canonical":"ip addr",
+ "explanation":"ip is the modern replacement for the deprecated ifconfig, and covers interfaces, addresses, routing and traffic. `ip addr` shows both IPv4 and IPv6 assignments plus each interface's MAC address."},
+
+{"id":"ch17-q22","chapter":17,"topic":"Utilize the hosts Table for Hostname-to-IP Resolution","objectives":[],"type":"mcq","difficulty":2,
+ "prompt":"Which file provides local hostname-to-IP resolution without querying DNS?","options":["/etc/hosts","/etc/hostname","/etc/resolv.conf","/etc/nsswitch.conf"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"/etc/hosts maps addresses to names locally. /etc/hostname holds this system's own name, and /etc/resolv.conf lists the DNS servers to query."},
+
+{"id":"ch17-q23","chapter":17,"topic":"Verify Network Configuration and Test Connectivity","objectives":[47],"type":"multi","difficulty":2,
+ "prompt":"Which tools test network connectivity and work with both IPv4 and IPv6? (Select all that apply.)","options":["ping","traceroute","tracepath","nmcli device status"],"answer":[0,1,2],"accept":[],"canonical":null,
+ "explanation":"ping, traceroute and tracepath auto-detect the IP version. nmcli device status reports local device state — useful for configuration checks, but it does not test reachability."}
+]

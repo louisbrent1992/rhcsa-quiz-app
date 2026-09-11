@@ -1,0 +1,91 @@
+[
+{"id":"ch08-q01","chapter":8,"topic":"Explain the Purpose of Scripts and How to Create them","objectives":[],"type":"mcq","difficulty":1,
+ "prompt":"What must the first line of a bash script contain, and what is it called?","options":["#!/bin/bash — the shebang, naming the interpreter","#/bin/bash — the header comment","!#/bin/bash — the bang-hash","# bash — the shell declaration"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"The #! character combination is the shebang and is followed by the full path to the interpreting shell. A # alone starts an ordinary comment, which the shell ignores."},
+
+{"id":"ch08-q02","chapter":8,"topic":"Explain the Purpose of Scripts and How to Create them","objectives":[],"type":"mcq","difficulty":2,
+ "prompt":"Where does the chapter recommend storing scripts so every user can run them without typing a path?","options":["/usr/local/bin","/root/scripts","/etc/scripts","/var/local"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"/usr/local/bin is already in the default PATH for all users, so a script placed there is callable by name alone."},
+
+{"id":"ch08-q03","chapter":8,"topic":"Execute Scripts and Implement Debugging Techniques","objectives":[],"type":"command","difficulty":2,
+ "prompt":"A new script /usr/local/bin/sys_info.sh is not executable. Add the execute permission for all users using symbolic notation.","options":[],"answer":[],
+ "accept":["chmod \\+x /usr/local/bin/sys_info\\.sh","chmod a\\+x /usr/local/bin/sys_info\\.sh","chmod ugo\\+x /usr/local/bin/sys_info\\.sh"],"canonical":"chmod +x /usr/local/bin/sys_info.sh",
+ "explanation":"The default umask of 0022 gives a new file 644 — no execute bit. chmod +x adds it for user, group and other."},
+
+{"id":"ch08-q04","chapter":8,"topic":"Execute Scripts and Implement Debugging Techniques","objectives":[],"type":"mcq","difficulty":3,
+ "prompt":"How do you run a script in debug mode so each line is echoed as it executes?","options":["bash -x script.sh, or put -x on the shebang line","bash -d script.sh","bash --verbose-only script.sh","Set DEBUG=1 before running it"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"With -x the shell prints each expanded line prefixed by a + before running it, so you can see exactly where execution went wrong. Writing #!/bin/bash -x makes it permanent."},
+
+{"id":"ch08-q05","chapter":8,"topic":"Build Your First Scripts: Display System Data, Use Variables, and Process Command-Line Arguments","objectives":[19],"type":"mcq","difficulty":2,
+ "prompt":"Which line stores the output of the hostname command in a variable for later use in a script?","options":["SYSNAME=$(hostname)","SYSNAME=hostname","SYSNAME=$hostname","SYSNAME=<hostname>"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"This is command substitution — objective 19, processing the output of shell commands within a script. Backticks `hostname` are the older equivalent form."},
+
+{"id":"ch08-q06","chapter":8,"topic":"Build Your First Scripts: Display System Data, Use Variables, and Process Command-Line Arguments","objectives":[],"type":"mcq","difficulty":2,
+ "prompt":"A script sets SYSNAME then exits. Why does `echo $SYSNAME` afterwards print nothing?","options":["The script ran in a sub-shell, and its local variables die with it","echo cannot read variables set by scripts","The variable name must be lowercase to persist","The script needed the execute bit to export it"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"A local variable exists only in the shell that defined it. Running the script starts a child shell, so nothing it sets survives unless the script is sourced instead of executed."},
+
+{"id":"ch08-q07","chapter":8,"topic":"Build Your First Scripts: Display System Data, Use Variables, and Process Command-Line Arguments","objectives":[18],"type":"mcq","difficulty":2,
+ "prompt":"In a script, what does $1 refer to?","options":["The first argument supplied on the command line","The script's own name","The number of arguments supplied","The exit code of the first command"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"$1, $2, $3 … are the positional parameters. $0 is the script name, $# the argument count, $* and $@ all arguments, and $$ the PID. Positions beyond 9 need braces, e.g. ${10}."},
+
+{"id":"ch08-q08","chapter":8,"topic":"Build Your First Scripts: Display System Data, Use Variables, and Process Command-Line Arguments","objectives":[18],"type":"multi","difficulty":3,
+ "prompt":"Match the special parameters used in scripts. Which statements are correct? (Select all that apply.)","options":["$0 holds the name of the script itself","$# holds the count of supplied arguments","$$ holds the PID of the running script","$? holds the exit code of the last command","$1 holds the total number of arguments"],"answer":[0,1,2,3],"accept":[],"canonical":null,
+ "explanation":"$1 is the first argument, not a count — that is $#. $? is the exit code of the most recently completed command."},
+
+{"id":"ch08-q09","chapter":8,"topic":"Build Your First Scripts: Display System Data, Use Variables, and Process Command-Line Arguments","objectives":[18],"type":"mcq","difficulty":3,
+ "prompt":"What does the `shift` command do inside a script?","options":["Moves the positional parameters one place left, discarding the old $1","Reverses the order of the arguments","Converts arguments to uppercase","Moves to the next line of the script"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"After a shift, the old $2 becomes $1 and the previous $1 is lost. `shift 2` moves two positions at once. It is the standard way to consume a series of arguments in turn."},
+
+{"id":"ch08-q10","chapter":8,"topic":"Implement Logic with Exit Codes and Tests","objectives":[16],"type":"command","difficulty":1,
+ "prompt":"Display the exit code returned by the command you just ran.","options":[],"answer":[],
+ "accept":["echo \\$\\?"],"canonical":"echo $?",
+ "explanation":"The special parameter ? holds the return code of the last command: 0 on success, non-zero on failure. Placing explicit exit codes throughout a script tells you exactly where it stopped."},
+
+{"id":"ch08-q11","chapter":8,"topic":"Implement Logic with Exit Codes and Tests","objectives":[16],"type":"mcq","difficulty":2,
+ "prompt":"What does an exit code of 0 conventionally mean?","options":["The command completed successfully","The command failed","The command produced no output","The command is still running"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"Zero means success; any non-zero value signals a failure, and different values can distinguish different failure modes."},
+
+{"id":"ch08-q12","chapter":8,"topic":"Implement Logic with Exit Codes and Tests","objectives":[16],"type":"multi","difficulty":3,
+ "prompt":"Which integer comparison operators are valid inside a test condition? (Select all that apply.)","options":["-eq for equal to","-ne for not equal to","-lt for less than","-ge for greater than or equal to","-eqs for string equality"],"answer":[0,1,2,3],"accept":[],"canonical":null,
+ "explanation":"Integer tests use -eq, -ne, -lt, -gt, -le and -ge. Strings are compared with = and != instead; there is no -eqs operator."},
+
+{"id":"ch08-q13","chapter":8,"topic":"Implement Logic with Exit Codes and Tests","objectives":[16],"type":"mcq","difficulty":3,
+ "prompt":"Which file test checks whether a path exists and is a directory?","options":["-d","-f","-e","-s"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"-d tests for a directory and -f for a regular file. -e only checks existence and -s checks that the file exists and is non-empty. -L tests for a symlink."},
+
+{"id":"ch08-q14","chapter":8,"topic":"Implement Logic with Exit Codes and Tests","objectives":[16],"type":"mcq","difficulty":2,
+ "prompt":"Which two forms express the same test condition?","options":["test -f /etc/fstab  and  [ -f /etc/fstab ]","test -f /etc/fstab  and  ( -f /etc/fstab )","[ -f /etc/fstab ]  and  { -f /etc/fstab }","test -f /etc/fstab  and  $(-f /etc/fstab)"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"The square brackets are a synonym for the test command. The spaces inside the brackets are mandatory — [ -f file ] works, [-f file] does not."},
+
+{"id":"ch08-q15","chapter":8,"topic":"Control Script Flow with Conditional Statements","objectives":[16],"type":"mcq","difficulty":2,
+ "prompt":"Which keyword closes an if construct in bash?","options":["fi","endif","end","done"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"if … then … fi. done closes a loop, not a conditional. The variants are if-then-fi, if-then-else-fi and if-then-elif-fi."},
+
+{"id":"ch08-q16","chapter":8,"topic":"Control Script Flow with Conditional Statements","objectives":[16],"type":"mcq","difficulty":3,
+ "prompt":"You need to test several different conditions and run a different action for each. Which construct fits?","options":["if-then-elif-fi","if-then-fi","for-do-done","until-do-done"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"if-then-fi acts only when the condition is true; if-then-else-fi handles exactly two outcomes; if-then-elif-fi chains any number of conditions, each with its own action."},
+
+{"id":"ch08-q17","chapter":8,"topic":"Control Script Flow with Conditional Statements","objectives":[16],"type":"multi","difficulty":3,
+ "prompt":"Which logical operators can join test conditions? (Select all that apply.)","options":["! for NOT","-a or && for AND","-o or || for OR","+ for AND"],"answer":[0,1,2],"accept":[],"canonical":null,
+ "explanation":"AND requires both operands to be true; OR requires at least one. The + character is arithmetic addition, not a logical operator."},
+
+{"id":"ch08-q18","chapter":8,"topic":"Automate Repetitive Tasks with Looping Constructs","objectives":[17],"type":"mcq","difficulty":2,
+ "prompt":"Which looping construct iterates over a fixed list of items until the list is exhausted?","options":["for-do-done","while-do-done","until-do-done","if-then-fi"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"The for loop (also called foreach) assigns each list element to a variable in turn. while repeats until its condition becomes false; until repeats until its condition becomes true."},
+
+{"id":"ch08-q19","chapter":8,"topic":"Automate Repetitive Tasks with Looping Constructs","objectives":[17],"type":"mcq","difficulty":3,
+ "prompt":"What is the difference between a while loop and an until loop?","options":["while runs while the condition is true; until runs while it is false","while runs a fixed number of times; until runs forever","until is a synonym for while","while works on lists; until works on integers"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"They are complements: while repeats until the condition becomes false, until repeats until the condition becomes true."},
+
+{"id":"ch08-q20","chapter":8,"topic":"Automate Repetitive Tasks with Looping Constructs","objectives":[17],"type":"mcq","difficulty":2,
+ "prompt":"Which keywords open and close the body of a for loop?","options":["do and done","then and fi","begin and end","{ and }"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"for VAR in LIST; do … done. The three components of a script are its shebang, its comments and its commands/control structures."},
+
+{"id":"ch08-q21","chapter":8,"topic":"Automate Repetitive Tasks with Looping Constructs","objectives":[17],"type":"mcq","difficulty":3,
+ "prompt":"Inside a loop that creates users, why would a script check $? immediately after useradd?","options":["To confirm the account was created before proceeding to set its password","To retrieve the new user's UID","To count how many users remain in the list","To reset the loop variable"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"$? holds useradd's exit code. A zero means success, so the script can safely call passwd; a non-zero means the account already exists or creation failed, and the script can stop."},
+
+{"id":"ch08-q22","chapter":8,"topic":"Automate Repetitive Tasks with Looping Constructs","objectives":[17],"type":"multi","difficulty":2,
+ "prompt":"Which arithmetic operators are available in loop test conditions? (Select all that apply.)","options":["% for remainder","== for equality comparison","!= for inequality","<= for less than or equal to","-eq for equality"],"answer":[0,1,2,3],"accept":[],"canonical":null,
+ "explanation":"Arithmetic evaluation — via let, (( )) or quotes — uses the C-style operators. -eq belongs to the test/[ ] family, not to arithmetic evaluation."}
+]

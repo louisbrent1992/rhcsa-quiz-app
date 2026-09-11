@@ -1,0 +1,84 @@
+[
+{"id":"ch01-q01","chapter":1,"topic":"Describe the RHEL Installer Program","objectives":[],"type":"mcq","difficulty":1,
+ "prompt":"What is the name of the RHEL 10 installer program?","options":["Anaconda","Kickstart","Cobbler","Ignition"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"RHEL is installed by Anaconda, which presents the central Installation Summary screen where every setting is configured before installation begins. Kickstart is the automation format Anaconda consumes, not the installer itself."},
+
+{"id":"ch01-q02","chapter":1,"topic":"Monitor the Installation: Logs and Consoles","objectives":[],"type":"mcq","difficulty":2,
+ "prompt":"How many text-based virtual consoles does Anaconda make available during installation?","options":["Six","Four","Two","Twelve"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"Anaconda provides six consoles, reachable with Ctrl+Alt+F1 through Ctrl+Alt+F6. Console 1 is the initial language screen, 2 is a root shell, 3-5 are the installation, storage and program logs, and 6 is the graphical installer."},
+
+{"id":"ch01-q03","chapter":1,"topic":"Monitor the Installation: Logs and Consoles","objectives":[],"type":"mcq","difficulty":3,
+ "prompt":"During installation you need a root shell to troubleshoot a storage problem. Which key combination switches to it?","options":["Ctrl+Alt+F2","Ctrl+Alt+F1","Ctrl+Alt+F4","Ctrl+Alt+F6"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"Console 2 (Ctrl+Alt+F2) is the root shell prompt. Ctrl+Alt+F4 shows the storage log, which is useful for reading the messages, but it is not an interactive shell."},
+
+{"id":"ch01-q04","chapter":1,"topic":"Monitor the Installation: Logs and Consoles","objectives":[],"type":"mcq","difficulty":2,
+ "prompt":"Anaconda writes its log files to /tmp during installation. Where are they moved once installation completes successfully?","options":["/var/log/anaconda","/var/log/install","/root/anaconda","They stay in /tmp"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"The logs are relocated to /var/log/anaconda after a successful installation, so they survive the reboot and can be reviewed on the running system."},
+
+{"id":"ch01-q05","chapter":1,"topic":"Monitor the Installation: Logs and Consoles","objectives":[],"type":"mcq","difficulty":3,
+ "prompt":"Which file records the configuration you entered on the Installation Summary screen, in a form that can seed an automated install?","options":["/root/anaconda-ks.cfg","/var/log/anaconda/anaconda.log","/var/log/anaconda/journal.log","/root/install.cfg"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"/root/anaconda-ks.cfg is the Kickstart file Anaconda generates from your choices. The files under /var/log/anaconda are diagnostic logs, not reusable configuration."},
+
+{"id":"ch01-q06","chapter":1,"topic":"Monitor the Installation: Logs and Consoles","objectives":[],"type":"mcq","difficulty":3,
+ "prompt":"Which installation log captures the messages produced by the dnf and rpm commands as software is installed?","options":["/var/log/anaconda/packaging.log","/var/log/anaconda/program.log","/var/log/anaconda/lorax-packages.log","/var/log/anaconda/syslog"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"packaging.log holds dnf and rpm output. lorax-packages.log records which packages were installed, program.log captures external programs, and syslog carries kernel messages."},
+
+{"id":"ch01-q07","chapter":1,"topic":"Perform a Custom RHEL Installation","objectives":[],"type":"mcq","difficulty":1,
+ "prompt":"Which base environment is selected by default during a RHEL 10 installation?","options":["Server with GUI","Minimal Install","Server","Workstation"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"Server with GUI is the default, giving an infrastructure server plus graphical support. Minimal Install is the smallest option and includes no graphics."},
+
+{"id":"ch01-q08","chapter":1,"topic":"Perform a Custom RHEL Installation","objectives":[],"type":"multi","difficulty":2,
+ "prompt":"Which of the following are base environments offered by the RHEL 10 installer? (Select all that apply.)","options":["Minimal Install","Virtualization Host","Custom Operating System","Container Host","Web Server"],"answer":[0,1,2],"accept":[],"canonical":null,
+ "explanation":"The six base environments are Server with GUI, Server, Minimal Install, Workstation, Custom Operating System and Virtualization Host. 'Container Host' and 'Web Server' are not base environments — web server packages come in as an add-on group."},
+
+{"id":"ch01-q09","chapter":1,"topic":"Perform a Custom RHEL Installation","objectives":[],"type":"mcq","difficulty":2,
+ "prompt":"Using the default automatic partitioning scheme on a single 20 GB disk, which partitions does Anaconda create?","options":["/boot, / and swap","/ and swap only","/boot, /, /home and swap","A single / partition"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"Automatic partitioning creates /boot, / and swap, and together they consume the whole disk. A separate /home is not part of the default scheme on this layout."},
+
+{"id":"ch01-q10","chapter":1,"topic":"Perform a Custom RHEL Installation","objectives":[],"type":"mcq","difficulty":3,
+ "prompt":"Can the /boot file system be placed inside an LVM logical volume?","options":["No — /boot must sit on a standard partition","Yes, provided the volume group is activated early","Yes, LVM is the default for /boot","Only when the disk uses a GPT label"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"/boot cannot reside within LVM; it must be a standard partition so the bootloader can read the kernel and initramfs before LVM is available."},
+
+{"id":"ch01-q11","chapter":1,"topic":"Perform a Custom RHEL Installation","objectives":[],"type":"mcq","difficulty":1,
+ "prompt":"Which bootloader does RHEL 10 install?","options":["GRUB2","LILO","systemd-boot","U-Boot"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"GRUB2 is the default and only bootloader available in RHEL. The 'Full disk summary and bootloader' link on the Installation Destination screen chooses which disk it is written to."},
+
+{"id":"ch01-q12","chapter":1,"topic":"Explain Linux, Open Source, and the Red Hat Ecosystem","objectives":[],"type":"mcq","difficulty":2,
+ "prompt":"Which kernel version is the initial release of RHEL 10 based on?","options":["6.12","5.14","6.6","4.18"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"RHEL 10 ships with kernel 6.12 at initial release. For contrast, RHEL 9 launched on 5.14 and RHEL 8 on 4.18."},
+
+{"id":"ch01-q13","chapter":1,"topic":"Explain Linux, Open Source, and the Red Hat Ecosystem","objectives":[],"type":"mcq","difficulty":2,
+ "prompt":"Who launched the GNU Project in 1984, and what was still missing from it by 1991?","options":["Richard Stallman; the kernel","Linus Torvalds; the compiler","Richard Stallman; the shell","Linus Torvalds; the C library"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"Richard Stallman started GNU in 1984 to build a free UNIX-compatible OS. By 1991 most components existed but the kernel did not — a gap filled by Linus Torvalds' Linux kernel, released under the GPL."},
+
+{"id":"ch01-q14","chapter":1,"topic":"Explain Linux, Open Source, and the Red Hat Ecosystem","objectives":[],"type":"mcq","difficulty":3,
+ "prompt":"What is the relationship between Fedora and RHEL?","options":["Fedora is the community test bed whose refined results feed later RHEL releases","Fedora is a paid rebuild of RHEL sources","RHEL is a community fork of Fedora maintained by IBM","They are unrelated distributions that happen to share a package format"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"The in-house Red Hat Linux project became the community-driven Fedora Project in 2003. Red Hat sponsors Fedora and uses it to trial new technology, folding the stable results into successive RHEL releases."},
+
+{"id":"ch01-q15","chapter":1,"topic":"Plan Your RHCSA Lab Environment: A Step-by-Step Guide","objectives":[],"type":"multi","difficulty":2,
+ "prompt":"Which requirements must the host computer meet to run the book's two-VM lab? (Select all that apply.)","options":["Hardware virtualization enabled in BIOS/UEFI","At least 8 GB of physical memory","About 50 GB of free storage","A dedicated discrete GPU","A static public IP address"],"answer":[0,1,2],"accept":[],"canonical":null,
+ "explanation":"The lab needs a dual-core or better CPU, 8 GB RAM (16 GB recommended), roughly 50 GB free storage, and hardware virtualization enabled in firmware — that last one is essential for running 64-bit guests. No discrete GPU or public IP is involved."},
+
+{"id":"ch01-q16","chapter":1,"topic":"Plan Your RHCSA Lab Environment: A Step-by-Step Guide","objectives":[],"type":"mcq","difficulty":2,
+ "prompt":"Which VirtualBox network mode does the lab use so the VMs can reach both the host and the internet?","options":["Bridged Adapter","NAT","Host-only Adapter","Internal Network"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"A Bridged Adapter puts the VM directly on the host's LAN segment, allowing bidirectional communication with the host and access to the internet — needed for the static addresses 192.168.0.110 and .120 used throughout the book."},
+
+{"id":"ch01-q17","chapter":1,"topic":"Access Your New RHEL System Locally and Remotely","objectives":[4],"type":"command","difficulty":1,
+ "prompt":"After connecting over SSH, which single command confirms which user account you are logged in as?","options":[],"answer":[],
+ "accept":["whoami","id -un","echo \\$USER"],"canonical":"whoami",
+ "explanation":"whoami prints the effective username. The chapter pairs it with hostname and pwd to confirm you landed on the right server, as the right user, in the right home directory."},
+
+{"id":"ch01-q18","chapter":1,"topic":"Access Your New RHEL System Locally and Remotely","objectives":[4],"type":"command","difficulty":2,
+ "prompt":"From a terminal, open an SSH session to server1 at 192.168.0.110 as the user user1. Write the command.","options":[],"answer":[],
+ "accept":["ssh user1@192\\.168\\.0\\.110","ssh -l user1 192\\.168\\.0\\.110","ssh 192\\.168\\.0\\.110 -l user1"],"canonical":"ssh user1@192.168.0.110",
+ "explanation":"ssh user1@192.168.0.110 is the standard form; ssh -l user1 192.168.0.110 is equivalent. This is exam objective 4 — accessing remote systems using ssh."},
+
+{"id":"ch01-q19","chapter":1,"topic":"Access Your New RHEL System Locally and Remotely","objectives":[4],"type":"command","difficulty":1,
+ "prompt":"Which command terminates your remote login session and returns you to the local prompt?","options":[],"answer":[],
+ "accept":["logout","exit"],"canonical":"logout",
+ "explanation":"Either logout or exit ends the session; Ctrl+d does the same thing from the keyboard."},
+
+{"id":"ch01-q20","chapter":1,"topic":"Access Your New RHEL System Locally and Remotely","objectives":[],"type":"mcq","difficulty":1,
+ "prompt":"Having installed the Server with GUI base environment, which desktop environment does RHEL 10 present at the graphical console?","options":["GNOME","KDE Plasma","Xfce","Cinnamon"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"GNOME (GNU Network Object Model Environment) is the default display manager and desktop environment in RHEL 10."}
+]

@@ -1,0 +1,450 @@
+[
+ {
+  "id": "ch20-q01",
+  "chapter": 20,
+  "topic": "Describe the OpenSSH Service, its Versions, and Supported Algorithms",
+  "objectives": [
+   4
+  ],
+  "type": "mcq",
+  "difficulty": 1,
+  "prompt": "Which SSH protocol version does RHEL 10 support, and on which TCP port does sshd listen by default?",
+  "options": [
+   "Version 2 only, on port 22",
+   "Versions 1 and 2, on port 22",
+   "Version 2 only, on port 2222",
+   "Version 1 only, on port 23"
+  ],
+  "answer": [
+   0
+  ],
+  "accept": [],
+  "canonical": null,
+  "explanation": "Version 2 is the default and only supported version. The Port directive in /etc/ssh/sshd_config sets the listening port, defaulting to 22."
+ },
+ {
+  "id": "ch20-q02",
+  "chapter": 20,
+  "topic": "Describe the OpenSSH Service, its Versions, and Supported Algorithms",
+  "objectives": [
+   4
+  ],
+  "type": "mcq",
+  "difficulty": 2,
+  "prompt": "Which legacy programs did SSH replace, and why?",
+  "options": [
+   "telnet, rsh and ftp \u2014 they sent credentials in clear text and did not encrypt data in transit",
+   "httpd and vsftpd \u2014 they were too slow",
+   "nfs and autofs \u2014 they lacked authentication",
+   "su and sudo \u2014 they logged passwords"
+  ],
+  "answer": [
+   0
+  ],
+  "accept": [],
+  "canonical": null,
+  "explanation": "SSH encrypts the channel, supports several authentication mechanisms, and uses message authentication codes to guarantee data integrity for the whole session."
+ },
+ {
+  "id": "ch20-q03",
+  "chapter": 20,
+  "topic": "Examine Core Encryption Techniques and Authentication Methods",
+  "objectives": [
+   57
+  ],
+  "type": "mcq",
+  "difficulty": 3,
+  "prompt": "How does OpenSSH combine symmetric and asymmetric encryption in a session?",
+  "options": [
+   "Asymmetric encryption handles key exchange and authentication; a symmetric session key then encrypts the bulk of the data",
+   "Symmetric encryption handles authentication; asymmetric encrypts all data",
+   "Only asymmetric encryption is used throughout",
+   "Only symmetric encryption is used throughout"
+  ],
+  "answer": [
+   0
+  ],
+  "accept": [],
+  "canonical": null,
+  "explanation": "Symmetric encryption is computationally cheap, so it carries the traffic. The session key is generated dynamically during the initial key exchange."
+ },
+ {
+  "id": "ch20-q04",
+  "chapter": 20,
+  "topic": "Examine Core Encryption Techniques and Authentication Methods",
+  "objectives": [
+   57
+  ],
+  "type": "mcq",
+  "difficulty": 3,
+  "prompt": "In public key authentication, which key goes where?",
+  "options": [
+   "The private key stays on the client; the public key is installed on the server",
+   "The public key stays on the client; the private key goes to the server",
+   "Both keys are copied to the server",
+   "Both keys stay on the client"
+  ],
+  "answer": [
+   0
+  ],
+  "accept": [],
+  "canonical": null,
+  "explanation": "The server challenges the client to prove possession of the private key. If that key has a passphrase, it is entered locally \u2014 no password ever crosses the network."
+ },
+ {
+  "id": "ch20-q05",
+  "chapter": 20,
+  "topic": "Examine Core Encryption Techniques and Authentication Methods",
+  "objectives": [
+   57
+  ],
+  "type": "multi",
+  "difficulty": 2,
+  "prompt": "Which authentication methods does OpenSSH support? (Select all that apply.)",
+  "options": [
+   "GSSAPI-based",
+   "Host-based",
+   "Public key-based",
+   "Challenge-response",
+   "Biometric-based"
+  ],
+  "answer": [
+   0,
+   1,
+   2,
+   3
+  ],
+  "accept": [],
+  "canonical": null,
+  "explanation": "Password-based authentication is also supported and is the last fallback. There is no biometric method in OpenSSH. The methods are attempted in roughly the listed order; host-based is rarely used today and is disabled by default in RHEL."
+ },
+ {
+  "id": "ch20-q06",
+  "chapter": 20,
+  "topic": "Describe the OpenSSH Service, its Versions, and Supported Algorithms",
+  "objectives": [],
+  "type": "mcq",
+  "difficulty": 2,
+  "prompt": "Which OpenSSH package provides the sshd daemon and /etc/ssh/sshd_config?",
+  "options": [
+   "openssh-server",
+   "openssh",
+   "openssh-clients",
+   "openssh-daemon"
+  ],
+  "answer": [
+   0
+  ],
+  "accept": [],
+  "canonical": null,
+  "explanation": "openssh has ssh-keygen and the core libraries; openssh-clients has ssh, sftp, ssh-copy-id and ssh_config. All three are installed by default."
+ },
+ {
+  "id": "ch20-q07",
+  "chapter": 20,
+  "topic": "Explain OpenSSH Configuration Files",
+  "objectives": [],
+  "type": "mcq",
+  "difficulty": 2,
+  "prompt": "Which file configures the SSH server, and which configures outbound client connections?",
+  "options": [
+   "/etc/ssh/sshd_config for the server; /etc/ssh/ssh_config for the client",
+   "/etc/ssh/ssh_config for the server; /etc/ssh/sshd_config for the client",
+   "Both use /etc/ssh/ssh_config",
+   "/etc/sshd.conf for the server; ~/.ssh/config for the client"
+  ],
+  "answer": [
+   0
+  ],
+  "accept": [],
+  "canonical": null,
+  "explanation": "Note the d: sshd_config is the daemon's file. Users can override client defaults in their own ~/.ssh config. Changes to sshd_config need `systemctl restart sshd` to take effect."
+ },
+ {
+  "id": "ch20-q08",
+  "chapter": 20,
+  "topic": "Explain OpenSSH Configuration Files",
+  "objectives": [
+   57
+  ],
+  "type": "mcq",
+  "difficulty": 3,
+  "prompt": "Which sshd_config directive names the file holding a user's authorised public keys, and what is its default?",
+  "options": [
+   "AuthorizedKeysFile, defaulting to ~/.ssh/authorized_keys",
+   "PubKeyAuthentication, defaulting to ~/.ssh/id_rsa.pub",
+   "IdentityFile, defaulting to ~/.ssh/known_hosts",
+   "HostKeyFile, defaulting to /etc/ssh/authorized_keys"
+  ],
+  "answer": [
+   0
+  ],
+  "accept": [],
+  "canonical": null,
+  "explanation": "PubKeyAuthentication (default yes) enables the method; AuthorizedKeysFile says where the accepted public keys live. IdentityFile is a client-side directive naming the private key."
+ },
+ {
+  "id": "ch20-q09",
+  "chapter": 20,
+  "topic": "Explain OpenSSH Configuration Files",
+  "objectives": [],
+  "type": "mcq",
+  "difficulty": 3,
+  "prompt": "What is the default value of PermitRootLogin in sshd_config?",
+  "options": [
+   "prohibit-password",
+   "yes",
+   "no",
+   "forced-commands-only"
+  ],
+  "answer": [
+   0
+  ],
+  "accept": [],
+  "canonical": null,
+  "explanation": "prohibit-password allows root to log in by key but not with a password. PermitEmptyPasswords defaults to no and X11Forwarding to no."
+ },
+ {
+  "id": "ch20-q10",
+  "chapter": 20,
+  "topic": "Explain OpenSSH Configuration Files",
+  "objectives": [],
+  "type": "mcq",
+  "difficulty": 3,
+  "prompt": "What does the client-side StrictHostKeyChecking directive control?",
+  "options": [
+   "Whether new host keys are added to ~/.ssh/known_hosts, and what happens when a stored key no longer matches",
+   "Whether the server verifies the client's key",
+   "Which encryption algorithm is negotiated",
+   "Whether passwords may be used as a fallback"
+  ],
+  "answer": [
+   0
+  ],
+  "accept": [],
+  "canonical": null,
+  "explanation": "The default, ask, prompts before adding a new key and refuses to connect on a mismatch. accept-new adds new keys silently but still refuses mismatches; no ignores changes entirely."
+ },
+ {
+  "id": "ch20-q11",
+  "chapter": 20,
+  "topic": "Explain OpenSSH Configuration Files",
+  "objectives": [],
+  "type": "mcq",
+  "difficulty": 3,
+  "prompt": "When is a user's ~/.ssh directory created?",
+  "options": [
+   "On first running ssh-keygen, or on first accepting a remote server's host key",
+   "At user account creation, from /etc/skel",
+   "When sshd starts for the first time",
+   "When ssh-copy-id is run on the server"
+  ],
+  "answer": [
+   0
+  ],
+  "accept": [],
+  "canonical": null,
+  "explanation": "Accepting a host key writes the server's fingerprint into ~/.ssh/known_hosts alongside its name or IP, which the client uses to verify the server on later connections."
+ },
+ {
+  "id": "ch20-q12",
+  "chapter": 20,
+  "topic": "Implement Public/Private Key-Based Authentication for Enhanced Security",
+  "objectives": [
+   57
+  ],
+  "type": "command",
+  "difficulty": 2,
+  "prompt": "Generate an RSA key pair with no passphrase and quiet output.",
+  "options": [],
+  "answer": [],
+  "accept": [
+   "ssh-keygen -t rsa -N [\"']{2} -q",
+   "ssh-keygen -q -t rsa -N [\"']{2}",
+   "ssh-keygen -t rsa -q -N [\"']{2}",
+   "ssh-keygen -N [\"']{2} -t rsa -q"
+  ],
+  "canonical": "ssh-keygen -t rsa -N \"\" -q",
+  "explanation": "-t chooses the algorithm, -N supplies the passphrase (empty here) and -q suppresses detail. The default identity in RHEL 10 is id_ed25519, with the public half in id_ed25519.pub."
+ },
+ {
+  "id": "ch20-q13",
+  "chapter": 20,
+  "topic": "Implement Public/Private Key-Based Authentication for Enhanced Security",
+  "objectives": [
+   57
+  ],
+  "type": "command",
+  "difficulty": 2,
+  "prompt": "Install your public key on server20 for the account user1, so key-based login works.",
+  "options": [],
+  "answer": [],
+  "accept": [
+   "ssh-copy-id user1@server20",
+   "ssh-copy-id -i [^ ]+ user1@server20"
+  ],
+  "canonical": "ssh-copy-id user1@server20",
+  "explanation": "ssh-copy-id appends the key to ~/.ssh/authorized_keys on the remote host and records server20's fingerprint in your local known_hosts. You supply the remote password once, then never again."
+ },
+ {
+  "id": "ch20-q14",
+  "chapter": 20,
+  "topic": "Implement Public/Private Key-Based Authentication for Enhanced Security",
+  "objectives": [
+   57
+  ],
+  "type": "multi",
+  "difficulty": 3,
+  "prompt": "Which cryptographic algorithms does OpenSSH support for key pairs? (Select all that apply.)",
+  "options": [
+   "RSA",
+   "DSA",
+   "ECDSA",
+   "Ed25519",
+   "MD5"
+  ],
+  "answer": [
+   0,
+   1,
+   2,
+   3
+  ],
+  "accept": [],
+  "canonical": null,
+  "explanation": "MD5 is a hash function, not a key algorithm. RSA supports both encryption and digital signatures; DSA and ECDSA are used for authentication, with ECDSA the modern alternative to DSA."
+ },
+ {
+  "id": "ch20-q15",
+  "chapter": 20,
+  "topic": "Implement Public/Private Key-Based Authentication for Enhanced Security",
+  "objectives": [
+   57
+  ],
+  "type": "mcq",
+  "difficulty": 2,
+  "prompt": "Which log file records SSH authentication events?",
+  "options": [
+   "/var/log/secure",
+   "/var/log/messages",
+   "/var/log/auth",
+   "/var/log/sshd.log"
+  ],
+  "answer": [
+   0
+  ],
+  "accept": [],
+  "canonical": null,
+  "explanation": "The SyslogFacility directive defaults to AUTH, which rsyslog routes to /var/log/secure. Entries show the timestamp, hostname, process and PID, username and source IP."
+ },
+ {
+  "id": "ch20-q16",
+  "chapter": 20,
+  "topic": "Run Commands on Remote Linux Systems",
+  "objectives": [
+   4
+  ],
+  "type": "command",
+  "difficulty": 2,
+  "prompt": "Run the hostname command on server20 as user1 without opening an interactive session.",
+  "options": [],
+  "answer": [],
+  "accept": [
+   "ssh user1@server20 hostname",
+   "ssh -l user1 server20 hostname"
+  ],
+  "canonical": "ssh user1@server20 hostname",
+  "explanation": "Appending a command to ssh executes it remotely and returns the output, without a full login shell. Quote the command if it contains shell metacharacters you want interpreted remotely."
+ },
+ {
+  "id": "ch20-q17",
+  "chapter": 20,
+  "topic": "Run Commands on Remote Linux Systems",
+  "objectives": [
+   4
+  ],
+  "type": "mcq",
+  "difficulty": 2,
+  "prompt": "Which two forms log in to server20 as user2?",
+  "options": [
+   "ssh user2@server20  and  ssh -l user2 server20",
+   "ssh server20 -u user2  and  ssh user2:server20",
+   "ssh --user user2 server20  and  ssh server20/user2",
+   "ssh server20 user2  and  ssh -U user2 server20"
+  ],
+  "answer": [
+   0
+  ],
+  "accept": [],
+  "canonical": null,
+  "explanation": "Without a username, ssh assumes the account you are logged in as locally. Both forms are equivalent."
+ },
+ {
+  "id": "ch20-q18",
+  "chapter": 20,
+  "topic": "Transfer Files Security between Linux Systems",
+  "objectives": [
+   29
+  ],
+  "type": "command",
+  "difficulty": 2,
+  "prompt": "Open an interactive secure file transfer session to server20 as user1.",
+  "options": [],
+  "answer": [],
+  "accept": [
+   "sftp user1@server20",
+   "sftp -l user1 server20"
+  ],
+  "canonical": "sftp user1@server20",
+  "explanation": "At the sftp> prompt, get downloads and put uploads. Type ? to list the available commands, and quit, bye or exit to leave."
+ },
+ {
+  "id": "ch20-q19",
+  "chapter": 20,
+  "topic": "Transfer Files Security between Linux Systems",
+  "objectives": [
+   29
+  ],
+  "type": "multi",
+  "difficulty": 3,
+  "prompt": "At the sftp> prompt, which commands act on the LOCAL system rather than the remote one? (Select all that apply.)",
+  "options": [
+   "lcd",
+   "lls",
+   "lpwd",
+   "lmkdir",
+   "get"
+  ],
+  "answer": [
+   0,
+   1,
+   2,
+   3
+  ],
+  "accept": [],
+  "canonical": null,
+  "explanation": "The l prefix means local. Everything else \u2014 cd, ls, pwd, mkdir, rename, rm \u2014 operates on the remote server. get downloads from the remote host to the local one."
+ },
+ {
+  "id": "ch20-q20",
+  "chapter": 20,
+  "topic": "Transfer Files Security between Linux Systems",
+  "objectives": [
+   29
+  ],
+  "type": "mcq",
+  "difficulty": 2,
+  "prompt": "Which sftp commands download and upload a file respectively?",
+  "options": [
+   "get and put",
+   "pull and push",
+   "download and upload",
+   "recv and send"
+  ],
+  "answer": [
+   0
+  ],
+  "accept": [],
+  "canonical": null,
+  "explanation": "get retrieves from the remote server and put sends to it. sftp needs either a resolvable hostname or an IP address for the target."
+ }
+]

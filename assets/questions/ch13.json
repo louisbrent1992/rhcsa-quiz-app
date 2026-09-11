@@ -1,0 +1,92 @@
+[
+{"id":"ch13-q01","chapter":13,"topic":"Explain the Linux Boot Process: Firmware, Bootloader, Kernel, and Initialization","objectives":[],"type":"mcq","difficulty":2,
+ "prompt":"What are the four phases of the boot process on an x86-64 RHEL system, in order?","options":["Firmware, bootloader, kernel, initialization","POST, GRUB2, systemd, login","BIOS, MBR, initramfs, target","Firmware, kernel, bootloader, initialization"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"Firmware (BIOS/UEFI) runs POST and finds a boot device; the bootloader (GRUB2) loads the kernel; the kernel unpacks initramfs and switches to the real root; systemd then completes initialization by starting services to reach the boot target."},
+
+{"id":"ch13-q02","chapter":13,"topic":"Explain the Linux Boot Process: Firmware, Bootloader, Kernel, and Initialization","objectives":[],"type":"mcq","difficulty":3,
+ "prompt":"How is the 512-byte Master Boot Record laid out on a BIOS system?","options":["446-byte bootloader stub, 64-byte partition table, 2-byte boot signature","512-byte bootloader with no partition table","256 bytes each of bootloader and partition table","64-byte bootloader, 446-byte partition table, 2-byte signature"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"That 64-byte partition table is why MBR supports only four primary partitions. UEFI systems instead read a FAT-formatted EFI System Partition and can host multiple bootloaders."},
+
+{"id":"ch13-q03","chapter":13,"topic":"Explain the Linux Boot Process: Firmware, Bootloader, Kernel, and Initialization","objectives":[],"type":"mcq","difficulty":3,
+ "prompt":"What does the kernel do with initramfs during boot?","options":["Unpacks it as a temporary root filesystem, then runs /init to prepare the real root before switching to it","Mounts it permanently as /boot","Uses it as swap space until the real swap is activated","Copies it to /sysroot and leaves it there"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"/init is a minimal systemd environment that loads driver modules, activates storage, assembles LVM or encrypted volumes, then mounts the real root at /sysroot and performs a switch-root. initramfs is discarded from memory afterwards, and systemd starts as PID 1."},
+
+{"id":"ch13-q04","chapter":13,"topic":"Explain the Linux Boot Process: Firmware, Bootloader, Kernel, and Initialization","objectives":[],"type":"mcq","difficulty":2,
+ "prompt":"Which process runs as PID 1 after the switch-root?","options":["systemd","init","kernel","grub2"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"systemd is the default initialization framework in RHEL 10. It starts the enabled userspace services and brings the system to its configured boot target."},
+
+{"id":"ch13-q05","chapter":13,"topic":"Interact with GRUB2 to Interrupt the Boot Process and Modify Boot Parameters","objectives":[22],"type":"mcq","difficulty":2,
+ "prompt":"At the GRUB2 menu, which key edits the selected kernel entry, and which key combination boots the edited entry?","options":["e to edit; Ctrl+x to boot","c to edit; Enter to boot","e to edit; Enter to boot","a to edit; Ctrl+b to boot"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"Press e to open the entry in a temporary editor and Ctrl+x to boot with your changes. Esc discards them. Pressing c instead opens the grub> command prompt."},
+
+{"id":"ch13-q06","chapter":13,"topic":"Interact with GRUB2 to Interrupt the Boot Process and Modify Boot Parameters","objectives":[22],"type":"mcq","difficulty":3,
+ "prompt":"You edit a kernel entry at the GRUB2 menu and boot. What happens to that change?","options":["It applies only to this boot; grub.cfg is not modified","It is written to grub.cfg and persists","It persists until the next kernel installation","It is saved to /etc/default/grub automatically"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"Menu edits are one-time and temporary. To change boot settings persistently you edit /etc/default/grub and regenerate grub.cfg."},
+
+{"id":"ch13-q07","chapter":13,"topic":"Interact with GRUB2 to Interrupt the Boot Process and Modify Boot Parameters","objectives":[22],"type":"mcq","difficulty":2,
+ "prompt":"Which line of a GRUB2 entry do you append a target name or kernel option to?","options":["The line beginning with the keyword linux","The line beginning with initrd","The line beginning with menuentry","The line beginning with set root"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"The linux line carries the kernel path and its command-line parameters. Appending rescue, emergency or 3 there boots into a less capable target."},
+
+{"id":"ch13-q08","chapter":13,"topic":"Manage GRUB2 Configuration to Persistently Change Boot Settings","objectives":[46],"type":"mcq","difficulty":2,
+ "prompt":"Which file should you edit to change boot settings persistently, and which file must never be edited by hand?","options":["Edit /etc/default/grub; never edit /boot/grub2/grub.cfg","Edit /boot/grub2/grub.cfg; never edit /etc/default/grub","Edit /etc/grub.d/00_header; never edit /etc/default/grub","Edit /boot/grub2/grubenv; never edit /etc/grub.d"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"grub.cfg is auto-generated from /etc/default/grub and the scripts in /etc/grub.d. It is rebuilt whenever a new kernel is installed, so manual edits to it are lost."},
+
+{"id":"ch13-q09","chapter":13,"topic":"Manage GRUB2 Configuration to Persistently Change Boot Settings","objectives":[46],"type":"command","difficulty":3,
+ "prompt":"Regenerate the GRUB2 boot configuration file after editing /etc/default/grub.","options":[],"answer":[],
+ "accept":["grub2-mkconfig -o /boot/grub2/grub\\.cfg","grub2-mkconfig --output=?/boot/grub2/grub\\.cfg"],"canonical":"grub2-mkconfig -o /boot/grub2/grub.cfg",
+ "explanation":"grub2-mkconfig runs the scripts in /etc/grub.d in sort order, pulling variables from /etc/default/grub, and writes the result to the path given with -o."},
+
+{"id":"ch13-q10","chapter":13,"topic":"Manage GRUB2 Configuration to Persistently Change Boot Settings","objectives":[46],"type":"mcq","difficulty":2,
+ "prompt":"Which directive in /etc/default/grub sets how long GRUB2 waits before booting the default entry?","options":["GRUB_TIMEOUT","GRUB_DEFAULT","GRUB_CMDLINE_LINUX","GRUB_DISABLE_SUBMENU"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"GRUB_TIMEOUT defaults to 5 seconds. GRUB_DEFAULT chooses the entry (saved means the last one booted, 0 the first), and GRUB_CMDLINE_LINUX supplies kernel command-line options."},
+
+{"id":"ch13-q11","chapter":13,"topic":"Manage GRUB2 Configuration to Persistently Change Boot Settings","objectives":[46],"type":"multi","difficulty":3,
+ "prompt":"Which statements about the /etc/grub.d scripts are correct? (Select all that apply.)","options":["00_header sets the environment and loads /etc/default/grub","10_linux detects installed kernels","30_os-prober scans for other operating systems","40_custom is a template for custom menu entries","They are run alphabetically by grub2-install"],"answer":[0,1,2,3],"accept":[],"canonical":null,
+ "explanation":"The scripts are run in sort order by grub2-mkconfig, not grub2-install. Their combined output becomes grub.cfg."},
+
+{"id":"ch13-q12","chapter":13,"topic":"Manage GRUB2 Configuration to Persistently Change Boot Settings","objectives":[46],"type":"mcq","difficulty":3,
+ "prompt":"What does GRUB_ENABLE_BLSCFG control?","options":["Whether each kernel gets its own .conf file under /boot/loader/entries","Whether the boot menu is hidden","Whether legacy BIOS booting is allowed","Whether the boot log is written to disk"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"With the BootLoader Specification format enabled, entries live as separate files under /boot/loader/entries, named after the machine ID from /etc/machine-id plus the kernel version."},
+
+{"id":"ch13-q13","chapter":13,"topic":"Boot the System Into Specific Targets for Troubleshooting or Testing","objectives":[22],"type":"multi","difficulty":2,
+ "prompt":"Which strings can be appended to the linux line to boot into a less capable target? (Select all that apply.)","options":["rescue","emergency","3","1, s or single as legacy forms of rescue","reboot"],"answer":[0,1,2,3],"accept":[],"canonical":null,
+ "explanation":"Both rescue and emergency prompt for the root password at login. The legacy runlevel designations 1, s and single still map to the rescue target."},
+
+{"id":"ch13-q14","chapter":13,"topic":"Recover System Access by Resetting a Lost or Forgotten root Password","objectives":[22],"type":"mcq","difficulty":3,
+ "prompt":"To reset a forgotten root password, what do you append to the linux line at the GRUB2 menu?","options":["init=/bin/bash","rescue","emergency","single"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"init=/bin/bash bypasses systemd entirely and drops you straight into a root shell, with / mounted read-only. rescue and emergency both demand the root password you do not have."},
+
+{"id":"ch13-q15","chapter":13,"topic":"Recover System Access by Resetting a Lost or Forgotten root Password","objectives":[22],"type":"command","difficulty":3,
+ "prompt":"After booting with init=/bin/bash, the root filesystem is mounted read-only. Remount it read-write so passwd can update /etc/shadow.","options":[],"answer":[],
+ "accept":["mount -o remount,rw /","mount -o rw,remount /","mount --options remount,rw /"],"canonical":"mount -o remount,rw /",
+ "explanation":"Without the remount, passwd cannot write the new hash. Order within -o does not matter."},
+
+{"id":"ch13-q16","chapter":13,"topic":"Recover System Access by Resetting a Lost or Forgotten root Password","objectives":[22],"type":"mcq","difficulty":3,
+ "prompt":"Why must you create /.autorelabel before rebooting after a root password reset?","options":["To make SELinux relabel all files, including the newly written /etc/shadow","To rebuild the GRUB2 configuration on next boot","To force a filesystem consistency check","To clear the saved boot entry"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"Writing /etc/shadow from a shell outside the normal boot can leave it with a wrong SELinux context, which would break logins. The relabel restores policy compliance. Finish with `exec /sbin/init` to trigger it and reboot."},
+
+{"id":"ch13-q17","chapter":13,"topic":"Analyze the Linux Kernel, including its Package Composition, Version Anatomy, and Critical Directories","objectives":[],"type":"command","difficulty":1,
+ "prompt":"Display the version of the currently running kernel.","options":[],"answer":[],
+ "accept":["uname -r","uname --kernel-release"],"canonical":"uname -r",
+ "explanation":"uname -r gives the kernel release, e.g. 6.12.0-55.9.1.el10_0.x86_64. Use uname -m to check the hardware architecture."},
+
+{"id":"ch13-q18","chapter":13,"topic":"Analyze the Linux Kernel, including its Package Composition, Version Anatomy, and Critical Directories","objectives":[],"type":"mcq","difficulty":3,
+ "prompt":"In the kernel version 6.12.0-55.9.1.el10_0.x86_64, what does 55.9.1 represent?","options":["The Red Hat customised build of the upstream 6.12.0 kernel","The upstream patch level","The number of loaded modules","The Enterprise Linux release number"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"6.12.0 is the general upstream version (6 major, 12 major revision, 0 patch level), 55.9.1 is Red Hat's build, el10_0 names the Enterprise Linux release, and x86_64 the architecture."},
+
+{"id":"ch13-q19","chapter":13,"topic":"Analyze the Linux Kernel, including its Package Composition, Version Anatomy, and Critical Directories","objectives":[],"type":"multi","difficulty":3,
+ "prompt":"Which files in /boot serve the described purpose? (Select all that apply.)","options":["vmlinuz-6* is the compressed kernel executable","initramfs-6* is the initial RAM filesystem used in early boot","config-6* is the kernel build configuration","system.map-6* maps memory addresses to kernel symbols","grubenv-6* stores the module list"],"answer":[0,1,2,3],"accept":[],"canonical":null,
+ "explanation":"/boot/grub2/grubenv stores persistent GRUB2 environment variables such as saved_entry — it is not versioned per kernel. symvers-6* holds symbol versioning for module compatibility."},
+
+{"id":"ch13-q20","chapter":13,"topic":"Analyze the Linux Kernel, including its Package Composition, Version Anatomy, and Critical Directories","objectives":[],"type":"mcq","difficulty":2,
+ "prompt":"Which directory holds the kernel modules for each installed kernel version?","options":["/usr/lib/modules","/lib/kernel/modules","/boot/modules","/proc/modules"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"Under /usr/lib/modules there is one subdirectory per installed kernel, named for its version. Its kernel/drivers subtree holds the hardware and software component modules."},
+
+{"id":"ch13-q21","chapter":13,"topic":"Update the Kernel by Downloading and Installing a New Version without Removing the Old One","objectives":[46],"type":"mcq","difficulty":3,
+ "prompt":"What happens to the existing kernel when you install a new one with dnf?","options":["It stays installed and remains selectable from the GRUB2 menu","It is replaced and its files are overwritten","It is removed once the new kernel boots successfully","It is kept only if you pass --keep-old"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"dnf adds a kernel rather than upgrading in place, so you can fall back if the new one misbehaves. grub.cfg is regenerated automatically and lists every bootable kernel."},
+
+{"id":"ch13-q22","chapter":13,"topic":"Analyze the Linux Kernel, including its Package Composition, Version Anatomy, and Critical Directories","objectives":[],"type":"mcq","difficulty":2,
+ "prompt":"Which kernel package contains no files itself but ensures the other kernel packages are installed correctly?","options":["kernel","kernel-core","kernel-modules","kernel-headers"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"The kernel package is a meta-package. kernel-core has the essential modules, kernel-modules covers common hardware, kernel-modules-extra less common hardware, and kernel-headers the kernel-to-userspace interface files."}
+]

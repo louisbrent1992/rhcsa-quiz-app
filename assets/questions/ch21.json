@@ -1,0 +1,88 @@
+[
+{"id":"ch21-q01","chapter":21,"topic":"Implement Host-Based Security Control with the Linux Firewall","objectives":[50],"type":"mcq","difficulty":2,
+ "prompt":"Which kernel framework underpins the RHEL firewall, and which modern user-space interface defines its rules?","options":["netfilter, with nftables replacing the older iptables","iptables, with netfilter replacing nftables","SELinux, with firewalld defining rules","TCP wrappers, with nftables defining rules"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"netfilter provides packet filtering, NAT and classification in the kernel. firewalld manages nftables rules dynamically through firewall-cmd, with no service restart required."},
+
+{"id":"ch21-q02","chapter":21,"topic":"Implement Host-Based Security Control with the Linux Firewall","objectives":[50],"type":"mcq","difficulty":2,
+ "prompt":"Which file lists the standard port assignments used by network services?","options":["/etc/services","/etc/protocols","/etc/firewalld/ports","/etc/nftables.conf"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"Common assignments to remember: FTP 21, SSH 22, Postfix/SMTP 25, HTTP 80 and NTP 123."},
+
+{"id":"ch21-q03","chapter":21,"topic":"Describe the firewalld Service and its Purpose","objectives":[55],"type":"mcq","difficulty":2,
+ "prompt":"What is the main advantage of firewalld over a static rule set?","options":["Rules can be added, changed or removed immediately without dropping connections or restarting the service","It requires no configuration files","It filters only outbound traffic","It operates entirely in user space without kernel involvement"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"That makes testing and troubleshooting far less disruptive. Rules can also be saved permanently so they are reapplied after a reboot."},
+
+{"id":"ch21-q04","chapter":21,"topic":"Describe the firewalld Service and its Purpose","objectives":[55],"type":"mcq","difficulty":3,
+ "prompt":"Where does firewalld keep its default rules versus custom rules?","options":["Defaults in /usr/lib/firewalld; custom rules in /etc/firewalld","Defaults in /etc/firewalld; custom rules in /usr/lib/firewalld","Both in /etc/firewalld","Defaults in /var/lib/firewalld; custom rules in /etc/firewalld"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"The system files under /usr/lib/firewalld are templates. Modifying one with a management tool copies it into /etc/firewalld automatically; firewalld reads and applies whatever is in /etc/firewalld."},
+
+{"id":"ch21-q05","chapter":21,"topic":"Explain the Concepts of firewalld Zones and Services","objectives":[55],"type":"mcq","difficulty":2,
+ "prompt":"Which zone is the firewalld default, applied to newly added network interfaces?","options":["public","trusted","home","drop"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"public rejects all incoming traffic except what is explicitly allowed, and is activated when firewalld starts. Its default zone file permits ssh, dhcpv6-client and cockpit."},
+
+{"id":"ch21-q06","chapter":21,"topic":"Explain the Concepts of firewalld Zones and Services","objectives":[55],"type":"mcq","difficulty":3,
+ "prompt":"What is the difference between the block and drop zones?","options":["block rejects traffic and returns an icmp-host-prohibited message; drop discards it silently","drop rejects with an ICMP error; block discards silently","block allows all traffic; drop denies all traffic","They are identical"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"drop is the most restrictive predefined zone, giving an attacker no response at all. trusted sits at the other extreme and allows all incoming traffic."},
+
+{"id":"ch21-q07","chapter":21,"topic":"Explain the Concepts of firewalld Zones and Services","objectives":[55],"type":"mcq","difficulty":3,
+ "prompt":"How many zones can a single network connection belong to at once?","options":["One","Two","As many as are defined","None; zones apply to ports, not connections"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"A connection belongs to exactly one zone, though a zone may hold many connections. Each zone's rules are defined and manipulated independently of the others."},
+
+{"id":"ch21-q08","chapter":21,"topic":"Explain the Concepts of firewalld Zones and Services","objectives":[55],"type":"mcq","difficulty":3,
+ "prompt":"In what order does firewalld decide which zone applies to an incoming packet?","options":["Zone matching the source IP, then the zone holding the receiving connection, then the default zone","Default zone, then source IP, then connection","Connection zone only","Whichever zone was most recently modified"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"A source-address match wins first. Failing that, firewalld uses the zone that owns the network connection, and only then falls back to the default zone."},
+
+{"id":"ch21-q09","chapter":21,"topic":"Explain the Concepts of firewalld Zones and Services","objectives":[55],"type":"mcq","difficulty":3,
+ "prompt":"Which predefined zone masquerades outgoing IPv4 traffic to appear to come from the outgoing interface's address?","options":["external","dmz","public","internal"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"external is intended for external networks with masquerading enabled. dmz is for publicly accessible demilitarised zones without that translation."},
+
+{"id":"ch21-q10","chapter":21,"topic":"Analyze the Structure of Zone and Service Configuration Files","objectives":[55],"type":"mcq","difficulty":2,
+ "prompt":"In what format are firewalld zone and service configuration files written?","options":["XML","JSON","YAML","INI"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"A zone file carries a name, description and the list of allowed services; a service file carries a name, description, port and protocol. See man firewalld.zone and man firewalld.service."},
+
+{"id":"ch21-q11","chapter":21,"topic":"Analyze the Structure of Zone and Service Configuration Files","objectives":[55],"type":"multi","difficulty":3,
+ "prompt":"Which directories hold firewalld configuration? (Select all that apply.)","options":["/usr/lib/firewalld/zones — system zone templates","/usr/lib/firewalld/services — system service templates","/etc/firewalld/zones — user-defined zones","/etc/firewalld/services — user-defined services","/var/lib/firewalld/rules — the runtime rule cache"],"answer":[0,1,2,3],"accept":[],"canonical":null,
+ "explanation":"There is no /var/lib/firewalld/rules; runtime rules live in memory until made permanent. Anything you edit belongs under /etc/firewalld."},
+
+{"id":"ch21-q12","chapter":21,"topic":"Control Access to Network Services and Ports Using firewalld","objectives":[50],"type":"mcq","difficulty":2,
+ "prompt":"What is firewalld's default posture toward incoming traffic?","options":["Everything is blocked unless a service or port is explicitly opened","Everything is allowed unless explicitly blocked","Only traffic on ports below 1024 is blocked","Only IPv6 traffic is blocked"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"You open what you need by adding a firewalld service (a preconfigured bundle of port, protocol and any helper modules) or an individual port to a zone. Outgoing traffic is allowed by default in all predefined zones."},
+
+{"id":"ch21-q13","chapter":21,"topic":"Manage Firewall Rules with the firewall-cmd Command","objectives":[50,55],"type":"command","difficulty":1,
+ "prompt":"Show the name of the current default firewalld zone.","options":[],"answer":[],
+ "accept":["firewall-cmd --get-default-zone"],"canonical":"firewall-cmd --get-default-zone",
+ "explanation":"--get-zones lists every available zone and --get-active-zones shows which are active and which interfaces are bound to them."},
+
+{"id":"ch21-q14","chapter":21,"topic":"Manage Firewall Rules with the firewall-cmd Command","objectives":[50,55],"type":"command","difficulty":2,
+ "prompt":"List every setting — services, ports, interfaces and sources — for the default zone.","options":[],"answer":[],
+ "accept":["firewall-cmd --list-all"],"canonical":"firewall-cmd --list-all",
+ "explanation":"Without --zone, firewall-cmd operates on the default zone. --list-all-zones shows the settings of every zone at once."},
+
+{"id":"ch21-q15","chapter":21,"topic":"Manage Firewall Rules with the firewall-cmd Command","objectives":[50,55],"type":"command","difficulty":2,
+ "prompt":"Permanently allow the http service through the firewall in the default zone.","options":[],"answer":[],
+ "accept":["firewall-cmd --permanent --add-service=?http","firewall-cmd --add-service=?http --permanent"],"canonical":"firewall-cmd --permanent --add-service=http",
+ "explanation":"--permanent writes to the persistent configuration but does NOT affect the running firewall until you reload. Omitting it changes only the runtime rules, which are lost on reload or restart."},
+
+{"id":"ch21-q16","chapter":21,"topic":"Manage Firewall Rules with the firewall-cmd Command","objectives":[50,55],"type":"command","difficulty":2,
+ "prompt":"Load the permanent firewall rules into the running configuration.","options":[],"answer":[],
+ "accept":["firewall-cmd --reload"],"canonical":"firewall-cmd --reload",
+ "explanation":"Reloading applies the permanent rules and discards any runtime-only changes. This is the step that is easy to forget after using --permanent."},
+
+{"id":"ch21-q17","chapter":21,"topic":"Manage Firewall Rules with the firewall-cmd Command","objectives":[50],"type":"command","difficulty":3,
+ "prompt":"Permanently open TCP port 8080 in the public zone.","options":[],"answer":[],
+ "accept":["firewall-cmd --permanent --zone=?public --add-port=?8080/tcp","firewall-cmd --permanent --add-port=?8080/tcp --zone=?public","firewall-cmd --zone=?public --permanent --add-port=?8080/tcp","firewall-cmd --add-port=?8080/tcp --zone=?public --permanent","firewall-cmd --zone=?public --add-port=?8080/tcp --permanent"],"canonical":"firewall-cmd --permanent --zone=public --add-port=8080/tcp",
+ "explanation":"A port must be given with its protocol as port/protocol. Use --add-port with a range (e.g. 8080-8090/tcp) to open several at once, and follow with --reload."},
+
+{"id":"ch21-q18","chapter":21,"topic":"Manage Firewall Rules with the firewall-cmd Command","objectives":[55],"type":"command","difficulty":3,
+ "prompt":"Change the default firewalld zone to work.","options":[],"answer":[],
+ "accept":["firewall-cmd --set-default-zone=?work"],"canonical":"firewall-cmd --set-default-zone=work",
+ "explanation":"--set-default-zone changes both the runtime and permanent configuration at once, so no --permanent or --reload is needed."},
+
+{"id":"ch21-q19","chapter":21,"topic":"Manage Firewall Rules with the firewall-cmd Command","objectives":[55],"type":"multi","difficulty":3,
+ "prompt":"Which firewall-cmd options manage the binding between network interfaces and zones? (Select all that apply.)","options":["--list-interfaces","--add-interface","--change-interface","--remove-interface","--bind-interface"],"answer":[0,1,2,3],"accept":[],"canonical":null,
+ "explanation":"There is no --bind-interface. --change-interface moves an interface to a different zone in one step, which is safer than removing and re-adding it."},
+
+{"id":"ch21-q20","chapter":21,"topic":"Manage Firewall Rules with the firewall-cmd Command","objectives":[55],"type":"command","difficulty":2,
+ "prompt":"Check whether the firewalld service is currently running, using firewall-cmd.","options":[],"answer":[],
+ "accept":["firewall-cmd --state"],"canonical":"firewall-cmd --state",
+ "explanation":"--state reports running or not running. --get-services lists all predefined services available to add to a zone, and --list-services shows those currently allowed in one."}
+]

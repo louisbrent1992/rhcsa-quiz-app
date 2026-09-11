@@ -1,0 +1,102 @@
+[
+{"id":"ch15-q01","chapter":15,"topic":"Compare and Contrast Partition Tables: Master Boot Record (MBR) vs. GUID Partition Table (GPT)","objectives":[30],"type":"mcq","difficulty":2,
+ "prompt":"How many primary partitions does MBR allow, and what is the maximum number of usable partitions?","options":["Four primary; 14 usable (3 primary plus 11 logical)","Four primary; four usable","128 primary; 128 usable","Two primary; 12 usable"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"To get more than four, one primary slot must be given up for an extended partition, which then holds up to 11 logical partitions numbered from 5. Extended partitions are containers only and store no data themselves."},
+
+{"id":"ch15-q02","chapter":15,"topic":"Compare and Contrast Partition Tables: Master Boot Record (MBR) vs. GUID Partition Table (GPT)","objectives":[30],"type":"multi","difficulty":3,
+ "prompt":"Which are advantages of GPT over MBR? (Select all that apply.)","options":["Support for up to 128 partitions with no extended/logical distinction","Support for disks larger than 2 TB","Redundant storage of the partition table","4 KB sector size support","A smaller partition table that boots faster on BIOS systems"],"answer":[0,1,2,3],"accept":[],"canonical":null,
+ "explanation":"MBR's 32-bit addressing and 512-byte sectors cap it at 2 TB, and it keeps no redundant copy — corruption makes the system unbootable. GPT includes a protective MBR in the first sector so BIOS systems can still boot from it."},
+
+{"id":"ch15-q03","chapter":15,"topic":"Identify Disks and Disk Partitions","objectives":[30],"type":"command","difficulty":1,
+ "prompt":"List all block devices with their partitions, sizes and mount points in tree form.","options":[],"answer":[],
+ "accept":["lsblk"],"canonical":"lsblk",
+ "explanation":"lsblk is the quickest overview. fdisk -l and parted print give more detail, including the disk label type and each partition's start and end sectors."},
+
+{"id":"ch15-q04","chapter":15,"topic":"Identify Disks and Disk Partitions","objectives":[30],"type":"mcq","difficulty":2,
+ "prompt":"On a system with disks sda and sdb, what is the device name of the second partition on the second disk?","options":["/dev/sdb2","/dev/sdb1","/dev/sda2","/dev/sd2b"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"Disks are lettered in order — sda, sdb, sdc — and partitions numbered from 1 within each disk. The s prefix covers SATA, SAS and SCSI devices."},
+
+{"id":"ch15-q05","chapter":15,"topic":"Identify Disks and Disk Partitions","objectives":[30],"type":"mcq","difficulty":3,
+ "prompt":"Which virtual file is updated automatically when partitions are created or deleted?","options":["/proc/partitions","/etc/fstab","/sys/block/partitions","/run/partitions"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"/proc/partitions reflects the kernel's live view, so checking it confirms the kernel saw your change. /etc/fstab is a static configuration file you edit yourself."},
+
+{"id":"ch15-q06","chapter":15,"topic":"Create and Delete Partitions on MBR and GPT Disks","objectives":[30],"type":"command","difficulty":2,
+ "prompt":"Write a GPT partition table (label) onto the new disk /dev/sdb.","options":[],"answer":[],
+ "accept":["parted /dev/sdb mklabel gpt","parted -s /dev/sdb mklabel gpt","parted /dev/sdb -s mklabel gpt"],"canonical":"parted /dev/sdb mklabel gpt",
+ "explanation":"A raw disk has no partition table, so parted print reports an error until you label it. Use msdos instead of gpt for an MBR disk; everything after that step is identical for both schemes."},
+
+{"id":"ch15-q07","chapter":15,"topic":"Create and Delete Partitions on MBR and GPT Disks","objectives":[30],"type":"command","difficulty":3,
+ "prompt":"Delete partition number 1 from the disk /dev/sdb using parted.","options":[],"answer":[],
+ "accept":["parted /dev/sdb rm 1","parted -s /dev/sdb rm 1","parted /dev/sdb -s rm 1"],"canonical":"parted /dev/sdb rm 1",
+ "explanation":"rm takes the partition number, not the device name. The procedure is the same for MBR and GPT disks; verify afterwards with parted print or lsblk."},
+
+{"id":"ch15-q08","chapter":15,"topic":"Create and Delete Partitions on MBR and GPT Disks","objectives":[30],"type":"multi","difficulty":2,
+ "prompt":"Which parted subcommands do the described jobs? (Select all that apply.)","options":["print — displays the partition table","mklabel — creates a partition table","mkpart — makes a new partition","rm — removes a partition","format — creates a file system"],"answer":[0,1,2,3],"accept":[],"canonical":null,
+ "explanation":"parted partitions disks; it does not build file systems — that is mkfs's job, covered in chapter 16. The name subcommand assigns a partition name."},
+
+{"id":"ch15-q09","chapter":15,"topic":"Implement Thin Provisioning to Optimize Storage Allocation","objectives":[],"type":"mcq","difficulty":3,
+ "prompt":"What characterises thin provisioning in LVM?","options":["Thin volumes can appear larger than the pool's physical capacity and consume space only as data is written","Every volume reserves its full size on disk immediately","It compresses data as it is written","It mirrors all writes to a second disk"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"You create a thin pool and carve thin volumes from it. When usage approaches a threshold such as 80%, you add physical storage to the pool and the volumes start using it immediately — deferring the upfront cost."},
+
+{"id":"ch15-q10","chapter":15,"topic":"Describe Logical Volume Manager (LVM) and its Core Components","objectives":[31,32,33],"type":"mcq","difficulty":2,
+ "prompt":"What are the three key objects in the LVM structure?","options":["Physical volume, volume group, logical volume","Partition, file system, mount point","Physical extent, logical extent, thin pool","Disk, slice, container"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"PVs are initialised block devices, a VG pools the space from one or more PVs, and LVs are carved out of that pool. PVs are subdivided into physical extents and LVs into logical extents."},
+
+{"id":"ch15-q11","chapter":15,"topic":"Describe Logical Volume Manager (LVM) and its Core Components","objectives":[],"type":"mcq","difficulty":3,
+ "prompt":"What is a Physical Extent (PE), and what is its default size?","options":["The smallest allocatable unit in LVM; 4 MB by default","The metadata header of a physical volume; 1 MB by default","A full physical volume; sized to the disk","A reserved area for LVM snapshots; 16 MB by default"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"A PV is divided into PEs when added to a volume group. The PE size is fixed for the whole VG at creation time, and the logical extent size always matches it."},
+
+{"id":"ch15-q12","chapter":15,"topic":"Describe Logical Volume Manager (LVM) and its Core Components","objectives":[33],"type":"mcq","difficulty":3,
+ "prompt":"In a volume group with a 16 MB PE size, you request a 200 MB logical volume. What size do you actually get?","options":["208 MB — the size is rounded up to a multiple of the PE size","200 MB exactly","192 MB — rounded down to a multiple of the PE size","The command fails because 200 is not a multiple of 16"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"LV sizes are always multiples of the PE size, so LVM rounds up: 16 x 13 = 208 MB. In this VG you could have 16, 32, 48 MB and so on."},
+
+{"id":"ch15-q13","chapter":15,"topic":"Perform LVM Administration: Creating, Extending, Reducing, Renaming, and Removing all LVM Components","objectives":[31],"type":"command","difficulty":2,
+ "prompt":"Initialise the whole disk /dev/sdd for use by LVM as a physical volume.","options":[],"answer":[],
+ "accept":["pvcreate -?v? ?/dev/sdd","pvcreate /dev/sdd"],"canonical":"pvcreate /dev/sdd",
+ "explanation":"pvcreate writes the LVM metadata — UUID, size and data pointers — and keeps a second copy at the end of the device. A whole disk needs no partition label first; LVM does not require one."},
+
+{"id":"ch15-q14","chapter":15,"topic":"Perform LVM Administration: Creating, Extending, Reducing, Renaming, and Removing all LVM Components","objectives":[32],"type":"command","difficulty":3,
+ "prompt":"Create the volume group vgbook with a 16 MB PE size, containing /dev/sdc1 and /dev/sdd.","options":[],"answer":[],
+ "accept":["vgcreate -s 16(M|MB|m)? vgbook /dev/sdc1 /dev/sdd","vgcreate -s 16(M|MB|m)? vgbook /dev/sdd /dev/sdc1"],"canonical":"vgcreate -s 16M vgbook /dev/sdc1 /dev/sdd",
+ "explanation":"-s sets the physical extent size for the whole volume group; every PV added later uses the same value. The VG name comes before the list of physical volumes."},
+
+{"id":"ch15-q15","chapter":15,"topic":"Perform LVM Administration: Creating, Extending, Reducing, Renaming, and Removing all LVM Components","objectives":[32],"type":"command","difficulty":2,
+ "prompt":"Add the physical volume /dev/sde to the existing volume group vgbook.","options":[],"answer":[],
+ "accept":["vgextend vgbook /dev/sde"],"canonical":"vgextend vgbook /dev/sde",
+ "explanation":"vgextend grows the pool; vgreduce removes a PV from it. Once inside a VG, a partition and a whole disk are treated identically."},
+
+{"id":"ch15-q16","chapter":15,"topic":"Perform LVM Administration: Creating, Extending, Reducing, Renaming, and Removing all LVM Components","objectives":[33],"type":"command","difficulty":2,
+ "prompt":"Create a 260 MB logical volume named lvbook1 in the volume group vgbook.","options":[],"answer":[],
+ "accept":["lvcreate -L 260(M|MB|m)? -n lvbook1 vgbook","lvcreate -n lvbook1 -L 260(M|MB|m)? vgbook"],"canonical":"lvcreate -L 260M -n lvbook1 vgbook",
+ "explanation":"-L gives the size in bytes-based units (MB is the default unit), -l gives it as a count of logical extents, and -n sets a custom name. Without -n you get lvol0, lvol1 and so on."},
+
+{"id":"ch15-q17","chapter":15,"topic":"Perform LVM Administration: Creating, Extending, Reducing, Renaming, and Removing all LVM Components","objectives":[39],"type":"command","difficulty":3,
+ "prompt":"Extend the logical volume /dev/vgbook/lvbook1 by an additional 100 MB.","options":[],"answer":[],
+ "accept":["lvextend -L \\+100(M|MB|m)? /dev/vgbook/lvbook1","lvresize -L \\+100(M|MB|m)? /dev/vgbook/lvbook1","lvextend -L \\+100(M|MB|m)? /dev/mapper/vgbook-lvbook1"],"canonical":"lvextend -L +100M /dev/vgbook/lvbook1",
+ "explanation":"The plus sign means 'add this much'; without it, -L sets the absolute new size. Add -r to have the command call fsadm and grow the file system at the same time."},
+
+{"id":"ch15-q18","chapter":15,"topic":"Perform LVM Administration: Creating, Extending, Reducing, Renaming, and Removing all LVM Components","objectives":[39],"type":"mcq","difficulty":3,
+ "prompt":"What does the -r option add to lvresize or lvextend?","options":["It resizes the underlying file system as well, by calling fsadm","It makes the operation recursive across the volume group","It reduces rather than extends","It forces a read-only remount first"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"Without -r you must grow the file system separately afterwards, or the extra space stays invisible to the mounted file system."},
+
+{"id":"ch15-q19","chapter":15,"topic":"Perform LVM Administration: Creating, Extending, Reducing, Renaming, and Removing all LVM Components","objectives":[],"type":"multi","difficulty":2,
+ "prompt":"Which LVM commands give a short summary listing of each object type? (Select all that apply.)","options":["pvs for physical volumes","vgs for volume groups","lvs for logical volumes","pvinfo for physical volumes"],"answer":[0,1,2],"accept":[],"canonical":null,
+ "explanation":"The pvs/vgs/lvs family gives one-line summaries; pvdisplay/vgdisplay/lvdisplay give the full detail. There is no pvinfo command."},
+
+{"id":"ch15-q20","chapter":15,"topic":"Perform LVM Administration: Creating, Extending, Reducing, Renaming, and Removing all LVM Components","objectives":[],"type":"mcq","difficulty":2,
+ "prompt":"Which command renames a volume group?","options":["vgrename","vgmod -n","vgchange --name","vgedit"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"vgrename renames a volume group and lvrename a logical volume. LVM allows user-defined names for both, which is one of its practical advantages."},
+
+{"id":"ch15-q21","chapter":15,"topic":"Deconstruct LVM Configuration Non-Destructively and Return Disks to their Raw State","objectives":[33],"type":"command","difficulty":2,
+ "prompt":"Remove the logical volume /dev/vgbook/lvbook1.","options":[],"answer":[],
+ "accept":["lvremove -y /dev/vgbook/lvbook1","lvremove /dev/vgbook/lvbook1","lvremove -f /dev/vgbook/lvbook1"],"canonical":"lvremove /dev/vgbook/lvbook1",
+ "explanation":"To dismantle an LVM stack you work inward-out: lvremove, then vgremove, then pvremove to return the devices to raw block storage."},
+
+{"id":"ch15-q22","chapter":15,"topic":"Deconstruct LVM Configuration Non-Destructively and Return Disks to their Raw State","objectives":[31],"type":"mcq","difficulty":3,
+ "prompt":"In what order must LVM objects be removed to return a disk to its raw state?","options":["lvremove, then vgremove, then pvremove","pvremove, then vgremove, then lvremove","vgremove, then lvremove, then pvremove","They can be removed in any order"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"Each layer depends on the one below it, so you unwind from the top. vgremove refuses while logical volumes still exist, and pvremove refuses while the PV belongs to a volume group."},
+
+{"id":"ch15-q23","chapter":15,"topic":"Describe Logical Volume Manager (LVM) and its Core Components","objectives":[],"type":"mcq","difficulty":3,
+ "prompt":"How do you find the PE size configured for the volume group rhel?","options":["vgdisplay rhel and read the \"PE Size\" line","pvs --peSize rhel","lvdisplay rhel | grep PE","cat /etc/lvm/pe.conf"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"vgdisplay prints the full volume group detail including PE Size and the total PE count. The logical extent size always equals the PE size."}
+]

@@ -1,0 +1,100 @@
+[
+{"id":"ch16-q01","chapter":16,"topic":"Describe and Differentiate Key File System Types: Ext4, XFS, VFAT, and ISO9660","objectives":[36],"type":"mcq","difficulty":1,
+ "prompt":"Which file system type is the default in RHEL 10?","options":["XFS","Ext4","VFAT","Btrfs"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"XFS is a 64-bit extent-based journaling file system supporting file systems and files up to 8 EiB. Ext4 remains fully supported and tops out at 1 EiB file systems and 16 TiB files."},
+
+{"id":"ch16-q02","chapter":16,"topic":"Describe and Differentiate Key File System Types: Ext4, XFS, VFAT, and ISO9660","objectives":[36],"type":"mcq","difficulty":3,
+ "prompt":"What is the major limitation of XFS compared with Ext4?","options":["XFS cannot be shrunk","XFS does not support journaling","XFS cannot exceed 2 TB","XFS cannot be mounted read-write"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"XFS grows online with xfs_growfs but has no shrink operation. It also skips boot-time checks, relying on xfs_repair to be run manually when needed."},
+
+{"id":"ch16-q03","chapter":16,"topic":"Describe and Differentiate Key File System Types: Ext4, XFS, VFAT, and ISO9660","objectives":[36],"type":"mcq","difficulty":2,
+ "prompt":"Which file system type would you use on a USB flash drive that must be readable on both Linux and Windows?","options":["VFAT","XFS","Ext4","ISO9660"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"VFAT supports 255-character filenames but does not distinguish case. ISO9660 is for optical media such as CDs and DVDs."},
+
+{"id":"ch16-q04","chapter":16,"topic":"Describe and Differentiate Key File System Types: Ext4, XFS, VFAT, and ISO9660","objectives":[36],"type":"mcq","difficulty":3,
+ "prompt":"What is the superblock in an extended file system, and why is it replicated?","options":["It holds structural information such as type, size and block count; copies exist so a corrupted primary can be replaced","It is the journal; copies allow parallel writes","It stores the file data; copies provide redundancy for user files","It is the inode table; copies speed up lookups"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"A corrupted primary superblock renders the file system inaccessible, so one of the backup superblocks is used to restore it. The inode table is a separate metadata structure holding per-file attributes and data-block pointers."},
+
+{"id":"ch16-q05","chapter":16,"topic":"Create, Mount, and Resize File Systems in Partitions and Logical Volumes","objectives":[36],"type":"command","difficulty":2,
+ "prompt":"Create an Ext4 file system on the partition /dev/sdb1.","options":[],"answer":[],
+ "accept":["mkfs -t ext4 /dev/sdb1","mkfs\\.ext4 /dev/sdb1","mkfs --type=?ext4 /dev/sdb1"],"canonical":"mkfs -t ext4 /dev/sdb1",
+ "explanation":"mkfs -t <type> and the type-specific mkfs.<type> forms are equivalent. mkfs.xfs accepts -f to force creation over existing data."},
+
+{"id":"ch16-q06","chapter":16,"topic":"Create, Mount, and Resize File Systems in Partitions and Logical Volumes","objectives":[36],"type":"command","difficulty":2,
+ "prompt":"Mount the file system on /dev/sdb1 at the existing mount point /ext4fs1.","options":[],"answer":[],
+ "accept":["mount /dev/sdb1 /ext4fs1/?"],"canonical":"mount /dev/sdb1 /ext4fs1",
+ "explanation":"mount takes the device (or its UUID or label) and the mount point. The mount point should be an empty, unused directory — mounting over a populated directory hides its contents."},
+
+{"id":"ch16-q07","chapter":16,"topic":"Create, Mount, and Resize File Systems in Partitions and Logical Volumes","objectives":[36],"type":"mcq","difficulty":3,
+ "prompt":"Which file does the kernel update when a file system is successfully mounted or unmounted?","options":["/proc/self/mounts","/etc/fstab","/etc/mtab.conf","/var/log/mounts"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"/etc/fstab is static configuration you write; /proc/self/mounts is the kernel's live record of what is actually mounted right now."},
+
+{"id":"ch16-q08","chapter":16,"topic":"Create, Mount, and Resize File Systems in Partitions and Logical Volumes","objectives":[39],"type":"command","difficulty":3,
+ "prompt":"Grow the mounted XFS file system at /xfsfs2 to fill its enlarged logical volume.","options":[],"answer":[],
+ "accept":["xfs_growfs /xfsfs2/?"],"canonical":"xfs_growfs /xfsfs2",
+ "explanation":"XFS grows online with xfs_growfs after lvextend. For Ext4 you would use resize2fs instead — or pass -r to lvextend/lvresize so fsadm handles either type automatically."},
+
+{"id":"ch16-q09","chapter":16,"topic":"Configure Persistent File System Mounting Using Device Names, UUIDs, and Labels","objectives":[34],"type":"multi","difficulty":2,
+ "prompt":"Which commands display a file system's UUID? (Select all that apply.)","options":["blkid","lsblk -f","xfs_admin -u (for XFS)","tune2fs -l (for extended file systems)","df -h"],"answer":[0,1,2,3],"accept":[],"canonical":null,
+ "explanation":"df reports usage, not identifiers. blkid and lsblk work on any type; xfs_admin is XFS-specific and tune2fs is for the extended family."},
+
+{"id":"ch16-q10","chapter":16,"topic":"Configure Persistent File System Mounting Using Device Names, UUIDs, and Labels","objectives":[34],"type":"mcq","difficulty":3,
+ "prompt":"Why does RHEL 10 use UUIDs rather than device names in /etc/fstab for standard partitions?","options":["A UUID stays persistent across reboots, whereas device names can change","UUIDs are shorter and easier to type","Device names are not supported by the mount command","UUIDs allow the file system to be mounted without root privileges"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"Disk enumeration can shift when hardware is added, so sdb may not always be the same disk. LVM logical volumes already have unique persistent device paths, so a UUID is not needed for them."},
+
+{"id":"ch16-q11","chapter":16,"topic":"Configure Persistent File System Mounting Using Device Names, UUIDs, and Labels","objectives":[34],"type":"mcq","difficulty":3,
+ "prompt":"What is the maximum label length on an XFS file system?","options":["12 characters","16 characters","32 characters","255 characters"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"XFS allows 12 characters and the extended file systems 16. Apply an XFS label with xfs_admin -L (the file system must be unmounted first) and an ext label with e2label."},
+
+{"id":"ch16-q12","chapter":16,"topic":"Configure Persistent File System Mounting Using Device Names, UUIDs, and Labels","objectives":[34],"type":"mcq","difficulty":3,
+ "prompt":"What do the six columns of an /etc/fstab entry contain, in order?","options":["Device/UUID/label, mount point, type, options, dump flag, fsck order","Mount point, device, type, options, fsck order, dump flag","Device, type, mount point, options, dump flag, fsck order","UUID, label, mount point, type, options, priority"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"For swap, column 2 is none or swap and column 3 is swap. Columns 5 and 6 apply only to extended file systems — XFS ignores them, and 0 in both is meaningless for XFS, virtual, remote and removable types."},
+
+{"id":"ch16-q13","chapter":16,"topic":"Configure Persistent File System Mounting Using Device Names, UUIDs, and Labels","objectives":[34],"type":"command","difficulty":3,
+ "prompt":"After editing /etc/fstab, validate it by mounting every entry that is not already mounted.","options":[],"answer":[],
+ "accept":["mount -a","mount --all"],"canonical":"mount -a",
+ "explanation":"Always run this before rebooting: it reports inconsistencies while you can still fix them. An invalid fstab entry can leave the system unbootable, forcing a repair from emergency mode. Follow with `systemctl daemon-reload` so systemd picks up the change."},
+
+{"id":"ch16-q14","chapter":16,"topic":"Configure Persistent File System Mounting Using Device Names, UUIDs, and Labels","objectives":[34],"type":"mcq","difficulty":3,
+ "prompt":"Which fstab mount option should be used for a file system that requires networking to be up before it can be mounted?","options":["_netdev","noauto","defaults","remount"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"_netdev defers the mount until the network is available — required for NFS. defaults means async, auto, rw and friends; noauto excludes the entry from mount -a."},
+
+{"id":"ch16-q15","chapter":16,"topic":"Monitor Storage Utilization and Calculate Disk Usage","objectives":[],"type":"command","difficulty":1,
+ "prompt":"Show file system usage in human-readable form, including each file system's type.","options":[],"answer":[],
+ "accept":["df -(?:hT|Th)","df -h -T","df -T -h"],"canonical":"df -hT",
+ "explanation":"-h gives human-readable sizes and -T adds the type column. -i shows inode usage, -t limits to one type, and -x excludes a type."},
+
+{"id":"ch16-q16","chapter":16,"topic":"Monitor Storage Utilization and Calculate Disk Usage","objectives":[],"type":"mcq","difficulty":2,
+ "prompt":"What is the difference between df and du?","options":["df reports usage for whole file systems; du reports the space a file or directory occupies","du reports whole file systems; df reports individual directories","df works only on XFS; du only on Ext4","They are equivalent"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"du -s gives a summary for a directory and -c adds a grand total. Both accept -h for human-readable output; both default to KB."},
+
+{"id":"ch16-q17","chapter":16,"topic":"Implement and Manage Swap Space in Partitions and Logical Volumes","objectives":[35],"type":"mcq","difficulty":2,
+ "prompt":"What is paging out (swapping out)?","options":["Moving idle pages from physical memory to swap to free room for other processes","Loading pages from swap back into memory after a page fault","Deleting unused pages from the page table","Compressing memory pages in place"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"The reverse — bringing data back after a page fault — is paging in. The whole mechanism is called demand paging; excessive paging that starves the system of useful work is thrashing."},
+
+{"id":"ch16-q18","chapter":16,"topic":"Implement and Manage Swap Space in Partitions and Logical Volumes","objectives":[35],"type":"multi","difficulty":2,
+ "prompt":"Which three commands manage swap space? (Select all that apply.)","options":["mkswap initialises a device as swap","swapon activates a swap area","swapoff deactivates a swap area","mkfs -t swap initialises a device as swap"],"answer":[0,1,2],"accept":[],"canonical":null,
+ "explanation":"Swap is not a file system, so mkfs is not used for it. For activation across reboots, add an fstab entry using the device file, UUID or label."},
+
+{"id":"ch16-q19","chapter":16,"topic":"Implement and Manage Swap Space in Partitions and Logical Volumes","objectives":[35],"type":"command","difficulty":2,
+ "prompt":"Initialise the partition /dev/sde1 as swap space.","options":[],"answer":[],
+ "accept":["mkswap /dev/sde1"],"canonical":"mkswap /dev/sde1",
+ "explanation":"After mkswap, activate it immediately with `swapon /dev/sde1` and add an fstab entry so it comes back after a reboot."},
+
+{"id":"ch16-q20","chapter":16,"topic":"Implement and Manage Swap Space in Partitions and Logical Volumes","objectives":[35],"type":"mcq","difficulty":3,
+ "prompt":"How does the kernel decide which swap area to use when several exist?","options":["By the pri option — higher numbers are used first, and equal priorities are used round-robin","Always the largest area first","Always in alphabetical order of device name","Randomly, to spread wear"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"Priorities run from -1 to 32767 and are set with pri in fstab. Without pri the default is -1; the swap created at installation gets -2. With no priorities set, areas are used in the order they appear in /proc/swaps."},
+
+{"id":"ch16-q21","chapter":16,"topic":"Implement and Manage Swap Space in Partitions and Logical Volumes","objectives":[35],"type":"command","difficulty":1,
+ "prompt":"Display memory and swap utilisation in human-readable form.","options":[],"answer":[],
+ "accept":["free -h","free --human"],"canonical":"free -h",
+ "explanation":"free reads /proc/meminfo. -t adds a total line, -s refreshes on an interval and -c repeats a set number of times. The Available column estimates what can start new processes without swapping."},
+
+{"id":"ch16-q22","chapter":16,"topic":"Create, Mount, and Resize File Systems in Partitions and Logical Volumes","objectives":[36],"type":"multi","difficulty":2,
+ "prompt":"Which are advantages of keeping data in several separate file systems rather than one? (Select all that apply.)","options":["Each can be mounted and unmounted independently","Repairs can target one file system at a time","Each can be tuned or optimised separately","Each can be grown or shrunk independently","Total disk space required is reduced"],"answer":[0,1,2,3],"accept":[],"canonical":null,
+ "explanation":"Separation costs a little space rather than saving it; the benefits are operational — isolation, targeted maintenance, independent tuning and flexible sizing."},
+
+{"id":"ch16-q23","chapter":16,"topic":"Create, Mount, and Resize File Systems in Partitions and Logical Volumes","objectives":[36],"type":"mcq","difficulty":2,
+ "prompt":"Which two file systems are mandatory for installing and booting RHEL?","options":["/ and /boot","/ and /home","/boot and /var","/ and /usr"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"The default disk layout creates just these two. /home, /opt, /tmp, /usr and /var are common optional additions in a custom layout."}
+]

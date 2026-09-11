@@ -1,0 +1,114 @@
+[
+{"id":"ch22-q01","chapter":22,"topic":"Describe Security Enhanced Linux (SELinux) and its Key Terminology","objectives":[],"type":"mcq","difficulty":2,
+ "prompt":"What is the fundamental difference between DAC and MAC?","options":["Under DAC the resource owner decides access; under MAC a system-wide policy decides, regardless of ownership","Under MAC the owner decides access; under DAC the kernel decides","DAC applies to files and MAC only to processes","They are two names for the same mechanism"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"SELinux implements Mandatory Access Control on top of the traditional Discretionary Access Control model. Even a file's owner is denied access if policy does not explicitly permit the requesting process to reach that object."},
+
+{"id":"ch22-q02","chapter":22,"topic":"Describe Security Enhanced Linux (SELinux) and its Key Terminology","objectives":[],"type":"mcq","difficulty":2,
+ "prompt":"Which SELinux policy is the default in RHEL, and what does it do?","options":["targeted — confines selected system services while other processes run unconfined","mls — enforces strict hierarchical controls on everything","minimum — protects only a small set of services","strict — confines every process on the system"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"RHEL ships targeted, mls and minimum. Under targeted, services such as httpd run in confined domains while logged-in users typically run unconfined."},
+
+{"id":"ch22-q03","chapter":22,"topic":"Describe Security Enhanced Linux (SELinux) and its Key Terminology","objectives":[],"type":"mcq","difficulty":3,
+ "prompt":"What is the Access Vector Cache (AVC)?","options":["A cache of prior SELinux access decisions, consulted before re-evaluating policy","The file holding all SELinux policy rules","A log of denied operations only","The list of SELinux users defined in the policy"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"Caching decisions keeps enforcement fast without weakening it. AVC denial messages are what you look for when troubleshooting SELinux problems."},
+
+{"id":"ch22-q04","chapter":22,"topic":"Explain SELinux Contexts for Users, Processes, Files, and Network Ports","objectives":[59],"type":"mcq","difficulty":2,
+ "prompt":"What are the four components of an SELinux context, in order?","options":["SELinux user, role, type (or domain), sensitivity level","Owner, group, permissions, level","Subject, object, access, policy","User, password, role, category"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"For example system_u:object_r:passwd_file_t:s0. Field 3 — the type for objects, the domain for processes — is what type enforcement actually evaluates."},
+
+{"id":"ch22-q05","chapter":22,"topic":"Explain SELinux Contexts for Users, Processes, Files, and Network Ports","objectives":[59],"type":"multi","difficulty":2,
+ "prompt":"Which commands display SELinux contexts? (Select all that apply.)","options":["ls -Z for files and directories","ps -Z for processes","id -Z for the current user","semanage port -l for network ports","getenforce for file contexts"],"answer":[0,1,2,3],"accept":[],"canonical":null,
+ "explanation":"getenforce reports the current operating mode, not any context. The -Z flag is the general convention for showing SELinux labels."},
+
+{"id":"ch22-q06","chapter":22,"topic":"Explain SELinux Contexts for Users, Processes, Files, and Network Ports","objectives":[59],"type":"mcq","difficulty":3,
+ "prompt":"A default RHEL user shows the SELinux user unconfined_u. What does that mean?","options":["Processes they launch run in the unconfined domain, governed mainly by DAC","They cannot log in until mapped to a confined user","They have root privileges","SELinux is disabled on the system"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"By default all Linux users, root included, map to unconfined_u, so SELinux enforcement targets system services rather than interactive sessions. Confined users such as user_u are restricted from su, sudo and running programs from their home directories."},
+
+{"id":"ch22-q07","chapter":22,"topic":"Explain SELinux Contexts for Users, Processes, Files, and Network Ports","objectives":[61],"type":"mcq","difficulty":3,
+ "prompt":"A service is configured to listen on a non-standard port and the firewall allows it, but the service still cannot bind. What is the likely cause?","options":["SELinux permits services to bind only to ports its policy defines; the port must be added to the policy","The port is below 1024 and requires root","firewalld needs a reload","The service must be restarted twice"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"SELinux port labelling is independent of the firewall. Any non-standard port must be added to the policy database with the correct type before a confined service can use it."},
+
+{"id":"ch22-q08","chapter":22,"topic":"Copy, Move, and Archive Files with and without SELinux Context","objectives":[59],"type":"mcq","difficulty":3,
+ "prompt":"You copy a file from /tmp to /etc/default with plain cp. What context does the destination file get?","options":["The context of the destination directory","The context of the source file","No context until relabelled","The context of the user running cp"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"A copy inherits the destination directory's context unless you pass --preserve=context. Overwriting an existing file makes the copy inherit the overwritten file's context, again unless --preserve=context is given."},
+
+{"id":"ch22-q09","chapter":22,"topic":"Copy, Move, and Archive Files with and without SELinux Context","objectives":[59],"type":"mcq","difficulty":3,
+ "prompt":"You move a file with mv into a directory that has a different context. What happens to the file's context?","options":["It is unchanged, even though it now differs from the destination directory","It takes the destination directory's context","It is cleared and must be restored","The move is refused"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"mv preserves the label, which is exactly how a file ends up mislabelled for its new location — a common cause of SELinux denials, fixed with restorecon."},
+
+{"id":"ch22-q10","chapter":22,"topic":"Copy, Move, and Archive Files with and without SELinux Context","objectives":[59],"type":"mcq","difficulty":3,
+ "prompt":"Which tar option preserves SELinux contexts inside an archive?","options":["--selinux","--preserve=context","--xattrs-only","-p"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"--preserve=context is the cp option; tar uses --selinux. tar's -p preserves ordinary permissions."},
+
+{"id":"ch22-q11","chapter":22,"topic":"Describe How Domain Transitioning Works","objectives":[],"type":"mcq","difficulty":3,
+ "prompt":"When user1 runs /usr/bin/passwd, which domain does the process transition into, and why is that necessary?","options":["passwd_t — policy allows that domain to write files labelled shadow_t","shadow_t — so it can become the owner of /etc/shadow","unconfined_t — so DAC alone governs the operation","init_t — inherited from systemd"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"The binary is labelled passwd_exec_t and policy marks it as an entrypoint into passwd_t. Once transitioned, the process may modify /etc/shadow but nothing unrelated."},
+
+{"id":"ch22-q12","chapter":22,"topic":"Describe How Domain Transitioning Works","objectives":[],"type":"mcq","difficulty":3,
+ "prompt":"What does the SELinux entrypoint permission control?","options":["Which executable files may trigger a transition into a given domain","Which users may log in to the system","Which ports a domain may bind to","Which directories a domain may enter with cd"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"Entrypoint is what lets privileged utilities work securely without granting broad access to the calling user's own processes."},
+
+{"id":"ch22-q13","chapter":22,"topic":"Query and Manage SELinux Using Command-Line Tools","objectives":[58],"type":"command","difficulty":1,
+ "prompt":"Display the current SELinux operating mode.","options":[],"answer":[],
+ "accept":["getenforce"],"canonical":"getenforce",
+ "explanation":"getenforce prints Enforcing, Permissive or Disabled. sestatus gives the fuller picture including the loaded policy and the mode set in the configuration file."},
+
+{"id":"ch22-q14","chapter":22,"topic":"Query and Manage SELinux Using Command-Line Tools","objectives":[58],"type":"command","difficulty":2,
+ "prompt":"Temporarily switch SELinux into permissive mode to troubleshoot a service.","options":[],"answer":[],
+ "accept":["setenforce (?:0|[Pp]ermissive)"],"canonical":"setenforce 0",
+ "explanation":"0 means permissive and 1 means enforcing. The change applies at once but is lost at reboot; edit SELINUX in /etc/selinux/config to make it persistent. Remember to switch back to enforcing once the problem is solved."},
+
+{"id":"ch22-q15","chapter":22,"topic":"Query and Manage SELinux Using Command-Line Tools","objectives":[58],"type":"mcq","difficulty":2,
+ "prompt":"Which file sets the SELinux mode and policy type at boot?","options":["/etc/selinux/config, via the SELINUX and SELINUXTYPE directives","/etc/sysconfig/selinux, via the MODE directive","/etc/selinux/targeted/policy, via the STATE directive","/sys/fs/selinux/config, via the enforce directive"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"SELINUX takes enforcing, permissive or disabled; SELINUXTYPE selects the policy, defaulting to targeted. Permissive activates SELinux but allows every action, logging what it would have denied."},
+
+{"id":"ch22-q16","chapter":22,"topic":"Query and Manage SELinux Using Command-Line Tools","objectives":[58],"type":"command","difficulty":2,
+ "prompt":"Show the full SELinux runtime status, including the loaded policy and the mode set in the config file.","options":[],"answer":[],
+ "accept":["sestatus( -v)?"],"canonical":"sestatus",
+ "explanation":"Adding -v also reports the contexts of the current and init processes and of the files listed in /etc/sestatus.conf."},
+
+{"id":"ch22-q17","chapter":22,"topic":"Modify SELinux Contexts for Files and Network Ports","objectives":[59,60],"type":"mcq","difficulty":3,
+ "prompt":"What is the crucial difference between chcon and semanage fcontext?","options":["chcon changes the label now but is lost on relabelling; semanage records it in the policy so it survives","semanage changes the label now; chcon updates the policy","chcon works only on directories","They are equivalent"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"The durable pattern is `semanage fcontext -a` to register the mapping, then `restorecon` to apply it — so a relabel (for example after re-enabling SELinux from disabled) does not undo your work."},
+
+{"id":"ch22-q18","chapter":22,"topic":"Modify SELinux Contexts for Files and Network Ports","objectives":[60],"type":"command","difficulty":2,
+ "prompt":"Restore the default SELinux contexts on /tmp/sedir1 and everything beneath it, from the policy database.","options":[],"answer":[],
+ "accept":["restorecon -R ?v? /tmp/sedir1/?","restorecon -Rv /tmp/sedir1/?","restorecon -vR /tmp/sedir1/?","restorecon -R -v /tmp/sedir1/?"],"canonical":"restorecon -R /tmp/sedir1",
+ "explanation":"-R recurses; add -v to see each change. restorecon reads the correct label from the policy, so it undoes any ad-hoc chcon."},
+
+{"id":"ch22-q19","chapter":22,"topic":"Add New SELinux Rules to the Policy Database","objectives":[60],"type":"command","difficulty":3,
+ "prompt":"Add a persistent file-context mapping so /tmp/sedir1 and everything under it is labelled with the type public_content_t.","options":[],"answer":[],
+ "accept":["semanage fcontext -a -t public_content_t [\"']?/tmp/sedir1\\(/\\.\\*\\)\\?[\"']?"],"canonical":"semanage fcontext -a -t public_content_t \"/tmp/sedir1(/.*)?\"",
+ "explanation":"The regular expression (/.*)? includes the directory's whole subtree and is only needed when you want recursion. The mapping is written to /etc/selinux/targeted/contexts/files/file_contexts.local; apply it with restorecon."},
+
+{"id":"ch22-q20","chapter":22,"topic":"Add New SELinux Rules to the Policy Database","objectives":[61],"type":"command","difficulty":3,
+ "prompt":"Add TCP port 8010 to the SELinux policy with the type http_port_t so httpd may listen on it.","options":[],"answer":[],
+ "accept":["semanage port -a -t http_port_t -p tcp 8010","semanage port -a -p tcp -t http_port_t 8010"],"canonical":"semanage port -a -t http_port_t -p tcp 8010",
+ "explanation":"-a adds, -t names the type and -p the protocol. Use `semanage port -l -t http_port_t` to list the ports httpd may already use, and -d to delete one."},
+
+{"id":"ch22-q21","chapter":22,"topic":"Modify SELinux Contexts for Files and Network Ports","objectives":[61],"type":"command","difficulty":2,
+ "prompt":"List the network ports currently defined in the SELinux policy database.","options":[],"answer":[],
+ "accept":["semanage port -l","semanage port --list"],"canonical":"semanage port -l",
+ "explanation":"The output has three columns: the SELinux type, the protocol, and the port numbers. Narrow it with -t to a single type."},
+
+{"id":"ch22-q22","chapter":22,"topic":"Define SELinux Booleans","objectives":[62],"type":"mcq","difficulty":2,
+ "prompt":"What is an SELinux Boolean?","options":["An on/off switch that enables or disables conditional rules in the policy without recompiling it","A permission bit stored in the file's inode","A flag that turns SELinux enforcement on or off system-wide","A category assigned under Multi-Category Security"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"Booleans change behaviour immediately. Their values live in virtual files under /sys/fs/selinux/booleans, one file per Boolean, and the selinux-policy-doc package documents them (man -K <boolean>)."},
+
+{"id":"ch22-q23","chapter":22,"topic":"Define SELinux Booleans","objectives":[62],"type":"command","difficulty":2,
+ "prompt":"Display the current setting of the Boolean nfs_export_all_rw.","options":[],"answer":[],
+ "accept":["getsebool nfs_export_all_rw"],"canonical":"getsebool nfs_export_all_rw",
+ "explanation":"getsebool -a lists them all. sestatus -b and `semanage boolean -l` also report Boolean states."},
+
+{"id":"ch22-q24","chapter":22,"topic":"Define SELinux Booleans","objectives":[62],"type":"command","difficulty":3,
+ "prompt":"Turn the Boolean nfs_export_all_rw on so the change survives a reboot.","options":[],"answer":[],
+ "accept":["setsebool -P nfs_export_all_rw (?:on|1|true)","semanage boolean -m --on nfs_export_all_rw"],"canonical":"setsebool -P nfs_export_all_rw on",
+ "explanation":"Without -P the change applies immediately but reverts at the next reboot, because only the virtual file under /sys/fs/selinux/booleans is written. -P also records it in the policy database."},
+
+{"id":"ch22-q25","chapter":22,"topic":"View and Analyze SELinux Alert Messages","objectives":[],"type":"mcq","difficulty":3,
+ "prompt":"Which package provides the SELinux Alert Browser used to view and debug SELinux denials?","options":["setroubleshoot-server","policycoreutils","setools-console","libselinux-utils"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"libselinux-utils supplies getenforce, setenforce and getsebool; policycoreutils supplies sestatus, setsebool and restorecon; policycoreutils-python-utils supplies semanage; setools-console supplies seinfo and sesearch."},
+
+{"id":"ch22-q26","chapter":22,"topic":"Query and Manage SELinux Using Command-Line Tools","objectives":[58],"type":"mcq","difficulty":3,
+ "prompt":"Which command disables SELinux persistently through the bootloader, and what else is required?","options":["grubby, adding selinux=0 to the kernel options — then reboot","setenforce 0 — no reboot needed","semanage disable — then reload the policy","sestatus -d — then restart systemd"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"grubby appends selinux=0 to the options line in the entry under /boot/loader/entries; --remove-args reverses it. Either change needs a reboot, and re-enabling SELinux triggers a full filesystem relabel."}
+]

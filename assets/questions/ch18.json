@@ -1,0 +1,85 @@
+[
+{"id":"ch18-q01","chapter":18,"topic":"Describe the Core Concepts and Architecture of the Network File System (NFS) Service","objectives":[37],"type":"mcq","difficulty":2,
+ "prompt":"In NFS terminology, what are the acts of making a share available on the server and attaching it on the client called?","options":["Exporting on the server; mounting on the client","Mounting on the server; exporting on the client","Publishing on the server; subscribing on the client","Sharing on both sides"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"NFS is client/server. Exporting a directory makes the whole tree beneath it available. A single system can act as both server and client at once."},
+
+{"id":"ch18-q02","chapter":18,"topic":"Describe the Core Concepts and Architecture of the Network File System (NFS) Service","objectives":[37],"type":"multi","difficulty":3,
+ "prompt":"Which NFS configurations are NOT supported? (Select all that apply.)","options":["Re-exporting a subdirectory of an existing share in the same file system","Re-exporting a mounted share","Multiple clients mounting the same share simultaneously","Exporting a directory whose subtree contains many files"],"answer":[0,1],"accept":[],"canonical":null,
+ "explanation":"Neither a subdirectory nor a parent of an existing share in the same file system may be re-exported, and re-exporting a mounted share leads to unpredictable behaviour. Concurrent access by many clients is a normal, supported benefit of NFS."},
+
+{"id":"ch18-q03","chapter":18,"topic":"Explain the Advantages of NFS and the Difference Between its Versions","objectives":[37],"type":"mcq","difficulty":2,
+ "prompt":"Which NFS version is the default in RHEL 10, and which transport does it support?","options":["4.2, TCP only","4.0, TCP and UDP","3, TCP and UDP","4.1, UDP only"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"RHEL 10 supports versions 3, 4.0, 4.1 and 4.2. NFSv3 supports both TCP and UDP; 4.0 and 4.1 use TCP by default with vestigial UDP support; 4.2 is TCP only."},
+
+{"id":"ch18-q04","chapter":18,"topic":"Explain the Advantages of NFS and the Difference Between its Versions","objectives":[37],"type":"multi","difficulty":3,
+ "prompt":"Which capabilities do the NFSv4.x protocols add over NFSv3? (Select all that apply.)","options":["Ability to traverse firewalls and work over the Internet","Support for encrypted transfers and enhanced security","Username and group name mapping to UIDs and GIDs","Better cross-platform interoperability and crash handling","Support for files larger than 2 GB"],"answer":[0,1,2,3],"accept":[],"canonical":null,
+ "explanation":"NFSv3 already handled 64-bit file sizes, so files over 2 GB were not new in v4. The rest are genuine v4 improvements."},
+
+{"id":"ch18-q05","chapter":18,"topic":"Configure an NFS Server to Share a Directory with Specific Clients","objectives":[37],"type":"mcq","difficulty":2,
+ "prompt":"Which package and which file are needed to export a directory over NFS?","options":["nfs-utils, and /etc/exports","nfs-server, and /etc/nfs.conf","autofs, and /etc/exports","nfs-utils, and /etc/fstab"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"Install nfs-utils, add the share and its client/option list to /etc/exports, then run exportfs. You must also open the nfs service in firewalld and enable the NFS service."},
+
+{"id":"ch18-q06","chapter":18,"topic":"Configure an NFS Server to Share a Directory with Specific Clients","objectives":[37],"type":"command","difficulty":3,
+ "prompt":"Export every share listed in /etc/exports, with verbose output.","options":[],"answer":[],
+ "accept":["exportfs -(?:av|va)","exportfs -a -v","exportfs -v -a"],"canonical":"exportfs -av",
+ "explanation":"-a acts on all entries in the file and -v reports what happened. To withdraw a share, use exportfs -u (or -uav for all)."},
+
+{"id":"ch18-q07","chapter":18,"topic":"Configure an NFS Server to Share a Directory with Specific Clients","objectives":[37],"type":"command","difficulty":3,
+ "prompt":"Permanently allow NFS traffic through the firewall on the NFS server.","options":[],"answer":[],
+ "accept":["firewall-cmd --permanent --add-service=?nfs","firewall-cmd --add-service=?nfs --permanent"],"canonical":"firewall-cmd --permanent --add-service=nfs",
+ "explanation":"--permanent writes the rule to the persistent configuration; follow with firewall-cmd --reload to load it into the running firewall."},
+
+{"id":"ch18-q08","chapter":18,"topic":"Mount an NFS Share on a Client Manually and Persistently","objectives":[37],"type":"command","difficulty":2,
+ "prompt":"Manually mount the share /common from the NFS server server20 onto the local mount point /local.","options":[],"answer":[],
+ "accept":["mount server20:/common /local/?","mount -t nfs server20:/common /local/?"],"canonical":"mount server20:/common /local",
+ "explanation":"The server:/path form identifies a remote share. The same mount command is used for local file systems — once mounted, the share behaves like any other."},
+
+{"id":"ch18-q09","chapter":18,"topic":"Mount an NFS Share on a Client Manually and Persistently","objectives":[37],"type":"mcq","difficulty":3,
+ "prompt":"Which fstab option should an NFS entry carry, and why?","options":["_netdev — so the system waits for networking before attempting the mount","noauto — so it is never mounted at boot","ro — because NFS shares are always read-only","remount — so the share is re-mounted on every access"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"Without _netdev the mount is attempted before the network is up and fails. Forgetting to update /etc/fstab on the client is a classic way to lose exam credit for otherwise-correct work."},
+
+{"id":"ch18-q10","chapter":18,"topic":"Discover the AutoFS Service: Learn How it Works, its Benefits over Static Mounts, and Key Components","objectives":[38],"type":"mcq","difficulty":2,
+ "prompt":"How does AutoFS decide when to mount a share?","options":["The automount daemon mounts on detecting activity in the mount point, and unmounts after an idle timeout","It mounts every configured share at boot","It polls the NFS server every 60 seconds","It mounts on demand but never unmounts"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"automount reads the master map at boot but mounts nothing until a cd, ls or similar access occurs. Idle shares are unmounted automatically, so the kernel does not carry unused mounts."},
+
+{"id":"ch18-q11","chapter":18,"topic":"Discover the AutoFS Service: Learn How it Works, its Benefits over Static Mounts, and Key Components","objectives":[38],"type":"multi","difficulty":3,
+ "prompt":"Which are advantages of AutoFS over an /etc/fstab entry? (Select all that apply.)","options":["Users do not need root privileges to access the mounted share","A down NFS server will not hang the client","Idle shares are unmounted automatically","Wildcards and environment variables are supported","Shares are guaranteed to be mounted at all times"],"answer":[0,1,2,3],"accept":[],"canonical":null,
+ "explanation":"Being mounted only on demand is the point of AutoFS, not a drawback. Mounts managed by AutoFS must never be mounted manually or listed in /etc/fstab, or the two mechanisms conflict."},
+
+{"id":"ch18-q12","chapter":18,"topic":"Analyze AutoFS Maps to Control Automount Behavior","objectives":[38],"type":"mcq","difficulty":2,
+ "prompt":"Which file is the AutoFS master map, and which file configures the service itself?","options":["/etc/auto.master is the master map; /etc/autofs.conf configures the service","/etc/autofs.conf is the master map; /etc/auto.master configures the service","/etc/auto.misc is the master map; /etc/automount.conf configures the service","/etc/fstab is the master map; /etc/autofs.conf configures the service"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"The master_map_name directive in /etc/autofs.conf names auto.master as the master map. Custom map files belong in /etc/auto.master.d, which AutoFS parses at startup."},
+
+{"id":"ch18-q13","chapter":18,"topic":"Analyze AutoFS Maps to Control Automount Behavior","objectives":[38],"type":"mcq","difficulty":3,
+ "prompt":"What is the default idle timeout before AutoFS unmounts a share?","options":["300 seconds (five minutes)","60 seconds","30 seconds","3600 seconds"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"The timeout directive defaults to 300. negative_timeout, which governs failed mount attempts, defaults to 60 seconds. Logging is set to none by default."},
+
+{"id":"ch18-q14","chapter":18,"topic":"Analyze AutoFS Maps to Control Automount Behavior","objectives":[38],"type":"mcq","difficulty":2,
+ "prompt":"What are the three common AutoFS map types?","options":["Master, direct and indirect","Master, slave and mirror","Static, dynamic and hybrid","Local, remote and virtual"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"The master map points at direct and indirect map files, which hold the actual mount point, server and share details."},
+
+{"id":"ch18-q15","chapter":18,"topic":"Mount NFS Shares On-Demand Using Direct and Indirect Mapping Techniques","objectives":[38],"type":"multi","difficulty":3,
+ "prompt":"Which statements about DIRECT maps are correct? (Select all that apply.)","options":["Direct-mounted shares are always visible to users","Local and direct-mounted shares can coexist under one parent directory","Each direct map entry adds its own entry to the mount table","Accessing a directory holding several direct mount points may trigger mounting them all","Shares become visible only after their subdirectory is accessed"],"answer":[0,1,2,3],"accept":[],"canonical":null,
+ "explanation":"The last statement describes indirect maps. Direct maps mount onto any number of unrelated mount points and stay visible."},
+
+{"id":"ch18-q16","chapter":18,"topic":"Mount NFS Shares On-Demand Using Direct and Indirect Mapping Techniques","objectives":[38],"type":"multi","difficulty":3,
+ "prompt":"Which statements about INDIRECT maps are correct? (Select all that apply.)","options":["Shares appear under a common parent (umbrella) mount point","Shares become visible only once their subdirectory is accessed","Local and indirect-mounted shares cannot coexist under the same parent directory","Each indirect map puts only one entry in the mount table","Every share is mounted as soon as AutoFS starts"],"answer":[0,1,2,3],"accept":[],"canonical":null,
+ "explanation":"Nothing is mounted until it is accessed — that is true of both map types. Indirect maps are generally preferred for NFS shares because they organise mounts more cleanly."},
+
+{"id":"ch18-q17","chapter":18,"topic":"Mount NFS Shares On-Demand Using Direct and Indirect Mapping Techniques","objectives":[38],"type":"mcq","difficulty":3,
+ "prompt":"You configured an AutoFS direct map for /autodir but `mount` shows nothing mounted. What should you do?","options":["Access the mount point — run ls or cd /autodir — to trigger the mount","Add the share to /etc/fstab as well","Restart the NFS server","Run exportfs -av on the client"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"AutoFS mounts only on activity. After five idle minutes the mount disappears again, and any fresh access brings it back."},
+
+{"id":"ch18-q18","chapter":18,"topic":"Configure NFS and AutoFS to Centrally Store and Automatically Mount User Home Directories","objectives":[38],"type":"mcq","difficulty":3,
+ "prompt":"In an indirect map for user home directories, what do the * and & characters do?","options":["* stands in for the mount point (the username); & substitutes the server and shared subdirectory","* matches any server; & matches any share","* comments out the entry; & continues it on the next line","* enables wildcards; & runs the mount in the background"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"This substitution lets AutoFS mount only the home directory of the user who is actually logging in, rather than the whole /home tree."},
+
+{"id":"ch18-q19","chapter":18,"topic":"Configure NFS and AutoFS to Centrally Store and Automatically Mount User Home Directories","objectives":[37],"type":"mcq","difficulty":2,
+ "prompt":"What is the administrative benefit of consolidating user home directories on an NFS server?","options":["Each user has a single home directory to maintain, regardless of which client they log into","Home directories consume no disk space on the server","Users no longer need accounts on the clients","Passwords are centralised automatically"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"NFS also lets read-only application binaries and common data be shared once instead of duplicated on every system, cutting both storage cost and administrative overhead."},
+
+{"id":"ch18-q20","chapter":18,"topic":"Discover the AutoFS Service: Learn How it Works, its Benefits over Static Mounts, and Key Components","objectives":[38],"type":"command","difficulty":2,
+ "prompt":"Start the AutoFS service now and configure it to start automatically at boot, in one command.","options":[],"answer":[],
+ "accept":["systemctl enable --now autofs(\\.service)?","systemctl --now enable autofs(\\.service)?"],"canonical":"systemctl enable --now autofs",
+ "explanation":"The autofs package must be installed first. Verify with `systemctl status autofs -l --no-pager` to see the full detail without a pager."}
+]

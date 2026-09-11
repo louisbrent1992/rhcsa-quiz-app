@@ -1,0 +1,83 @@
+[
+{"id":"ch10-q01","chapter":10,"topic":"Explain the Structure, Naming Conventions, and Management Tools for Red Hat Packages","objectives":[],"type":"mcq","difficulty":2,
+ "prompt":"In the package name openssl-3.2.2-16.el10.x86_64.rpm, which part is the release?","options":["16","3.2.2","el10","x86_64"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"The five parts are name (openssl), version (3.2.2), release/build (16), the el10 compatibility marker, and the architecture (x86_64). noarch means architecture-independent and src marks a source package."},
+
+{"id":"ch10-q02","chapter":10,"topic":"Explain the Structure, Naming Conventions, and Management Tools for Red Hat Packages","objectives":[],"type":"mcq","difficulty":2,
+ "prompt":"What replaced YUM as the default package manager starting with RHEL 8, and what is yum now?","options":["DNF replaced it; yum is a symbolic link to dnf","RPM replaced it; yum was removed entirely","Flatpak replaced it; yum is deprecated","PackageKit replaced it; yum is an alias"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"DNF (Dandified YUM) is the default in RHEL 8 and later. The yum command survives in RHEL 10 as a symlink to dnf for compatibility; both live in /usr/bin."},
+
+{"id":"ch10-q03","chapter":10,"topic":"Explain the Structure, Naming Conventions, and Management Tools for Red Hat Packages","objectives":[],"type":"mcq","difficulty":3,
+ "prompt":"What is the main limitation of rpm compared with dnf?","options":["rpm does not resolve package dependencies automatically","rpm cannot install packages, only query them","rpm cannot verify GPG signatures","rpm works only on source packages"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"rpm reports a failed-dependency error and aborts, leaving you to find and install each prerequisite by hand. Resolving dependencies automatically is the whole reason dnf exists."},
+
+{"id":"ch10-q04","chapter":10,"topic":"Describe the Concepts of Package Dependencies and the RPM Database","objectives":[],"type":"mcq","difficulty":2,
+ "prompt":"Where is the RPM package database stored?","options":["/var/lib/rpm","/var/cache/dnf","/etc/rpm","/usr/lib/rpm"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"/var/lib/rpm holds the metadata for every installed package — names, versions, dependencies, and the ownership, permissions, timestamps and sizes of each file."},
+
+{"id":"ch10-q05","chapter":10,"topic":"Query, Install, Upgrade, Freshen, Overwrite, and Remove Packages","objectives":[],"type":"command","difficulty":1,
+ "prompt":"List every package installed on the system using rpm.","options":[],"answer":[],
+ "accept":["rpm -qa","rpm --query --all","rpm -q -a","rpm -a -q"],"canonical":"rpm -qa",
+ "explanation":"-q queries and -a selects all installed packages. Query options act on installed packages unless you add -p to query an installable .rpm file instead."},
+
+{"id":"ch10-q06","chapter":10,"topic":"Query, Install, Upgrade, Freshen, Overwrite, and Remove Packages","objectives":[],"type":"command","difficulty":2,
+ "prompt":"Find out which installed package owns the file /etc/chrony.conf.","options":[],"answer":[],
+ "accept":["rpm -qf /etc/chrony\\.conf","rpm -q -f /etc/chrony\\.conf","rpm --query --file /etc/chrony\\.conf"],"canonical":"rpm -qf /etc/chrony.conf",
+ "explanation":"-qf maps a file back to the package that provides it — the usual first step when you need to restore a lost configuration file."},
+
+{"id":"ch10-q07","chapter":10,"topic":"Query, Install, Upgrade, Freshen, Overwrite, and Remove Packages","objectives":[],"type":"multi","difficulty":3,
+ "prompt":"Match the rpm query options. Which are correct? (Select all that apply.)","options":["-ql lists all files in a package","-qc lists only the configuration files","-qd lists only the documentation files","-qi shows package information","-qR lists the packages that require this one"],"answer":[0,1,2,3],"accept":[],"canonical":null,
+ "explanation":"-qR lists what the package REQUIRES (its own dependencies). To see what depends on it, use --whatrequires instead."},
+
+{"id":"ch10-q08","chapter":10,"topic":"Query, Install, Upgrade, Freshen, Overwrite, and Remove Packages","objectives":[13],"type":"mcq","difficulty":3,
+ "prompt":"What is the difference between rpm -U and rpm -F?","options":["-U installs the package if it is absent; -F only acts when an older version is already installed","-F installs if absent; -U only upgrades","-U removes the old version first; -F keeps both","They are identical"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"Upgrade (-U) doubles as an install. Freshen (-F) does nothing when the package is not already present. During an upgrade, affected configuration files are backed up with an .rpmsave extension."},
+
+{"id":"ch10-q09","chapter":10,"topic":"Query, Install, Upgrade, Freshen, Overwrite, and Remove Packages","objectives":[13],"type":"mcq","difficulty":2,
+ "prompt":"Which rpm option removes an installed package?","options":["-e","-r","-d","-x"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"-e (--erase) uninstalls. It first checks whether any other package depends on the one being removed and refuses if so."},
+
+{"id":"ch10-q10","chapter":10,"topic":"Query, Install, Upgrade, Freshen, Overwrite, and Remove Packages","objectives":[13],"type":"mcq","difficulty":3,
+ "prompt":"You suspect files from an installed package are corrupt and want to lay down the same version again. Which option does that?","options":["--replacepkgs","--force-reinstall","-F","--refresh"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"--replacepkgs overwrites the existing files with those from the same-version package, giving you a clean starting point."},
+
+{"id":"ch10-q11","chapter":10,"topic":"Query, Install, Upgrade, Freshen, Overwrite, and Remove Packages","objectives":[13],"type":"mcq","difficulty":2,
+ "prompt":"What do the -i, -v and -h options do together in `rpm -ivh package.rpm`?","options":["Install, be verbose, and show progress as hash marks","Inspect, verify, and hash the package","Install, validate signature, and halt on error","Import a key, verify, and hold the package"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"-i installs, -v adds detail (or -vv for more), and -h prints hash marks as a progress bar."},
+
+{"id":"ch10-q12","chapter":10,"topic":"Extract Files from Installable Packages","objectives":[],"type":"mcq","difficulty":3,
+ "prompt":"Which command extracts the files from an installable .rpm without installing it?","options":["rpm2cpio","rpmextract","rpm -x","cpio2rpm"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"Pipe rpm2cpio into cpio with -i to extract and -d to create the directory structure. Do it in a scratch location such as /tmp, then copy the recovered file to its real home."},
+
+{"id":"ch10-q13","chapter":10,"topic":"Extract Files from Installable Packages","objectives":[],"type":"mcq","difficulty":3,
+ "prompt":"Why would you extract files from an rpm rather than reinstall the package?","options":["To recover one lost or damaged file without disturbing the rest of the installation","Because extraction resolves dependencies automatically","Because rpm cannot reinstall a package that is already present","To convert a binary package into a source package"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"Extraction is surgical: it lets you retrieve a single configuration file or command and restore it to its original state, leaving everything else untouched."},
+
+{"id":"ch10-q14","chapter":10,"topic":"Validate Package Integrity and Authenticity","objectives":[],"type":"mcq","difficulty":3,
+ "prompt":"Which rpm option checks a package's checksum and GPG signature before installation?","options":["-K","-V","-q --checksig","--verify"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"-K validates integrity (the embedded checksum) and authenticity (the GPG signature), reporting OK when both pass. -V is a different check — it verifies an already-installed package's file attributes."},
+
+{"id":"ch10-q15","chapter":10,"topic":"View GPG Keys and Verify Package and File Attributes","objectives":[],"type":"mcq","difficulty":2,
+ "prompt":"Where are Red Hat's GPG public keys placed during OS installation?","options":["/etc/pki/rpm-gpg/","/etc/gpg/","/var/lib/rpm/keys/","/usr/share/gpg/"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"RPM-GPG-KEY-redhat-release is the primary key for RHEL 10 packages and updates. Import a key with rpm --import before verifying signatures against it."},
+
+{"id":"ch10-q16","chapter":10,"topic":"View GPG Keys and Verify Package and File Attributes","objectives":[],"type":"mcq","difficulty":3,
+ "prompt":"`rpm -V at` returns nothing at all. What does that mean?","options":["No monitored attribute of any file in the package has changed since installation","The package is not installed","The verification failed silently","The package has no files to verify"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"Silence is success. When something has changed, rpm prints a nine-character code — S for size, M for mode or type, 5 for a checksum mismatch, D for a device number change — with a period marking each attribute that is intact."},
+
+{"id":"ch10-q17","chapter":10,"topic":"View GPG Keys and Verify Package and File Attributes","objectives":[],"type":"mcq","difficulty":3,
+ "prompt":"In `rpm -V` output, what does an M in the code column indicate?","options":["The permission mode or the file type has been altered","The MD5 checksum does not match","The file has been moved","The file is missing"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"M flags a changed mode or type; a checksum mismatch shows as 5, and a size change as S. Chmod-ing a packaged file from 644 to 770 is exactly what makes M appear."},
+
+{"id":"ch10-q18","chapter":10,"topic":"Perform Comprehensive Package Management Using the rpm Command","objectives":[45],"type":"multi","difficulty":2,
+ "prompt":"Which directories on the mounted RHEL 10 ISO contain the installable packages? (Select all that apply.)","options":["/mnt/BaseOS/Packages","/mnt/AppStream/Packages","/mnt/Extras/Packages","/mnt/Repodata/Packages"],"answer":[0,1],"accept":[],"canonical":null,
+ "explanation":"BaseOS carries the core operating system and AppStream the applications and runtimes. The directory names are case sensitive."},
+
+{"id":"ch10-q19","chapter":10,"topic":"Perform Comprehensive Package Management Using the rpm Command","objectives":[45],"type":"mcq","difficulty":3,
+ "prompt":"Which /etc/fstab device and file system type mount the RHEL ISO from the VM's optical drive?","options":["/dev/sr0 with type iso9660","/dev/sda1 with type xfs","/dev/cdrom with type udf","/dev/loop0 with type ext4"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"/dev/sr0 is the first optical drive and iso9660 is the standard optical-media file system. Mount it read-only (ro), then run `mount -a` to apply the new fstab line without rebooting."},
+
+{"id":"ch10-q20","chapter":10,"topic":"Query, Install, Upgrade, Freshen, Overwrite, and Remove Packages","objectives":[],"type":"mcq","difficulty":2,
+ "prompt":"How do you query metadata from an installable .rpm file rather than an installed package?","options":["Add -p, as in rpm -qip package.rpm","Add -f, as in rpm -qif package.rpm","Add -a, as in rpm -qia package.rpm","It is not possible before installation"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"-p redirects any query option at a package file on disk. Without it, rpm looks the name up in the installed package database instead."}
+]

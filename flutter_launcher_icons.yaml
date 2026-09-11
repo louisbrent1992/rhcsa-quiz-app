@@ -1,0 +1,18 @@
+# Regenerate with:  dart run flutter_launcher_icons
+# Source images come from tool/make_icon.py.
+flutter_launcher_icons:
+  image_path: "icon/icon.png"
+
+  android: true
+  # Adaptive icons: Android masks the foreground to whatever shape the launcher
+  # uses, so the glyph is drawn smaller on a transparent field and the red is
+  # supplied as a flat background colour behind it.
+  adaptive_icon_background: "#C0091B"
+  adaptive_icon_foreground: "icon/foreground.png"
+  # Monochrome layer for Android 13+ themed icons.
+  adaptive_icon_monochrome: "icon/foreground.png"
+
+  ios: true
+  # iOS icons must not have an alpha channel; this flattens it onto the red.
+  remove_alpha_ios: true
+  background_color_ios: "#C0091B"

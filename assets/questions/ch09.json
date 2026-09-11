@@ -1,0 +1,93 @@
+[
+{"id":"ch09-q01","chapter":9,"topic":"View and Identify Processes to Monitor System Activity","objectives":[23],"type":"command","difficulty":2,
+ "prompt":"List every process on the system in full format, showing UID, PID, PPID and the command.","options":[],"answer":[],
+ "accept":["ps -(?:ef|fe)","ps -e -f","ps -f -e"],"canonical":"ps -ef",
+ "explanation":"-e selects every process and -f gives the full-format listing. Without options, ps shows only the processes tied to the current terminal."},
+
+{"id":"ch09-q02","chapter":9,"topic":"View and Identify Processes to Monitor System Activity","objectives":[23],"type":"mcq","difficulty":2,
+ "prompt":"In ps output, what does a question mark (?) in the TTY column indicate?","options":["The process has no controlling terminal — it is a daemon","The terminal could not be determined","The process is a zombie","The process is running on the graphical console"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"pts means a pseudo terminal, tty a physical one, Console the graphical console, and ? no controlling terminal at all — the signature of a background daemon."},
+
+{"id":"ch09-q03","chapter":9,"topic":"View and Identify Processes to Monitor System Activity","objectives":[23],"type":"multi","difficulty":2,
+ "prompt":"Which commands quickly return just the PID of a named process? (Select all that apply.)","options":["pidof","pgrep","ps -C","top -p"],"answer":[0,1],"accept":[],"canonical":null,
+ "explanation":"pidof and pgrep both take a process name and return its PID; used without options they produce identical results. ps -C lists full process lines for a command name rather than bare PIDs."},
+
+{"id":"ch09-q04","chapter":9,"topic":"View and Identify Processes to Monitor System Activity","objectives":[23],"type":"mcq","difficulty":3,
+ "prompt":"Which file system do ps and similar tools read to obtain process information?","options":["/proc","/sys","/run","/var/log"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"The procfs virtual file system mounted at /proc exposes the kernel's live view of every process. It is created in memory at boot and destroyed at shutdown."},
+
+{"id":"ch09-q05","chapter":9,"topic":"View and Identify Processes to Monitor System Activity","objectives":[23],"type":"mcq","difficulty":2,
+ "prompt":"Which tool shows continuously updated, real-time CPU and memory usage per process?","options":["top","ps","pgrep","crontab"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"top refreshes live and is the natural way to spot CPU- or memory-intensive processes. Its columns include PR (priority), NI (niceness), %CPU and %MEM. Press q to quit, f to choose fields, F to pick the sort field."},
+
+{"id":"ch09-q06","chapter":9,"topic":"Inspect Process States and Understand How Execution Priority is Determined","objectives":[],"type":"mcq","difficulty":2,
+ "prompt":"What is a zombie (defunct) process?","options":["A process that has finished but whose entry remains until the parent reads its exit status","A process stuck waiting on hardware I/O","A process suspended by SIGSTOP","A process running with the lowest possible priority"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"The five basic states are running/runnable (R), interruptible sleep (S), uninterruptible sleep (D), stopped (T) and zombie (Z). Uninterruptible sleep is the one that cannot be killed even with signal 9."},
+
+{"id":"ch09-q07","chapter":9,"topic":"Inspect Process States and Understand How Execution Priority is Determined","objectives":[],"type":"mcq","difficulty":3,
+ "prompt":"A process is stuck in state D and will not die even with `kill -9`. What does that state mean?","options":["Uninterruptible sleep — it is waiting on hardware I/O and ignores signals","Defunct — the parent has not reaped it","Stopped — it needs SIGCONT to resume","Running — the scheduler has not preempted it"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"A process in uninterruptible sleep is blocked in a kernel I/O operation and cannot be interrupted by any signal. It often points to a storage hardware or driver problem."},
+
+{"id":"ch09-q08","chapter":9,"topic":"Adjust Process Niceness to Influence CPU Scheduling","objectives":[24],"type":"mcq","difficulty":2,
+ "prompt":"What is the range of niceness values, and which end is the most favourable?","options":["-20 to +19; -20 is the highest priority","0 to 39; 0 is the highest priority","-19 to +20; +20 is the highest priority","1 to 99; 99 is the highest priority"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"There are 40 values from -20 (most favourable, highest priority) to +19 (least favourable). Most processes start at the default niceness of 0, which corresponds to priority 80."},
+
+{"id":"ch09-q09","chapter":9,"topic":"Adjust Process Niceness to Influence CPU Scheduling","objectives":[24],"type":"mcq","difficulty":3,
+ "prompt":"A normal user tries to launch a program with a niceness of -10 and is refused. Why?","options":["Normal users may only raise niceness (lower priority); root is needed to lower it","Negative niceness values are invalid","The nice command requires the program to be in /usr/local/bin","-10 is outside the permitted range"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"Unprivileged users can only make their processes nicer to others. Increasing priority — moving niceness toward -20 — requires root, so the command needs sudo."},
+
+{"id":"ch09-q10","chapter":9,"topic":"Adjust Process Niceness to Influence CPU Scheduling","objectives":[24],"type":"command","difficulty":3,
+ "prompt":"Launch the top program at a niceness of +2, which is lower priority than the default.","options":[],"answer":[],
+ "accept":["nice -n \\+?2 top","nice -\\+?2 top","nice --adjustment=\\+?2 top"],"canonical":"nice -n 2 top",
+ "explanation":"nice -n sets the starting niceness. The resulting process shows priority 82 and NI 2 in ps -l output. Use renice to change the niceness of an already-running process."},
+
+{"id":"ch09-q11","chapter":9,"topic":"Terminate, Pause, and Restart Programs with Signals","objectives":[23],"type":"mcq","difficulty":2,
+ "prompt":"Which signal does kill or pkill send when you do not name one, and what does it do?","options":["15 (SIGTERM) — asks the process to stop in an orderly fashion","9 (SIGKILL) — terminates the process abruptly","1 (SIGHUP) — makes the process re-read its configuration","19 (SIGSTOP) — suspends the process"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"SIGTERM is the default and lets the process clean up before exiting. Always try it first; SIGKILL is a last resort because it gives the process no chance to close files, risking data loss."},
+
+{"id":"ch09-q12","chapter":9,"topic":"Terminate, Pause, and Restart Programs with Signals","objectives":[23],"type":"multi","difficulty":3,
+ "prompt":"Match the control signals. Which pairings are correct? (Select all that apply.)","options":["1 = SIGHUP, which makes a daemon re-read its configuration without restarting","2 = SIGINT, the Ctrl+c interrupt","9 = SIGKILL, an abrupt termination","19 = SIGSTOP, the same as Ctrl+z","15 = SIGKILL, the forceful kill"],"answer":[0,1,2,3],"accept":[],"canonical":null,
+ "explanation":"15 is SIGTERM, the soft termination signal; 9 is SIGKILL. SIGCONT (18) resumes a stopped process, like the bg command. kill -l lists all 64 signals."},
+
+{"id":"ch09-q13","chapter":9,"topic":"Terminate, Pause, and Restart Programs with Signals","objectives":[23],"type":"command","difficulty":3,
+ "prompt":"Forcefully terminate every running process named crond by name, using signal 9.","options":[],"answer":[],
+ "accept":["pkill -9 crond","pkill -(?:SIGKILL|KILL) crond","killall -9 crond","killall -(?:SIGKILL|KILL) crond"],"canonical":"pkill -9 crond",
+ "explanation":"pkill and killall act on process names, while kill needs PIDs. Ordinary users may only signal their own processes; root may signal any."},
+
+{"id":"ch09-q14","chapter":9,"topic":"Run Commands in the Future without Manual Intervention","objectives":[41],"type":"mcq","difficulty":2,
+ "prompt":"Which daemons handle one-time and recurring scheduled jobs respectively?","options":["atd for one-time, crond for recurring","crond for one-time, atd for recurring","systemd-timers for both","anacron for one-time, crond for recurring"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"Neither daemon needs restarting after you add or change a job. crond skips jobs missed while the system was down; atd will attempt a missed at job when the system comes back up."},
+
+{"id":"ch09-q15","chapter":9,"topic":"Control Which Users can Schedule Tasks","objectives":[41],"type":"mcq","difficulty":3,
+ "prompt":"/etc/cron.allow does not exist and /etc/cron.deny exists but is empty. Who may schedule cron jobs?","options":["All users","No users","Only root","Only users listed in /etc/cron.d"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"This is the default state, which grants everyone access. If neither file exists, no one but root may schedule. An allow file that exists but is empty permits no users, and its existence always overrides the deny file."},
+
+{"id":"ch09-q16","chapter":9,"topic":"Control Which Users can Schedule Tasks","objectives":[41],"type":"multi","difficulty":2,
+ "prompt":"Which statements about the at/cron access files are true? (Select all that apply.)","options":["They hold one username per line","root is always permitted regardless of their contents","An existing allow file overrides the deny file","The four files are at.allow, at.deny, cron.allow and cron.deny","They must list UIDs rather than usernames"],"answer":[0,1,2,3],"accept":[],"canonical":null,
+ "explanation":"All four live in /etc and share the same one-username-per-line syntax. root's access is unaffected by whether it appears in them."},
+
+{"id":"ch09-q17","chapter":9,"topic":"Schedule and Manage One-Time Jobs","objectives":[41],"type":"multi","difficulty":2,
+ "prompt":"Which commands list or remove pending at jobs? (Select all that apply.)","options":["atq lists them","at -l lists them","atrm removes one by job ID","at -d removes one by job ID","at -r lists them"],"answer":[0,1,2,3],"accept":[],"canonical":null,
+ "explanation":"atq and at -l are equivalent, as are atrm and at -d. Submitted jobs are spooled as files under /var/spool/at."},
+
+{"id":"ch09-q18","chapter":9,"topic":"Schedule and Manage One-Time Jobs","objectives":[41],"type":"mcq","difficulty":3,
+ "prompt":"Which directory holds spooled at jobs, and which log records their execution?","options":["/var/spool/at and /var/log/cron","/var/spool/cron and /var/log/at","/etc/at.d and /var/log/messages","/var/spool/at and /var/log/at"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"at jobs spool to /var/spool/at and user crontabs to /var/spool/cron, but both services log every invocation to /var/log/cron. Reading that log requires root."},
+
+{"id":"ch09-q19","chapter":9,"topic":"Describe the Crontab Syntax to Automate Routine Tasks","objectives":[41],"type":"mcq","difficulty":2,
+ "prompt":"What is the order of the five schedule fields in a crontab entry?","options":["minute, hour, day of month, month, day of week","hour, minute, day of week, day of month, month","day of week, month, day of month, hour, minute","minute, hour, month, day of month, day of week"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"Minute 0–59, hour 0–23, day of month 1–31, month 1–12 (or jan–dec), day of week 0–7 (0 and 7 both mean Sunday). Field 6 is the command to run."},
+
+{"id":"ch09-q20","chapter":9,"topic":"Describe the Crontab Syntax to Automate Routine Tasks","objectives":[41],"type":"mcq","difficulty":3,
+ "prompt":"What does `*/5` in the minute field of a crontab entry mean?","options":["Every fifth minute","At minute 5 only","Five minutes after the hour, once a day","Between minute 0 and minute 5"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"The forward slash introduces a step value, so */5 fires every fifth minute and 0-59/4 every fourth. Step values work the same way in the hour, day, month and weekday fields."},
+
+{"id":"ch09-q21","chapter":9,"topic":"Schedule and Manage Recurring Jobs","objectives":[41],"type":"command","difficulty":2,
+ "prompt":"Open your own crontab for editing.","options":[],"answer":[],
+ "accept":["crontab -e","crontab --edit"],"canonical":"crontab -e",
+ "explanation":"-e edits, -l lists and -r removes your crontab. -u <user> targets another user's crontab, which requires the right privileges. The file opens in vim by default."},
+
+{"id":"ch09-q22","chapter":9,"topic":"Schedule and Manage Recurring Jobs","objectives":[41],"type":"mcq","difficulty":3,
+ "prompt":"Where is user1's personal crontab file stored?","options":["/var/spool/cron/user1","/etc/cron.d/user1","/home/user1/.crontab","/etc/crontab"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"Each user's crontab is a file named after them in /var/spool/cron. The other two locations crond reads — /etc/crontab and /etc/cron.d — may only be modified by root."}
+]

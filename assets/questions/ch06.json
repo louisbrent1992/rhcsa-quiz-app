@@ -1,0 +1,91 @@
+[
+{"id":"ch06-q01","chapter":6,"topic":"Enforce Password Security Policies with Aging Attributes","objectives":[52],"type":"multi","difficulty":2,
+ "prompt":"Which two commands manage password aging attributes on a local account? (Select all that apply.)","options":["chage","passwd","usermod","useradd"],"answer":[0,1],"accept":[],"canonical":null,
+ "explanation":"chage and passwd both write the aging fields (3–8) of /etc/shadow. usermod can set account and password expiry too, but its role in this chapter is locking and unlocking."},
+
+{"id":"ch06-q02","chapter":6,"topic":"Enforce Password Security Policies with Aging Attributes","objectives":[52],"type":"command","difficulty":3,
+ "prompt":"Using chage, set mindays to 7, maxdays to 90 and warndays to 10 for the account user100.","options":[],"answer":[],
+ "accept":["chage -m 7 -M 90 -W 10 user100","chage -M 90 -m 7 -W 10 user100","chage -W 10 -m 7 -M 90 user100","chage -m 7 -W 10 -M 90 user100","chage -M 90 -W 10 -m 7 user100","chage -W 10 -M 90 -m 7 user100"],"canonical":"chage -m 7 -M 90 -W 10 user100",
+ "explanation":"Note the case: lowercase -m is the minimum days, uppercase -M the maximum, and -W the warning period. The passwd equivalents are -n, -x and -w respectively."},
+
+{"id":"ch06-q03","chapter":6,"topic":"Enforce Password Security Policies with Aging Attributes","objectives":[52],"type":"mcq","difficulty":3,
+ "prompt":"What does `chage -d 0 user60` do?","options":["Forces user60 to change their password at next login","Disables password aging for user60","Expires the account immediately so user60 cannot log in","Removes user60's password"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"Field 3 is the last-change date in days since the UNIX epoch; setting it to 0 makes the password look infinitely old, so a change is demanded at next login. `passwd -e user60` achieves the same thing."},
+
+{"id":"ch06-q04","chapter":6,"topic":"Enforce Password Security Policies with Aging Attributes","objectives":[52],"type":"command","difficulty":2,
+ "prompt":"Display the current password aging settings for the account user5.","options":[],"answer":[],
+ "accept":["chage -l user5","chage --list user5"],"canonical":"chage -l user5",
+ "explanation":"chage -l prints the last change date, password and account expiry, inactivity period and the min/max/warning values. passwd -S user5 gives a terser one-line status."},
+
+{"id":"ch06-q05","chapter":6,"topic":"Enforce Password Security Policies with Aging Attributes","objectives":[52],"type":"mcq","difficulty":3,
+ "prompt":"How do you disable the account expiry date that was previously set with chage -E?","options":["chage -E -1 <user>","chage -E 0 <user>","chage -E never <user>","chage -d -1 <user>"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"-1 turns the feature off. The same convention applies to -I -1 (inactivity) and -M -1 (maximum age)."},
+
+{"id":"ch06-q06","chapter":6,"topic":"Enforce Password Security Policies with Aging Attributes","objectives":[52],"type":"mcq","difficulty":2,
+ "prompt":"Which file holds the system-wide default password aging settings applied to new accounts?","options":["/etc/login.defs","/etc/shadow","/etc/default/useradd","/etc/security/pwquality.conf"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"PASS_MAX_DAYS, PASS_MIN_DAYS and PASS_WARN_AGE in /etc/login.defs are the defaults. Per-user values live in fields 3–8 of /etc/shadow."},
+
+{"id":"ch06-q07","chapter":6,"topic":"Lock and Unlock User Accounts to Control System Access","objectives":[],"type":"mcq","difficulty":2,
+ "prompt":"What does locking an account with `usermod -L` actually change?","options":["It prepends an exclamation mark to the password hash in /etc/shadow","It sets the shell to /sbin/nologin","It deletes the password hash entirely","It sets the account expiry date to today"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"The leading ! makes the stored hash unmatchable, so no password can authenticate. usermod -U or passwd -u removes it; passwd -l is the equivalent lock."},
+
+{"id":"ch06-q08","chapter":6,"topic":"Lock and Unlock User Accounts to Control System Access","objectives":[],"type":"multi","difficulty":2,
+ "prompt":"Which commands can lock a user account? (Select all that apply.)","options":["usermod -L","passwd -l","chage -l","passwd -d"],"answer":[0,1],"accept":[],"canonical":null,
+ "explanation":"usermod -L and passwd -l both lock. chage -l merely lists aging settings, and passwd -d deletes the password without expiring the account — which leaves it passwordless, not locked."},
+
+{"id":"ch06-q09","chapter":6,"topic":"Manage Group Memberships and Properties","objectives":[53],"type":"command","difficulty":2,
+ "prompt":"Create a group named linuxadm with GID 5000.","options":[],"answer":[],
+ "accept":["groupadd -g 5000 linuxadm","groupadd --gid 5000 linuxadm"],"canonical":"groupadd -g 5000 linuxadm",
+ "explanation":"-g assigns a specific GID; without it the next free GID from the login.defs range is used. -r creates a system group with a GID between 1 and 999."},
+
+{"id":"ch06-q10","chapter":6,"topic":"Manage Group Memberships and Properties","objectives":[53],"type":"command","difficulty":3,
+ "prompt":"Add user1 to the supplementary group dba without disturbing their existing group memberships.","options":[],"answer":[],
+ "accept":["usermod -a ?G dba user1","usermod -G ?a dba user1","usermod --append --groups dba user1"],"canonical":"usermod -aG dba user1",
+ "explanation":"-G alone REPLACES the supplementary group list; -a appends to it. Forgetting -a is a classic way to silently drop a user out of every other group."},
+
+{"id":"ch06-q11","chapter":6,"topic":"Manage Group Memberships and Properties","objectives":[53],"type":"command","difficulty":2,
+ "prompt":"Rename the group linuxadm to sysadm.","options":[],"answer":[],
+ "accept":["groupmod -n sysadm linuxadm","groupmod --new-name sysadm linuxadm"],"canonical":"groupmod -n sysadm linuxadm",
+ "explanation":"-n takes the new name first, then the existing group name. Renaming replaces the original entry — the old group name no longer exists."},
+
+{"id":"ch06-q12","chapter":6,"topic":"Manage Group Memberships and Properties","objectives":[53],"type":"mcq","difficulty":3,
+ "prompt":"What does the -o option do for groupadd and groupmod?","options":["Permits a GID that duplicates an existing group's, so the system treats them as one","Overwrites the group if it already exists","Makes the group the owner of new files","Marks the group as a system group"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"-o (--non-unique) waives the uniqueness check on the GID. useradd has the same option for UIDs; two identities sharing a numeric ID get identical rights."},
+
+{"id":"ch06-q13","chapter":6,"topic":"Switch User Identities","objectives":[5],"type":"mcq","difficulty":3,
+ "prompt":"What is the difference between `su root` and `su - root`?","options":["The hyphen runs root's startup scripts, simulating a full login","The hyphen skips the password prompt","Without the hyphen the command fails for normal users","The hyphen keeps you in your current directory"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"su - (or su -l) starts a login shell: it sources the target user's startup files and moves to their home directory. Plain su switches identity but keeps your existing environment."},
+
+{"id":"ch06-q14","chapter":6,"topic":"Switch User Identities","objectives":[5],"type":"mcq","difficulty":3,
+ "prompt":"After user1 runs `su - user100`, what do `whoami` and `logname` report?","options":["whoami reports user100; logname reports user1","Both report user100","Both report user1","whoami reports user1; logname reports user100"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"whoami gives the effective (current) identity, while logname gives the real identity of whoever originally logged in — useful for spotting who is behind a switched session."},
+
+{"id":"ch06-q15","chapter":6,"topic":"Switch User Identities","objectives":[5],"type":"mcq","difficulty":2,
+ "prompt":"Whose password is required when root runs `su - user100`?","options":["None — root switches to any account without a password prompt","user100's password","root's own password","Both root's and user100's"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"root may assume any identity unchallenged. A normal user must supply the target user's password to switch."},
+
+{"id":"ch06-q16","chapter":6,"topic":"Delegate Administrative Privileges","objectives":[54],"type":"mcq","difficulty":2,
+ "prompt":"Which command should be used to edit /etc/sudoers, and why?","options":["visudo — it validates the syntax before saving and prevents concurrent edits","vim — it is the standard editor for all configuration files","sudoedit — it is the only command permitted to open the file","nano — it will not corrupt the file's formatting"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"visudo edits a temporary copy (/etc/sudoers.tmp), checks the syntax, and refuses to save a broken file. A syntax error saved directly could lock everyone out of administrative access."},
+
+{"id":"ch06-q17","chapter":6,"topic":"Delegate Administrative Privileges","objectives":[54],"type":"mcq","difficulty":3,
+ "prompt":"What does the sudoers entry `user10 ALL=(ALL) NOPASSWD:ALL` grant?","options":["Full root authority for every command, without ever prompting for a password","Full root authority, prompting for user10's password each time","The ability to run only commands listed in NOPASSWD","Permission to change the root password without authenticating"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"NOPASSWD: suppresses the password prompt, and the trailing ALL means every command. Dropping NOPASSWD: makes sudo ask for the invoking user's own password."},
+
+{"id":"ch06-q18","chapter":6,"topic":"Delegate Administrative Privileges","objectives":[54],"type":"mcq","difficulty":3,
+ "prompt":"Where should custom sudo rules preferably be placed, and what prefix denotes a group in them?","options":["Drop-in files under /etc/sudoers.d, with % marking a group","Directly in /etc/sudoers, with @ marking a group","In /etc/security/sudo.conf, with & marking a group","In ~/.sudoers, with % marking a group"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"Drop-in files in /etc/sudoers.d keep the main file clean and survive package updates. A percentage sign identifies a group, e.g. %dba ALL=(ALL) ALL."},
+
+{"id":"ch06-q19","chapter":6,"topic":"Delegate Administrative Privileges","objectives":[54],"type":"mcq","difficulty":2,
+ "prompt":"Under which account name does sudo record successful command execution in /var/log/secure?","options":["The actual user who invoked sudo","root, since the command runs with root privileges","The owner of the command being run","No user name is recorded"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"This accountability is precisely why sudo is preferred over su: the log ties each privileged action to a real person, and privileges can be scoped to specific commands."},
+
+{"id":"ch06-q20","chapter":6,"topic":"Change File and Directory Owning User and Owning Group","objectives":[],"type":"command","difficulty":2,
+ "prompt":"Set both the owning user to user200 and the owning group to dba on the directory /tmp/dir10, applying it recursively.","options":[],"answer":[],
+ "accept":["chown -R user200:dba /tmp/dir10/?","chown -R user200\\.dba /tmp/dir10/?","chown --recursive user200:dba /tmp/dir10/?"],"canonical":"chown -R user200:dba /tmp/dir10",
+ "explanation":"chown accepts user:group to change both at once, and -R walks the tree. Changing ownership requires root privileges."},
+
+{"id":"ch06-q21","chapter":6,"topic":"Change File and Directory Owning User and Owning Group","objectives":[],"type":"mcq","difficulty":2,
+ "prompt":"Which statement about chown and chgrp is correct?","options":["chown can set the owning user and group; chgrp sets only the group","chgrp can set the owning user and group; chown sets only the user","Both can set either attribute interchangeably","Neither requires root privileges"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"chown user:group handles both, whereas chgrp is limited to the owning group. Both need root privileges to reassign ownership."}
+]

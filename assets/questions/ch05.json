@@ -1,0 +1,87 @@
+[
+{"id":"ch05-q01","chapter":5,"topic":"Monitor Current and Past User Logins","objectives":[],"type":"mcq","difficulty":2,
+ "prompt":"Which file does the `who` command read to report the users currently logged in?","options":["/run/utmp","/var/log/wtmp","/var/log/btmp","/var/log/lastlog"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"who reads /run/utmp for the current sessions. /var/log/wtmp holds login/logout history (read by last), /var/log/btmp failed attempts (lastb), and /var/log/lastlog each user's most recent login (lastlog)."},
+
+{"id":"ch05-q02","chapter":5,"topic":"Monitor Current and Past User Logins","objectives":[],"type":"mcq","difficulty":2,
+ "prompt":"Which command reports a history of failed login attempts, and which file does it read?","options":["lastb, reading /var/log/btmp","last, reading /var/log/wtmp","lastlog, reading /var/log/lastlog","faillog, reading /run/utmp"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"lastb reads /var/log/btmp and must be run as root or through sudo. Repeated failures for a valid account may mean a forgotten password — or a break-in attempt."},
+
+{"id":"ch05-q03","chapter":5,"topic":"Monitor Current and Past User Logins","objectives":[],"type":"multi","difficulty":3,
+ "prompt":"What does `w` show that `who` does not? (Select all that apply.)","options":["Idle time for each session","The command the user is currently running","CPU time consumed on the terminal","The user's UID and primary group","The user's password aging settings"],"answer":[0,1,2],"accept":[],"canonical":null,
+ "explanation":"w adds IDLE, JCPU, PCPU and WHAT columns plus an uptime-style header line. UID and group come from id; password aging from chage."},
+
+{"id":"ch05-q04","chapter":5,"topic":"Inspect System Reboot History","objectives":[],"type":"command","difficulty":2,
+ "prompt":"List only the system reboot events from the login history.","options":[],"answer":[],
+ "accept":["last reboot"],"canonical":"last reboot",
+ "explanation":"Passing reboot as an argument filters last's output to boot records, showing the kernel version and how long the system was down (or 'still running')."},
+
+{"id":"ch05-q05","chapter":5,"topic":"Query User and Group Identity Information","objectives":[],"type":"command","difficulty":1,
+ "prompt":"Display your UID, primary GID, group memberships and SELinux context in one command.","options":[],"answer":[],
+ "accept":["id"],"canonical":"id",
+ "explanation":"id with no argument reports the calling user's identity. Supply a username to inspect someone else. The groups command shows only the group list, primary group first."},
+
+{"id":"ch05-q06","chapter":5,"topic":"Query User and Group Identity Information","objectives":[],"type":"mcq","difficulty":2,
+ "prompt":"In the output of `groups`, what is the significance of the first group listed?","options":["It is the user's primary group","It is the most recently added group","It is the group with the lowest GID","It is always the wheel group"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"The first entry is the primary group, taken from the GID field of the user's /etc/passwd line. The rest are secondary (supplementary) groups that grant extra access."},
+
+{"id":"ch05-q07","chapter":5,"topic":"Decode the Structure of the Local User Authentication Files","objectives":[],"type":"mcq","difficulty":2,
+ "prompt":"How many colon-separated fields does each line of /etc/passwd contain?","options":["Seven","Nine","Four","Five"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"passwd has seven fields: login name, password placeholder, UID, GID, GECOS comment, home directory and shell. /etc/shadow has nine and both /etc/group and /etc/gshadow have four."},
+
+{"id":"ch05-q08","chapter":5,"topic":"Decode the Structure of the Local User Authentication Files","objectives":[],"type":"mcq","difficulty":3,
+ "prompt":"What are the permissions on /etc/shadow, and why?","options":["000 — no permissions at all, so the hashed passwords cannot be read","644 — world-readable like /etc/passwd","600 — readable and writable by root only","400 — readable by root only"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"/etc/shadow and /etc/gshadow carry 000 permissions and are owned by root; a privileged background mechanism updates them. /etc/passwd and /etc/group are 644 because they hold no secrets."},
+
+{"id":"ch05-q09","chapter":5,"topic":"Decode the Structure of the Local User Authentication Files","objectives":[],"type":"mcq","difficulty":2,
+ "prompt":"An 'x' appears in the password field of a user's /etc/passwd line. What does it mean?","options":["The hashed password is stored in /etc/shadow","The account is disabled","The account is locked","The user has no password"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"x means shadow passwords are in use. An asterisk (*) marks a disabled account — common for system accounts — and an exclamation mark (!) marks a locked one."},
+
+{"id":"ch05-q10","chapter":5,"topic":"Decode the Structure of the Local User Authentication Files","objectives":[],"type":"mcq","difficulty":3,
+ "prompt":"How are UID ranges allocated on RHEL?","options":["0 for root, 1–200 core system accounts, 201–999 non-core system accounts, 1000+ normal users","0 for root, 1–999 normal users, 1000+ system accounts","0–99 system accounts, 100+ normal users","0 for root, all others assigned randomly"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"UID 0 is root. Red Hat statically assigns 1–200 to core system accounts, reserves 201–999 for non-core service accounts, and normal users start at 1000. The ranges are configured by UID_MIN/UID_MAX in /etc/login.defs."},
+
+{"id":"ch05-q11","chapter":5,"topic":"Decode the Structure of the Local User Authentication Files","objectives":[],"type":"mcq","difficulty":3,
+ "prompt":"What is a User Private Group (UPG)?","options":["A group created automatically for each new user, named after them with GID matching their UID","A group that only the root user may join","A group whose membership list is hidden in /etc/gshadow","A group used exclusively for sudo access"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"RHEL creates a UPG per user by default, which is why a new user's GID normally equals their UID. It is controlled by USERGROUPS_ENAB in /etc/login.defs."},
+
+{"id":"ch05-q12","chapter":5,"topic":"Decode the Structure of the Local User Authentication Files","objectives":[],"type":"mcq","difficulty":3,
+ "prompt":"Field 4 of /etc/group lists member usernames. Which users are NOT listed there?","options":["Users for whom this group is their primary group","Users who joined most recently","Group administrators","Users with a locked account"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"Primary membership is expressed by the GID in /etc/passwd, not by the member list in /etc/group. That field enumerates supplementary members only."},
+
+{"id":"ch05-q13","chapter":5,"topic":"Manage the User Lifecycle: Creating, Modifying, and Deleting Local User Accounts","objectives":[51],"type":"command","difficulty":2,
+ "prompt":"Create the account user3 with UID 1010, home directory /usr/user3a and login shell /bin/sh.","options":[],"answer":[],
+ "accept":["useradd -u 1010 -d /usr/user3a -s /bin/sh user3","useradd -u 1010 -s /bin/sh -d /usr/user3a user3","useradd -d /usr/user3a -u 1010 -s /bin/sh user3","useradd -s /bin/sh -u 1010 -d /usr/user3a user3","useradd -d /usr/user3a -s /bin/sh -u 1010 user3","useradd -s /bin/sh -d /usr/user3a -u 1010 user3"],"canonical":"useradd -u 1010 -d /usr/user3a -s /bin/sh user3",
+ "explanation":"-u sets the UID, -d the home directory and -s the shell; the login name comes last. Options may be given in any order. Anything you omit is taken from /etc/default/useradd and /etc/login.defs."},
+
+{"id":"ch05-q14","chapter":5,"topic":"Manage the User Lifecycle: Creating, Modifying, and Deleting Local User Accounts","objectives":[51],"type":"command","difficulty":3,
+ "prompt":"Delete the account user2new together with its home directory and mail spool.","options":[],"answer":[],
+ "accept":["userdel -r user2new","userdel --remove user2new"],"canonical":"userdel -r user2new",
+ "explanation":"Without -r, userdel removes the authentication-file entries but leaves the home directory behind. -f forces removal even while the user is logged in."},
+
+{"id":"ch05-q15","chapter":5,"topic":"Manage the User Lifecycle: Creating, Modifying, and Deleting Local User Accounts","objectives":[51],"type":"multi","difficulty":3,
+ "prompt":"Which usermod option pairs are needed to rename a user's home directory and move its contents? (Select all that apply.)","options":["-d to give the new home directory path","-m to move the existing contents there","-l to change the login name","-a to append the move to the audit log","-r to remove the old directory"],"answer":[0,1],"accept":[],"canonical":null,
+ "explanation":"-d names the new location and -m moves the contents into it, creating the directory if needed. -l changes the login name (a separate concern), -a is only meaningful with -G, and -r belongs to userdel."},
+
+{"id":"ch05-q16","chapter":5,"topic":"Manage the User Lifecycle: Creating, Modifying, and Deleting Local User Accounts","objectives":[51],"type":"mcq","difficulty":2,
+ "prompt":"Which directory does useradd copy user initialization files from when creating a home directory?","options":["/etc/skel","/etc/default","/usr/share/defaults","/etc/profile.d"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"/etc/skel holds the skeleton files — .bash_profile, .bashrc and .bash_logout by default — copied into each new home directory. Use useradd -k to point at a different skeleton directory."},
+
+{"id":"ch05-q17","chapter":5,"topic":"Manage the User Lifecycle: Creating, Modifying, and Deleting Local User Accounts","objectives":[51],"type":"multi","difficulty":2,
+ "prompt":"Which files supply defaults to useradd for options you do not specify? (Select all that apply.)","options":["/etc/default/useradd","/etc/login.defs","/etc/passwd","/etc/skel/.bashrc"],"answer":[0,1],"accept":[],"canonical":null,
+ "explanation":"useradd reads /etc/default/useradd (home base, shell, skeleton, expiry, inactivity) and /etc/login.defs (UID/GID ranges, umask, password aging, encryption method). usermod, userdel, chage and passwd also consult login.defs."},
+
+{"id":"ch05-q18","chapter":5,"topic":"Assign and Change User Passwords","objectives":[52],"type":"command","difficulty":1,
+ "prompt":"Set or change the password for the account user2, being prompted for it interactively.","options":[],"answer":[],
+ "accept":["passwd user2"],"canonical":"passwd user2",
+ "explanation":"Run as root (or via sudo), passwd <user> sets another account's password. A user running passwd with no argument changes their own."},
+
+{"id":"ch05-q19","chapter":5,"topic":"Create Non-Login User Accounts","objectives":[51],"type":"mcq","difficulty":2,
+ "prompt":"A user who should have no login access can still authenticate. What should you check first?","options":["Their shell field in /etc/passwd — it should be /sbin/nologin","Their UID — it should be below 1000","Their entry in /etc/gshadow","Whether /etc/nologin.txt exists"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"The nologin shell is what refuses the session, printing 'This account is currently not available.' /etc/nologin.txt only customises that message; it does not enforce the restriction."},
+
+{"id":"ch05-q20","chapter":5,"topic":"Create Non-Login User Accounts","objectives":[51],"type":"command","difficulty":2,
+ "prompt":"Create the account user4 with all default attributes but a non-interactive shell that refuses logins.","options":[],"answer":[],
+ "accept":["useradd -s /(?:usr/)?sbin/nologin user4"],"canonical":"useradd -s /sbin/nologin user4",
+ "explanation":"Service accounts such as mail, ftp and sshd are created this way — they exist to own processes and files, not to log in. Either /sbin/nologin or /usr/sbin/nologin works."}
+]

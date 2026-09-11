@@ -1,0 +1,87 @@
+[
+{"id":"ch04-q01","chapter":4,"topic":"Interpret and Modify File and Directory Permissions","objectives":[10],"type":"mcq","difficulty":1,
+ "prompt":"What are the three permission classes in the standard ugo/rwx model?","options":["user (owner), group, and other (public)","read, write, and execute","add, revoke, and assign","root, wheel, and nobody"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"Classes are user (u), group (g) and other (o), with a special class all (a) covering the three. Types are read, write and execute; modes are add (+), revoke (-) and assign (=)."},
+
+{"id":"ch04-q02","chapter":4,"topic":"Interpret and Modify File and Directory Permissions","objectives":[10,40],"type":"mcq","difficulty":2,
+ "prompt":"What does the execute (x) permission allow on a directory?","options":["Changing into it with cd","Listing its contents with ls","Creating and deleting entries inside it","Running the files it contains"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"On directories the bits mean something different from files: r lists the contents, w creates/deletes/renames entries, and x permits entering the directory with cd. You need x to traverse a directory even to reach a file inside it."},
+
+{"id":"ch04-q03","chapter":4,"topic":"Interpret and Modify File and Directory Permissions","objectives":[10,40],"type":"multi","difficulty":3,
+ "prompt":"A user can read a file but cannot cd into the directory holding it. Which are plausible causes? (Select all that apply.)","options":["The directory lacks the execute bit for that user's class","A parent directory in the path lacks the execute bit","The directory lacks the read bit, so ls fails but cd would work","The file itself lacks the execute bit"],"answer":[0,1],"accept":[],"canonical":null,
+ "explanation":"Traversal requires x on the directory and on every parent in the path. Missing r would break ls but not cd, and the file's own execute bit is irrelevant to entering a directory."},
+
+{"id":"ch04-q04","chapter":4,"topic":"Apply Permissions with Symbolic and Octal Notations","objectives":[10],"type":"mcq","difficulty":2,
+ "prompt":"What is the symbolic equivalent of octal permissions 751?","options":["rwxr-x--x","rwxr--r-x","rw-r-x--x","rwx-wx--x"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"Each digit is the sum of read=4, write=2, execute=1. So 7 = rwx, 5 = r-x, 1 = --x, giving rwxr-x--x."},
+
+{"id":"ch04-q05","chapter":4,"topic":"Apply Permissions with Symbolic and Octal Notations","objectives":[10],"type":"mcq","difficulty":2,
+ "prompt":"After `chmod 555 file1`, what does the owner get?","options":["Read and execute","Read and write","Read, write and execute","Execute only"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"5 is 4 (read) + 1 (execute), so every class — including the owner — gets r-x. Note that the owner is not privileged by chmod; the digit given is exactly what is applied."},
+
+{"id":"ch04-q06","chapter":4,"topic":"Apply Permissions with Symbolic and Octal Notations","objectives":[10],"type":"command","difficulty":2,
+ "prompt":"Using octal notation, give permfile2 read, write and execute for all three permission classes.","options":[],"answer":[],
+ "accept":["chmod -?v? ?777 permfile2","chmod 777 permfile2"],"canonical":"chmod 777 permfile2",
+ "explanation":"7 = 4+2+1 = rwx for user, group and other. Add -v to have chmod report what it changed."},
+
+{"id":"ch04-q07","chapter":4,"topic":"Change Access Rights for the Owner, Group, and Public","objectives":[10],"type":"command","difficulty":2,
+ "prompt":"Using symbolic notation, add the read permission for user, group and other on file1 in a single command.","options":[],"answer":[],
+ "accept":["chmod -?v? ?a\\+r file1","chmod a\\+r file1","chmod ugo\\+r file1","chmod u\\+r,g\\+r,o\\+r file1"],"canonical":"chmod a+r file1",
+ "explanation":"The a class stands for user, group and other combined, and + adds a bit without disturbing the others. Using = instead would assign exactly that bit and clear the rest."},
+
+{"id":"ch04-q08","chapter":4,"topic":"Change Access Rights for the Owner, Group, and Public","objectives":[10],"type":"mcq","difficulty":3,
+ "prompt":"How do the symbolic modes +, - and = differ?","options":["+ adds a bit, - revokes a bit, = assigns exactly the bits listed and clears the rest","+ and = are identical; - revokes","+ adds, - revokes, = displays the current mode","= only works with octal notation"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"= is absolute for the class it names: `chmod g=r file` leaves the group with read only, clearing write and execute, whereas `chmod g+r file` leaves any existing group bits in place."},
+
+{"id":"ch04-q09","chapter":4,"topic":"Configure Default Permissions for New Files and Directories","objectives":[56],"type":"mcq","difficulty":2,
+ "prompt":"What is the default umask for users, including root, on RHEL?","options":["0022","0027","0002","0077"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"The default is 0022; the leading zero has no significance. It yields 644 on new files and 755 on new directories."},
+
+{"id":"ch04-q10","chapter":4,"topic":"Configure Default Permissions for New Files and Directories","objectives":[56],"type":"mcq","difficulty":3,
+ "prompt":"With a umask of 000, what permissions does a newly created regular file get?","options":["666 — files never receive the execute bit at creation","777 — the umask masks nothing","644 — the default is applied regardless","000 — no permissions at all"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"Initial permissions are 666 for files and 777 for directories, and the umask is subtracted from those. For security, a new file never gets execute even when the arithmetic would allow it — you must add it with chmod."},
+
+{"id":"ch04-q11","chapter":4,"topic":"Configure Default Permissions for New Files and Directories","objectives":[56],"type":"command","difficulty":3,
+ "prompt":"Set the umask so that new files are created 640 and new directories 750.","options":[],"answer":[],
+ "accept":["umask 0?27"],"canonical":"umask 027",
+ "explanation":"666 - 027 = 640 and 777 - 027 = 750. Set at the prompt the value lasts only for the session; put it in a shell startup file to make it persistent. umask -S shows the value symbolically."},
+
+{"id":"ch04-q12","chapter":4,"topic":"Configure Default Permissions for New Files and Directories","objectives":[56],"type":"mcq","difficulty":2,
+ "prompt":"You change the umask in your shell. What happens to files created before the change?","options":["Nothing — the umask affects only files created afterwards","They are re-permissioned to match the new umask","They become inaccessible until chmod is run","Only files in the current directory are updated"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"The umask is applied at creation time only. Existing files and directories keep whatever permissions they already have; use chmod to change those."},
+
+{"id":"ch04-q13","chapter":4,"topic":"Locate Files and Directories using a Variety of Ways","objectives":[],"type":"command","difficulty":2,
+ "prompt":"Search /dev for entries whose names begin with 'usb', ignoring case.","options":[],"answer":[],
+ "accept":["find /dev -iname [\"']?usb\\*[\"']?"],"canonical":"find /dev -iname \"usb*\"",
+ "explanation":"-iname is the case-insensitive form of -name. Quoting the pattern stops the shell from expanding the asterisk before find sees it. -print is the default action and can be omitted."},
+
+{"id":"ch04-q14","chapter":4,"topic":"Locate Files and Directories using a Variety of Ways","objectives":[],"type":"command","difficulty":3,
+ "prompt":"Find files under /var/log modified within the last 100 minutes.","options":[],"answer":[],
+ "accept":["find /var/log -mmin -100"],"canonical":"find /var/log -mmin -100",
+ "explanation":"-mmin works in minutes and -mtime in days. A leading minus means 'less than' (within the last N), a plus means 'more than', and a bare number means exactly N."},
+
+{"id":"ch04-q15","chapter":4,"topic":"Locate Files and Directories using a Variety of Ways","objectives":[],"type":"mcq","difficulty":3,
+ "prompt":"What does `find /dev -type c -perm 440` match?","options":["Character device files under /dev whose permissions are exactly 440","Any file under /dev with at least 440 permissions","Block device files with permissions 440","Files owned by a group with read access"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"-type c selects character devices (b is block, d directory, f regular, p named pipe, s socket). A bare -perm 440 requires an exact match; prefix the mode with / to mean 'any of these bits' or - to mean 'all of these bits, at least'."},
+
+{"id":"ch04-q16","chapter":4,"topic":"Locate Files and Directories using a Variety of Ways","objectives":[],"type":"mcq","difficulty":3,
+ "prompt":"What does `find / -name core -ok rm {} \\;` do?","options":["Finds every file named core and asks for confirmation before deleting each one","Silently deletes every file named core","Lists files named core without deleting them","Fails, because -ok requires -exec"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"-ok behaves like -exec but prompts before each action. find substitutes {} with each match, and the escaped semicolon \\; terminates the command."},
+
+{"id":"ch04-q17","chapter":4,"topic":"Locate Files and Directories using a Variety of Ways","objectives":[],"type":"multi","difficulty":3,
+ "prompt":"Which find expressions are valid ways to narrow a search? (Select all that apply.)","options":["-size +40M for files larger than 40 MB","-not -group root to exclude files whose owning group is root","-maxdepth 2 to limit how far below the starting point to descend","-owner root to match files owned by root","-mindepth 3 to skip the first two levels"],"answer":[0,1,2,4],"accept":[],"canonical":null,
+ "explanation":"The ownership predicate is -user, not -owner. -not (or !) negates a test, and -maxdepth/-mindepth bound how deep find descends."},
+
+{"id":"ch04-q18","chapter":4,"topic":"Locate Files and Directories using a Variety of Ways","objectives":[],"type":"command","difficulty":3,
+ "prompt":"Find every regular file under /usr owned by the user root.","options":[],"answer":[],
+ "accept":["find /usr -type f -user root","find /usr -user root -type f"],"canonical":"find /usr -type f -user root",
+ "explanation":"-type f restricts to regular files and -user names the owning user. Add -group for the owning group and -size or -mtime to narrow further."},
+
+{"id":"ch04-q19","chapter":4,"topic":"Locate Files and Directories using a Variety of Ways","objectives":[],"type":"mcq","difficulty":2,
+ "prompt":"In a find -exec clause, what does {} represent?","options":["Each matched pathname, substituted in as it is found","The starting directory of the search","An empty placeholder that must be left literal","The exit status of the previous test"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"find replaces {} with the path of each match before running the command. The clause ends with an escaped semicolon (\\;) so the shell does not consume it."},
+
+{"id":"ch04-q20","chapter":4,"topic":"Interpret and Modify File and Directory Permissions","objectives":[40],"type":"mcq","difficulty":2,
+ "prompt":"Who may run chmod on a given file?","options":["The file's owner and root","Any member of the owning group","Anyone with write permission on the file","Only root"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"chmod can be run by the file's owner or by root. Having write permission on the contents does not confer the right to change the mode."}
+]

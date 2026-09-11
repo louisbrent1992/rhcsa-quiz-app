@@ -1,0 +1,93 @@
+[
+{"id":"ch07-q01","chapter":7,"topic":"Manage Shell and Environment Variables","objectives":[],"type":"mcq","difficulty":2,
+ "prompt":"What is the difference between a local (shell) variable and an environment variable?","options":["An environment variable is inherited by sub-shells; a local variable is not","A local variable persists across logins; an environment variable does not","Local variables can only hold numbers","Environment variables are readable only by root"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"A local variable exists only in the shell that defined it. export promotes it to an environment variable, which child shells inherit. Anything set in a sub-shell is lost when that sub-shell exits."},
+
+{"id":"ch07-q02","chapter":7,"topic":"Manage Shell and Environment Variables","objectives":[],"type":"multi","difficulty":2,
+ "prompt":"Which commands display shell variables? (Select all that apply.)","options":["env — environment variables only","printenv — environment variables only","set — both local and environment variables","echo $VAR — the value of one named variable","unset VAR — the value before removing it"],"answer":[0,1,2,3],"accept":[],"canonical":null,
+ "explanation":"unset removes a variable and prints nothing. env and printenv list environment variables, set lists local ones as well, and echo shows a single value when the name is prefixed with $."},
+
+{"id":"ch07-q03","chapter":7,"topic":"Manage Shell and Environment Variables","objectives":[],"type":"mcq","difficulty":2,
+ "prompt":"Which environment variable defines the colon-separated list of directories searched when you run a command?","options":["PATH","SHELL","HOME","PS1"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"A correctly configured PATH lets you run commands without typing their absolute path. PS1 defines the primary prompt, PS2 the secondary one, and SHELL the path to your login shell."},
+
+{"id":"ch07-q04","chapter":7,"topic":"Use Command and Variable Substitutions","objectives":[],"type":"mcq","difficulty":3,
+ "prompt":"Which syntax captures a command's output for assignment to a variable?","options":["$(hostname) — or the older `hostname` backticks","{hostname}","<hostname>","\"hostname\""],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"This is command substitution. $() is preferred over backticks because it nests cleanly and is easier to read. Variable substitution, by contrast, is simply $VARNAME."},
+
+{"id":"ch07-q05","chapter":7,"topic":"Leverage Shell Features such as Tab Completion, Command History, Quick Navigation and Editing at the Command Line, Tilde Substitution, and Alias Substitution","objectives":[],"type":"mcq","difficulty":2,
+ "prompt":"Which variable names the file where bash stores your command history?","options":["HISTFILE — default ~/.bash_history","HISTSIZE — default ~/.bash_history","HISTFILESIZE — default ~/.history","HISTCONTROL — default ~/.bash_history"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"HISTFILE names the file (~/.bash_history by default). HISTSIZE caps the commands held in memory this session and HISTFILESIZE the lines kept in the file."},
+
+{"id":"ch07-q06","chapter":7,"topic":"Leverage Shell Features such as Tab Completion, Command History, Quick Navigation and Editing at the Command Line, Tilde Substitution, and Alias Substitution","objectives":[],"type":"mcq","difficulty":3,
+ "prompt":"At the prompt, what does `!!` do?","options":["Re-runs the most recent command","Re-runs the second command in history","Clears the history list","Negates the exit status of the last command"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"!! repeats the last command — handy as `sudo !!`. !15 re-runs history line 15, and !ch re-runs the most recent command starting with 'ch'."},
+
+{"id":"ch07-q07","chapter":7,"topic":"Leverage Shell Features such as Tab Completion, Command History, Quick Navigation and Editing at the Command Line, Tilde Substitution, and Alias Substitution","objectives":[],"type":"mcq","difficulty":3,
+ "prompt":"You have aliased rm to `rm -i`. How do you run the original rm just this once?","options":["Prefix it with a backslash: \\rm","Prefix it with sudo","Use unalias rm first; there is no other way","Quote it: 'rm'"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"A backslash before the name bypasses alias expansion for that invocation. unalias rm would remove the alias permanently for the session."},
+
+{"id":"ch07-q08","chapter":7,"topic":"Leverage Shell Features such as Tab Completion, Command History, Quick Navigation and Editing at the Command Line, Tilde Substitution, and Alias Substitution","objectives":[],"type":"mcq","difficulty":3,
+ "prompt":"In tilde expansion, what does `~-` refer to?","options":["The previous working directory","The current directory","The root user's home directory","The parent of the home directory"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"~ alone is $HOME, ~+ is the current directory, ~- is the previous working directory, and ~username is that user's home directory."},
+
+{"id":"ch07-q09","chapter":7,"topic":"Utilize Metacharacters in Redirections, Piping, and Quoting Mechanisms","objectives":[2],"type":"mcq","difficulty":1,
+ "prompt":"Which file descriptors represent stdin, stdout and stderr?","options":["0, 1 and 2","1, 2 and 3","2, 1 and 0","-1, 0 and 1"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"0 is standard input, 1 standard output and 2 standard error. `ls > file` is shorthand for `ls 1> file`."},
+
+{"id":"ch07-q10","chapter":7,"topic":"Utilize Metacharacters in Redirections, Piping, and Quoting Mechanisms","objectives":[2],"type":"command","difficulty":2,
+ "prompt":"Run `ls` and append its standard output to the existing file ls.out rather than overwriting it.","options":[],"answer":[],
+ "accept":["ls 1?>> ?ls\\.out"],"canonical":"ls >> ls.out",
+ "explanation":"> truncates the target, >> appends. Both may be written with the explicit descriptor, so `ls 1>> ls.out` is identical."},
+
+{"id":"ch07-q11","chapter":7,"topic":"Utilize Metacharacters in Redirections, Piping, and Quoting Mechanisms","objectives":[2],"type":"command","difficulty":3,
+ "prompt":"Run `find / -name core` as a normal user and discard the permission-denied error messages while still seeing the results.","options":[],"answer":[],
+ "accept":["find / -name core 2> ?/dev/null"],"canonical":"find / -name core 2>/dev/null",
+ "explanation":"2> redirects standard error only, and /dev/null discards whatever is written to it. Standard output still reaches the terminal."},
+
+{"id":"ch07-q12","chapter":7,"topic":"Utilize Metacharacters in Redirections, Piping, and Quoting Mechanisms","objectives":[2],"type":"mcq","difficulty":3,
+ "prompt":"Which two forms send BOTH standard output and standard error to outerr.out?","options":["ls /usr /cdr &> outerr.out  and  ls /usr /cdr 1> outerr.out 2>&1","ls /usr /cdr > outerr.out  and  ls /usr /cdr 2> outerr.out","ls /usr /cdr >> outerr.out  and  ls /usr /cdr 2>> outerr.out","ls /usr /cdr | outerr.out  and  ls /usr /cdr 0> outerr.out"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"&> is the shorthand; 2>&1 means 'send errors wherever output is already going' and must come after the output redirection. Use &>> to append instead of overwrite."},
+
+{"id":"ch07-q13","chapter":7,"topic":"Utilize Metacharacters in Redirections, Piping, and Quoting Mechanisms","objectives":[2],"type":"mcq","difficulty":3,
+ "prompt":"What does enabling the shell's noclobber option with `set -o noclobber` do?","options":["Prevents > from overwriting an existing file","Disables output redirection entirely","Stops the shell from expanding wildcards","Prevents commands from being written to history"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"noclobber protects against accidentally truncating a file with >. Turn it back off with set +o noclobber. The same set +o/-o pattern toggles history."},
+
+{"id":"ch07-q14","chapter":7,"topic":"Utilize Metacharacters in Redirections, Piping, and Quoting Mechanisms","objectives":[2],"type":"mcq","difficulty":2,
+ "prompt":"What do the single and double quoting mechanisms differ on?","options":["Double quotes still honour \\, $ and single quotes; single quotes suppress every special character","Single quotes still honour $; double quotes suppress everything","They are interchangeable","Single quotes work only inside scripts"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"echo '$LOGNAME' prints the literal text, whereas echo \"$LOGNAME\" prints the value. A backslash escapes a single character in either context."},
+
+{"id":"ch07-q15","chapter":7,"topic":"Perform Pattern Matching using Filename Globbing","objectives":[],"type":"mcq","difficulty":2,
+ "prompt":"Which glob lists files in /var/log whose names are exactly four characters long?","options":["ls /var/log/????","ls /var/log/*4*","ls /var/log/[4]","ls /var/log/*???"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"? matches exactly one character (never the leading dot of a hidden file), so four of them match a four-character name. * matches any sequence, including none."},
+
+{"id":"ch07-q16","chapter":7,"topic":"Perform Pattern Matching using Filename Globbing","objectives":[],"type":"mcq","difficulty":3,
+ "prompt":"What does the glob `[!a-d]*` match?","options":["Names that do NOT begin with a, b, c or d","Names beginning with the literal characters !a-d","Names containing a, b, c or d anywhere","Nothing; ! is invalid inside brackets"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"Inside square brackets, ! negates the set. A range must be written in order ([a-z], [0-9]); an unordered set like [xyz] is matched regardless of the order you list it in."},
+
+{"id":"ch07-q17","chapter":7,"topic":"Implement Pattern Matching using Regular Expressions","objectives":[3],"type":"command","difficulty":2,
+ "prompt":"Print every line of /etc/passwd whose shell field ends with bash, anchoring the pattern to the end of the line.","options":[],"answer":[],
+ "accept":["grep [\"']?bash\\$[\"']? /etc/passwd"],"canonical":"grep bash$ /etc/passwd",
+ "explanation":"$ anchors a pattern to the end of a line and ^ to the beginning — so ^root finds lines starting with root. Quote the pattern when it contains characters the shell would otherwise interpret."},
+
+{"id":"ch07-q18","chapter":7,"topic":"Implement Pattern Matching using Regular Expressions","objectives":[3],"type":"command","difficulty":3,
+ "prompt":"Show the lines of /etc/passwd that do NOT contain the pattern nologin, prefixing each with its line number.","options":[],"answer":[],
+ "accept":["grep -(?:vn|nv) nologin /etc/passwd","grep -v -n nologin /etc/passwd","grep -n -v nologin /etc/passwd"],"canonical":"grep -vn nologin /etc/passwd",
+ "explanation":"-v inverts the match and -n prefixes line numbers. Combine with -i for a case-insensitive search and -w to match whole words only."},
+
+{"id":"ch07-q19","chapter":7,"topic":"Implement Pattern Matching using Regular Expressions","objectives":[3],"type":"mcq","difficulty":3,
+ "prompt":"Which command prints lines matching either 'cron' or 'ly'?","options":["grep -E 'cron|ly'  — or equivalently grep -e cron -e ly","grep 'cron|ly' without any option","grep -w 'cron ly'","grep -v 'cron' 'ly'"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"The pipe acts as alternation in extended regular expressions, which -E enables. Repeating -e for each pattern achieves the same result with basic grep."},
+
+{"id":"ch07-q20","chapter":7,"topic":"Implement Pattern Matching using Regular Expressions","objectives":[3],"type":"multi","difficulty":2,
+ "prompt":"Which grep options match the described behaviour? (Select all that apply.)","options":["-i performs a case-insensitive search","-w matches whole words only","-v excludes matching lines","-n hides line numbers","-E enables extended regular expressions"],"answer":[0,1,2,4],"accept":[],"canonical":null,
+ "explanation":"-n shows line numbers rather than hiding them. The period (.) matches exactly one character position, so 'acce..' finds words beginning with acce followed by two more characters."},
+
+{"id":"ch07-q21","chapter":7,"topic":"Configure System-Wide and Per-User Shell Environments","objectives":[],"type":"multi","difficulty":2,
+ "prompt":"Which are system-wide bash startup files or directories maintained by the administrator? (Select all that apply.)","options":["/etc/profile","/etc/bashrc","/etc/profile.d","~/.bash_profile","~/.bashrc"],"answer":[0,1,2],"accept":[],"canonical":null,
+ "explanation":"/etc/profile sets common environment variables and processes the scripts in /etc/profile.d; /etc/bashrc defines functions, aliases and the prompt. The dot files in a home directory are the per-user equivalents."},
+
+{"id":"ch07-q22","chapter":7,"topic":"Utilize Metacharacters in Redirections, Piping, and Quoting Mechanisms","objectives":[2],"type":"mcq","difficulty":1,
+ "prompt":"What does the pipe operator (|) do?","options":["Sends the standard output of one command as the standard input of the next","Runs two commands in parallel","Redirects output to a file","Escapes the next character"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"A chain of several pipes is called a pipeline, for example `ls | grep -v root | grep -i dec | nl | tail -4`. The same character also expresses alternation in regular expressions."}
+]

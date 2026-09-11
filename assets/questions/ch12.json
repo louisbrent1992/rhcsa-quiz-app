@@ -1,0 +1,85 @@
+[
+{"id":"ch12-q01","chapter":12,"topic":"Explore the Flatpak Application Framework and its Containerized Approach","objectives":[],"type":"mcq","difficulty":2,
+ "prompt":"What problem was Flatpak designed to solve that RPM struggles with?","options":["Dependency conflicts when applications need different versions of the same library","Slow package downloads over the network","The inability to verify GPG signatures","The lack of a command-line interface"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"RPM requires deep system integration and shares system libraries, so two applications needing different versions of one library collide. Flatpak lets each application bundle its own dependencies and run isolated from the host."},
+
+{"id":"ch12-q02","chapter":12,"topic":"Explore the Flatpak Application Framework and its Containerized Approach","objectives":[],"type":"mcq","difficulty":2,
+ "prompt":"What is the relationship between Flatpak and RPM in RHEL 10?","options":["Flatpak complements RPM; RPM remains essential for system components and services","Flatpak replaces RPM entirely in RHEL 10","RPM is used only for desktop applications now","They are alternative front ends to the same package format"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"RPM stays the right tool for system services, drivers and tools that need deep OS integration. Flatpak targets desktop applications, where isolation, portability and version flexibility matter more."},
+
+{"id":"ch12-q03","chapter":12,"topic":"Explain the Core Architecture, including Sandboxing and OSTree Storage","objectives":[],"type":"mcq","difficulty":3,
+ "prompt":"Which technology does Flatpak use as its core sandboxing mechanism?","options":["Bubblewrap","Podman","SELinux","systemd-nspawn"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"Bubblewrap uses Linux kernel features to control filesystem visibility, isolate process trees, restrict networking, limit IPC and map user/group IDs for privilege separation."},
+
+{"id":"ch12-q04","chapter":12,"topic":"Explain the Core Architecture, including Sandboxing and OSTree Storage","objectives":[],"type":"mcq","difficulty":3,
+ "prompt":"How does OSTree keep Flatpak's disk usage down?","options":["It deduplicates at the file level, storing one copy and hard-linking the rest","It compresses every application into a single archive","It deletes runtimes after each application launch","It stores applications only in RAM"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"If five applications ship the same version of a library, OSTree keeps one copy on disk and links the others to it. This offsets some of the space cost of bundled dependencies."},
+
+{"id":"ch12-q05","chapter":12,"topic":"Explain the Core Architecture, including Sandboxing and OSTree Storage","objectives":[],"type":"mcq","difficulty":3,
+ "prompt":"A sandboxed Flatpak application needs to open a file from your home directory. What mechanism makes that possible?","options":["A Portal, which asks for user consent and grants access to just that file","An Override, which permanently disables the sandbox","The Runtime, which mounts /home into the sandbox","A Bundle, which copies the file into the container"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"XDG Desktop Portals mediate common desktop operations — opening and saving files, printing, screenshots, notifications. The user picks the file in a dialog and the application receives access to only that file."},
+
+{"id":"ch12-q06","chapter":12,"topic":"Explain the Core Architecture, including Sandboxing and OSTree Storage","objectives":[],"type":"mcq","difficulty":2,
+ "prompt":"What is a Flatpak Runtime?","options":["A shared base platform of libraries and dependencies that applications build on","A record of how long an application has been running","The sandbox process that supervises an application","A single-file bundle containing an application"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"Examples are org.freedesktop.Platform for general applications and org.gnome.Platform for GNOME ones. Runtimes are versioned independently so several versions can coexist."},
+
+{"id":"ch12-q07","chapter":12,"topic":"Compare and Contrast Flatpak Applications with Traditional RPM Packages","objectives":[],"type":"multi","difficulty":3,
+ "prompt":"Which statements correctly describe Flatpak relative to RPM? (Select all that apply.)","options":["Flatpak can install system-wide or per-user; RPM is system-wide only","Multiple versions of a Flatpak application can coexist; RPM allows one per system","Flatpak applications are sandboxed with restricted file access by default","Flatpak has built-in rollback support","Flatpak uses less disk space than RPM"],"answer":[0,1,2,3],"accept":[],"canonical":null,
+ "explanation":"Flatpak generally uses MORE disk space because dependencies are bundled rather than shared — OSTree deduplication offsets this only partly."},
+
+{"id":"ch12-q08","chapter":12,"topic":"Compare and Contrast Flatpak Applications with Traditional RPM Packages","objectives":[],"type":"mcq","difficulty":2,
+ "prompt":"How is a Flatpak application identified?","options":["By a reverse-DNS identifier such as org.mozilla.firefox","By a name-version-release-arch string such as firefox-128-1.x86_64","By a numeric application ID","By its SHA-256 checksum"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"The three-part reverse-DNS notation guarantees uniqueness across all distributions. A Ref adds architecture and branch: name/arch/branch."},
+
+{"id":"ch12-q09","chapter":12,"topic":"Configure and Manage Flatpak Remotes (Repositories)","objectives":[14],"type":"mcq","difficulty":3,
+ "prompt":"Where are system-wide Flatpak remotes defined, and what privilege do they need?","options":["/etc/flatpak/remotes.d/ — administrative privileges required","~/.local/share/flatpak/repo/ — no special privileges","/var/lib/flatpak/repo/ — administrative privileges required","/etc/yum.repos.d/ — administrative privileges required"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"System remotes serve every user and need root to change. User remotes live under ~/.local/share/flatpak/repo/ and can be managed without elevation, but their applications are visible only to that user."},
+
+{"id":"ch12-q10","chapter":12,"topic":"Configure and Manage Flatpak Remotes (Repositories)","objectives":[14],"type":"command","difficulty":2,
+ "prompt":"List the Flatpak remotes currently configured on the system.","options":[],"answer":[],
+ "accept":["flatpak remote-list( -d| --show-details)?","flatpak remotes"],"canonical":"flatpak remote-list",
+ "explanation":"Add -d for expanded detail including each remote's title and URL. RHEL 10 ships with a remote named rhel already configured from /etc/flatpak/remotes.d/rhel.flatpakrepo."},
+
+{"id":"ch12-q11","chapter":12,"topic":"Configure and Manage Flatpak Remotes (Repositories)","objectives":[14],"type":"mcq","difficulty":2,
+ "prompt":"Which flatpak subcommands add and remove a remote?","options":["remote-add and remote-delete","add-remote and del-remote","repo-add and repo-remove","install-remote and uninstall-remote"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"remote-add registers a repository and remote-delete removes it; remote-list shows what is configured. Remotes are GPG-signed so downloads can be checked for integrity and authenticity."},
+
+{"id":"ch12-q12","chapter":12,"topic":"Configure and Manage Flatpak Remotes (Repositories)","objectives":[14],"type":"mcq","difficulty":2,
+ "prompt":"What is Flathub?","options":["The main public Flatpak remote, hosting thousands of applications","Red Hat's commercially supported Flatpak remote","The local OSTree cache directory","The sandbox supervisor process"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"Flathub at https://flathub.org is the prominent official public remote. Red Hat maintains its own rhel remote, and organisations can host private OSTree-based remotes internally."},
+
+{"id":"ch12-q13","chapter":12,"topic":"Search for, Install, Run, Update, and Remove Flatpak Applications and Runtimes","objectives":[15],"type":"command","difficulty":2,
+ "prompt":"Search the configured remotes for applications matching the term calculator.","options":[],"answer":[],
+ "accept":["flatpak search calculator"],"canonical":"flatpak search calculator",
+ "explanation":"flatpak search queries the remotes' appstream metadata. flatpak info then shows the details of a specific application before you install it."},
+
+{"id":"ch12-q14","chapter":12,"topic":"Search for, Install, Run, Update, and Remove Flatpak Applications and Runtimes","objectives":[15],"type":"command","difficulty":2,
+ "prompt":"Launch the installed Flatpak application org.gnome.gedit.","options":[],"answer":[],
+ "accept":["flatpak run org\\.gnome\\.gedit"],"canonical":"flatpak run org.gnome.gedit",
+ "explanation":"flatpak run starts the application inside its sandbox with its runtime mounted. flatpak ps then shows the running instance with its instance ID, PID, name and runtime."},
+
+{"id":"ch12-q15","chapter":12,"topic":"Search for, Install, Run, Update, and Remove Flatpak Applications and Runtimes","objectives":[15],"type":"command","difficulty":2,
+ "prompt":"Remove the installed Flatpak application org.gnome.Calculator.","options":[],"answer":[],
+ "accept":["flatpak uninstall -y org\\.gnome\\.Calculator","flatpak -y uninstall org\\.gnome\\.Calculator","flatpak uninstall org\\.gnome\\.Calculator( -y)?"],"canonical":"flatpak uninstall org.gnome.Calculator",
+ "explanation":"uninstall removes an application or a runtime. Note the verb differs from dnf, which uses remove."},
+
+{"id":"ch12-q16","chapter":12,"topic":"Search for, Install, Run, Update, and Remove Flatpak Applications and Runtimes","objectives":[15],"type":"multi","difficulty":3,
+ "prompt":"Which options narrow a flatpak list or search to a single component type? (Select all that apply.)","options":["--app for applications","--runtime for runtimes","--extension for extensions","--bundle for bundles"],"answer":[0,1],"accept":[],"canonical":null,
+ "explanation":"--app and --runtime are the two filters used to count and list each kind separately. A bare flatpak list shows applications and their runtime dependencies together."},
+
+{"id":"ch12-q17","chapter":12,"topic":"Search for, Install, Run, Update, and Remove Flatpak Applications and Runtimes","objectives":[15],"type":"mcq","difficulty":3,
+ "prompt":"Where are Flatpak applications and runtimes stored after a system-wide install?","options":["/var/lib/flatpak, in the app and runtime subdirectories","/usr/share/flatpak/apps","/opt/flatpak","/etc/flatpak/installations.d"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"The repo subdirectory of the same installation path holds the information about added remotes. /etc/flatpak/installations.d only lists the system installation paths."},
+
+{"id":"ch12-q18","chapter":12,"topic":"Manage Application Permissions","objectives":[],"type":"mcq","difficulty":3,
+ "prompt":"Which flatpak subcommand changes an application's permissions away from its sandbox defaults?","options":["override","permission-set","sandbox","repair"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"An Override is a stored modification of the default sandbox settings. repair fixes a damaged installation, and history shows past updates."},
+
+{"id":"ch12-q19","chapter":12,"topic":"Manage Application Permissions","objectives":[],"type":"mcq","difficulty":2,
+ "prompt":"What access does a Flatpak application have to the host filesystem by default?","options":["Minimal — it must request access explicitly, and users can review it","Full access, the same as the user running it","Read-only access to the entire filesystem","Access to /home only"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"Sandboxed applications cannot see other processes, read arbitrary files, or change system configuration unless permission is granted. That granular model is the security advantage over traditional packages, which run with the user's full privileges."},
+
+{"id":"ch12-q20","chapter":12,"topic":"Configure and Manage Flatpak Remotes (Repositories)","objectives":[14],"type":"mcq","difficulty":3,
+ "prompt":"Which command refreshes the appstream metadata for all configured remotes?","options":["flatpak update --appstream","flatpak remote-list --refresh","flatpak repair --metadata","flatpak search --update"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"This pulls down both the applications list and its metadata. Naming a remote afterwards restricts the refresh to that one remote."}
+]

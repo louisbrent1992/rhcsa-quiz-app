@@ -1,0 +1,133 @@
+[
+{"id":"ch14-q01","chapter":14,"topic":"Explain the Concepts of systemd Units and Targets","objectives":[],"type":"mcq","difficulty":1,
+ "prompt":"What PID does systemd run as?","options":["1","0","2","Whatever the kernel assigns at boot"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"The kernel starts systemd as PID 1 after the switch-root, and it stays running until shutdown, managing initialization, services and process tracking."},
+
+{"id":"ch14-q02","chapter":14,"topic":"Explain the Concepts of systemd Units and Targets","objectives":[],"type":"mcq","difficulty":2,
+ "prompt":"Which directory holds the default unit files distributed with installed packages?","options":["/usr/lib/systemd/system","/etc/systemd/system","/run/systemd/system","/var/lib/systemd"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"Packages install their units in /usr/lib/systemd/system — the lowest precedence. Runtime units in /run/systemd/system override those, and administrator customisations under /etc/systemd override both."},
+
+{"id":"ch14-q03","chapter":14,"topic":"Explain the Concepts of systemd Units and Targets","objectives":[],"type":"multi","difficulty":3,
+ "prompt":"Which of these are valid systemd unit types? (Select all that apply.)","options":["service","socket","timer","mount","runlevel"],"answer":[0,1,2,3],"accept":[],"canonical":null,
+ "explanation":"Unit types include automount, device, mount, path, scope, service, slice, socket, swap, target and timer. Runlevels are the System V concept that targets replaced."},
+
+{"id":"ch14-q04","chapter":14,"topic":"Explain the Concepts of systemd Units and Targets","objectives":[],"type":"mcq","difficulty":3,
+ "prompt":"What is the difference between the Requires and Wants directives in a unit file?","options":["Requires makes the unit fail if the dependency does not start; Wants does not","Wants is checked first, then Requires","Requires applies to targets and Wants to services","They are synonyms"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"Wants is the softer form — activation proceeds even if the wanted unit fails. Before and After express ordering, and Conflicts names units that must NOT be running."},
+
+{"id":"ch14-q05","chapter":14,"topic":"Explain the Concepts of systemd Units and Targets","objectives":[],"type":"mcq","difficulty":2,
+ "prompt":"What is a systemd target?","options":["A logical grouping of units used to bring the system to an operational state","A single service and its dependencies","A configuration file for the kernel","A scheduled job definition"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"Targets are a unit type with the .target extension. Some inherit services from other targets and add their own — graphical.target, for example, builds on multi-user.target."},
+
+{"id":"ch14-q06","chapter":14,"topic":"Manage systemd Services and Targets","objectives":[42,28],"type":"command","difficulty":1,
+ "prompt":"Check the current status of the atd service.","options":[],"answer":[],
+ "accept":["systemctl status atd(\\.service)?"],"canonical":"systemctl status atd",
+ "explanation":"status shows the description, load state, whether the unit is enabled for autostart, the activation state and the main PID."},
+
+{"id":"ch14-q07","chapter":14,"topic":"Manage systemd Services and Targets","objectives":[42,49],"type":"command","difficulty":2,
+ "prompt":"Configure the httpd service to start automatically at boot and start it right now, in a single command.","options":[],"answer":[],
+ "accept":["systemctl enable --now httpd(\\.service)?","systemctl --now enable httpd(\\.service)?"],"canonical":"systemctl enable --now httpd",
+ "explanation":"--now combines enable with start (and disable with stop). Without it, enable only affects future boots and start only affects the current one."},
+
+{"id":"ch14-q08","chapter":14,"topic":"Manage systemd Services and Targets","objectives":[42],"type":"command","difficulty":2,
+ "prompt":"Check whether the atd service is configured to start automatically at boot.","options":[],"answer":[],
+ "accept":["systemctl is-enabled atd(\\.service)?"],"canonical":"systemctl is-enabled atd",
+ "explanation":"is-enabled reports the autostart setting, is-active reports whether it is currently running, and is-failed reports whether it crashed."},
+
+{"id":"ch14-q09","chapter":14,"topic":"Manage systemd Services and Targets","objectives":[42],"type":"mcq","difficulty":3,
+ "prompt":"How does masking a unit differ from disabling it?","options":["Masking symlinks the unit to /dev/null so it cannot be started at all, even manually","Masking only prevents autostart; disabling also stops it","Masking deletes the unit file","They are equivalent"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"A disabled unit will not autostart but can still be started by hand or pulled in as a dependency. A masked unit cannot be started at all until you unmask it."},
+
+{"id":"ch14-q10","chapter":14,"topic":"Manage systemd Services and Targets","objectives":[42],"type":"mcq","difficulty":3,
+ "prompt":"What is the difference between systemctl reload and systemctl restart?","options":["reload makes the running unit re-read its configuration without changing its PID; restart stops and starts it","restart re-reads configuration; reload stops and starts","reload works only on targets","They are equivalent for service units"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"reload avoids dropping connections because the process is never replaced. Use daemon-reload — a different subcommand — after editing unit files, to make systemd re-read them."},
+
+{"id":"ch14-q11","chapter":14,"topic":"Manage systemd Services and Targets","objectives":[42],"type":"command","difficulty":3,
+ "prompt":"After editing a unit file on disk, make systemd re-read all unit files and rebuild the dependency tree.","options":[],"answer":[],
+ "accept":["systemctl daemon-reload"],"canonical":"systemctl daemon-reload",
+ "explanation":"Without daemon-reload, systemd keeps using the version of the unit it loaded into memory earlier, and your edits appear to have no effect."},
+
+{"id":"ch14-q12","chapter":14,"topic":"Display and Configure Default System Boot Target","objectives":[43],"type":"command","difficulty":2,
+ "prompt":"Show which target the system boots into by default.","options":[],"answer":[],
+ "accept":["systemctl get-default"],"canonical":"systemctl get-default",
+ "explanation":"default.target is a symbolic link to the real target file. get-default reports where that link points."},
+
+{"id":"ch14-q13","chapter":14,"topic":"Display and Configure Default System Boot Target","objectives":[43],"type":"command","difficulty":2,
+ "prompt":"Persistently change the default boot target to the text-based multi-user target.","options":[],"answer":[],
+ "accept":["systemctl set-default multi-user(\\.target)?"],"canonical":"systemctl set-default multi-user.target",
+ "explanation":"set-default replaces the default.target symlink so the change survives reboots. This is distinct from isolate, which only switches the currently running system."},
+
+{"id":"ch14-q14","chapter":14,"topic":"Switch to Non-Default Targets for Testing or Troubleshooting","objectives":[21],"type":"command","difficulty":3,
+ "prompt":"Switch the currently running system from the graphical target to the multi-user target, without rebooting.","options":[],"answer":[],
+ "accept":["systemctl isolate multi-user(\\.target)?"],"canonical":"systemctl isolate multi-user.target",
+ "explanation":"isolate transitions the running system to the named target, stopping units that are not part of it. It is temporary — the default boot target is unchanged."},
+
+{"id":"ch14-q15","chapter":14,"topic":"Switch to Non-Default Targets for Testing or Troubleshooting","objectives":[21],"type":"mcq","difficulty":3,
+ "prompt":"How do the rescue and emergency targets differ?","options":["rescue mounts local file systems with networking disabled; emergency mounts only / read-only with no other services","emergency includes networking; rescue does not","rescue requires no password; emergency does","They are the same target under two names"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"Emergency is the more minimal of the two — root read-only, nothing else mounted, no networking or services. Both prompt for the root password."},
+
+{"id":"ch14-q16","chapter":14,"topic":"Switch to Non-Default Targets for Testing or Troubleshooting","objectives":[20],"type":"mcq","difficulty":2,
+ "prompt":"What are the halt, poweroff and reboot commands in RHEL 10?","options":["Symbolic links to systemctl, kept for compatibility","Independent binaries that bypass systemd","Aliases defined in /etc/bashrc","Deprecated and removed"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"They map to `shutdown -H now`, `-P now` and `-r now` respectively, broadcasting a warning, blocking new logins and stopping services first. Using systemctl directly is recommended."},
+
+{"id":"ch14-q17","chapter":14,"topic":"Analyze System Log Configuration File","objectives":[26],"type":"mcq","difficulty":2,
+ "prompt":"Which daemon handles traditional system logging, and which file configures it?","options":["rsyslogd, configured by /etc/rsyslog.conf","systemd-journald, configured by /etc/rsyslog.conf","syslogd, configured by /etc/syslog.conf","logrotate, configured by /etc/rsyslog.conf"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"rsyslogd reads /etc/rsyslog.conf plus any .conf files in /etc/rsyslog.d at startup, and writes most logs under /var/log."},
+
+{"id":"ch14-q18","chapter":14,"topic":"Analyze System Log Configuration File","objectives":[26],"type":"mcq","difficulty":3,
+ "prompt":"In an rsyslog rule, what do the two halves of the selector field mean?","options":["facility.priority — the category of process, and the severity level","priority.facility — the severity, and the destination","file.action — the log file and what to do with it","source.target — where the message came from and where it goes"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"Facilities include auth, authpriv, cron, daemon, kern, mail and local0–local7. A named priority also matches every higher severity, so mail.error logs error, crit, alert and emerg."},
+
+{"id":"ch14-q19","chapter":14,"topic":"Analyze System Log Configuration File","objectives":[26],"type":"mcq","difficulty":3,
+ "prompt":"Which is the correct order of syslog priorities from most to least critical?","options":["emerg, alert, crit, err, warning, notice, info, debug","debug, info, notice, warning, err, crit, alert, emerg","crit, emerg, alert, err, warning, info, notice, debug","alert, emerg, crit, warning, err, notice, info, debug"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"emerg means the system is unusable and debug is the most verbose. Specifying a priority captures that level and everything more severe."},
+
+{"id":"ch14-q20","chapter":14,"topic":"Analyze System Log Configuration File","objectives":[26],"type":"multi","difficulty":2,
+ "prompt":"Which log files receive the described messages by default? (Select all that apply.)","options":["/var/log/secure — authentication messages","/var/log/maillog — mail messages","/var/log/cron — cron messages","/var/log/boot.log — boot messages from the local7 facility","/var/log/messages — only kernel messages"],"answer":[0,1,2,3],"accept":[],"canonical":null,
+ "explanation":"/var/log/messages catches all info-and-above messages EXCEPT the mail, authpriv and cron facilities, which have their own files."},
+
+{"id":"ch14-q21","chapter":14,"topic":"Examine Log Rotation Settings","objectives":[26],"type":"mcq","difficulty":2,
+ "prompt":"Which files configure log rotation, and what triggers it?","options":["/etc/logrotate.conf plus /etc/logrotate.d, triggered daily by logrotate.timer","/etc/rsyslog.conf, triggered weekly by cron","/etc/logrotate.conf only, triggered manually","/etc/systemd/journald.conf, triggered monthly"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"logrotate.timer invokes logrotate.service daily. The global default in logrotate.conf is weekly rotation with four weeks retained; per-service files in /etc/logrotate.d override those globals."},
+
+{"id":"ch14-q22","chapter":14,"topic":"Record Custom Messages in System Log File","objectives":[26],"type":"command","difficulty":2,
+ "prompt":"Write the custom message \"Hello world\" into the system log.","options":[],"answer":[],
+ "accept":["logger [\"']?Hello world[\"']?"],"canonical":"logger \"Hello world\"",
+ "explanation":"The imuxsock input module in rsyslog.conf provides this support. Entries default to user.notice priority; -p sets a different facility.priority. Normal users may run logger."},
+
+{"id":"ch14-q23","chapter":14,"topic":"Retrieve, Filter, and Scrutinize Log Messages from systemd Journal","objectives":[26],"type":"command","difficulty":2,
+ "prompt":"Show journal messages from the current boot only.","options":[],"answer":[],
+ "accept":["journalctl -b( -0)?","journalctl --boot"],"canonical":"journalctl -b",
+ "explanation":"-b defaults to -0, the current boot. -1 is the previous boot, -2 the one before that, and so on."},
+
+{"id":"ch14-q24","chapter":14,"topic":"Retrieve, Filter, and Scrutinize Log Messages from systemd Journal","objectives":[26],"type":"command","difficulty":3,
+ "prompt":"Show only the journal entries belonging to the sshd.service unit.","options":[],"answer":[],
+ "accept":["journalctl -u sshd(\\.service)?","journalctl --unit=?sshd(\\.service)?"],"canonical":"journalctl -u sshd.service",
+ "explanation":"-u filters by systemd unit. Other useful filters are -k for kernel messages, -n for a line count, -p for priority, -f to follow live, and -o verbose for full detail."},
+
+{"id":"ch14-q25","chapter":14,"topic":"Configure Persistent Journal Storage to Maintain Log Data Across System Reboots","objectives":[27],"type":"mcq","difficulty":2,
+ "prompt":"Where does systemd-journald store journals by default, and why are they lost at reboot?","options":["/run/log/journal — /run is a memory-based file system destroyed at shutdown","/var/log/journal — it is cleared by logrotate","/tmp/journal — files there are deleted after 10 days","/var/run/journal — it is a symlink to /dev/null"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"/run is created in memory at boot and destroyed at shutdown, so journals there are transient. rsyslogd reads them and writes durable text copies to /var/log/messages."},
+
+{"id":"ch14-q26","chapter":14,"topic":"Configure Persistent Journal Storage to Maintain Log Data Across System Reboots","objectives":[27],"type":"mcq","difficulty":3,
+ "prompt":"With Storage=auto (the default) in journald.conf, what must you do to get persistent journals?","options":["Create /var/log/journal manually, then restart systemd-journald","Nothing — auto always creates it","Set Storage=volatile and restart the service","Add a logrotate rule for the journal"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"auto uses /var/log/journal if it exists but will not create it; persistent creates it for you. After restarting the service, a subdirectory named for the machine ID in /etc/machine-id appears."},
+
+{"id":"ch14-q27","chapter":14,"topic":"Apply and Manage Tuning Profiles to Enhance System Performance","objectives":[25],"type":"command","difficulty":2,
+ "prompt":"List the available tuning profiles along with the currently active one.","options":[],"answer":[],
+ "accept":["tuned-adm list"],"canonical":"tuned-adm list",
+ "explanation":"tuned-adm active shows only the current profile. The default profile on a typical RHEL system is balanced."},
+
+{"id":"ch14-q28","chapter":14,"topic":"Apply and Manage Tuning Profiles to Enhance System Performance","objectives":[25],"type":"command","difficulty":2,
+ "prompt":"Switch the active tuning profile to powersave.","options":[],"answer":[],
+ "accept":["tuned-adm profile powersave"],"canonical":"tuned-adm profile powersave",
+ "explanation":"tuned-adm recommend suggests the best profile for this system's characteristics, and tuned-adm off disables tuning entirely until you set a profile again."},
+
+{"id":"ch14-q29","chapter":14,"topic":"Apply and Manage Tuning Profiles to Enhance System Performance","objectives":[25],"type":"mcq","difficulty":3,
+ "prompt":"Where must a custom tuning profile be stored for tuned to recognise it?","options":["/etc/tuned","/usr/lib/tuned/profiles","/var/lib/tuned","/etc/tuned.d"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"Predefined profiles ship in /usr/lib/tuned/profiles, one subdirectory per profile. Custom profiles — written from scratch or based on an existing one — belong under /etc/tuned."},
+
+{"id":"ch14-q30","chapter":14,"topic":"Apply and Manage Tuning Profiles to Enhance System Performance","objectives":[25],"type":"mcq","difficulty":3,
+ "prompt":"Which tuning profile provides maximum performance at the cost of maximum power consumption?","options":["throughput-performance","balanced","powersave","virtual-guest"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"balanced trades the two off and is the usual default; powersave and balanced-battery favour power saving; virtual-guest and virtual-host are tuned for virtualisation."}
+]

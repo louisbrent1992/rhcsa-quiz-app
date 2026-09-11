@@ -1,0 +1,96 @@
+[
+{"id":"ch03-q01","chapter":3,"topic":"Identify Common Linux File Types","objectives":[],"type":"mcq","difficulty":2,
+ "prompt":"In `ls -l` output, what does a leading 'l' in the first column indicate?","options":["A symbolic link","A regular file with a long name","A locked file","A block device"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"The first character encodes the file type: - regular, d directory, l symbolic link, c character device, b block device, p named pipe, s socket. A symlink line also shows an arrow (->) to its target."},
+
+{"id":"ch03-q02","chapter":3,"topic":"Identify Common Linux File Types","objectives":[],"type":"mcq","difficulty":3,
+ "prompt":"For a device file, what do the major and minor numbers identify?","options":["Major identifies the device driver; minor identifies the specific device or partition","Major identifies the device size; minor identifies its speed","Major is the inode number; minor is the link count","Major identifies the mount point; minor the file system type"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"A driver gets a unique major number — 8 for SCSI/SATA disks, 253 for device mapper, 11 for optical — and each device or partition that driver manages gets its own minor number. They appear in the size columns of ls -l for device files."},
+
+{"id":"ch03-q03","chapter":3,"topic":"Identify Common Linux File Types","objectives":[],"type":"mcq","difficulty":2,
+ "prompt":"How do the `file` and `stat` commands differ when run against /etc/sysconfig/anaconda?","options":["file reports the kind of content (ASCII text); stat reports the file type (regular file)","file reports the size; stat reports the permissions","They produce identical output","file works only on binaries; stat only on text"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"file inspects content and names it specifically (e.g. 'ASCII text'), while stat reports the metadata including the generic type 'regular file'. Linux does not use filename extensions to determine type."},
+
+{"id":"ch03-q04","chapter":3,"topic":"Compress and Uncompress Files","objectives":[6],"type":"mcq","difficulty":2,
+ "prompt":"How do gzip and bzip2 compare?","options":["bzip2 usually compresses better but runs slower than gzip","gzip usually compresses better but runs slower than bzip2","They produce identical output at identical speed","bzip2 only works on directories"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"bzip2 typically achieves a smaller result at the cost of speed. The difference matters on large files; for small ones either is fine. gzip appends .gz and bzip2 appends .bz2, replacing the original file in both cases."},
+
+{"id":"ch03-q05","chapter":3,"topic":"Compress and Uncompress Files","objectives":[6],"type":"command","difficulty":1,
+ "prompt":"Compress the file ~/fstab with gzip.","options":[],"answer":[],
+ "accept":["gzip (?:~/|\\./)?fstab"],"canonical":"gzip fstab",
+ "explanation":"gzip replaces fstab with fstab.gz. gunzip fstab.gz reverses it, restoring the original name, size and timestamp. gzip -l shows compression statistics, and -r walks a directory tree."},
+
+{"id":"ch03-q06","chapter":3,"topic":"Create and Manage Archives","objectives":[6],"type":"command","difficulty":2,
+ "prompt":"Create a gzip-compressed tarball /tmp/skel.tar.gz containing the /etc/skel directory.","options":[],"answer":[],
+ "accept":["tar -?[czvf]*z[czvf]*f? ?/tmp/skel\\.tar\\.gz /etc/skel","tar --create --gzip --file /tmp/skel\\.tar\\.gz /etc/skel"],"canonical":"tar -czvf /tmp/skel.tar.gz /etc/skel",
+ "explanation":"-c creates, -z pipes through gzip, -v is verbose, and -f names the archive. Use -j instead of -z for bzip2. The archive stores paths without the leading slash so it can be extracted anywhere."},
+
+{"id":"ch03-q07","chapter":3,"topic":"Create and Manage Archives","objectives":[6],"type":"command","difficulty":2,
+ "prompt":"List the contents of /tmp/skel.tar.gz without extracting it.","options":[],"answer":[],
+ "accept":["tar -?[tzvf]*t[tzvf]*f? ?/tmp/skel\\.tar\\.gz","tar --list --file /tmp/skel\\.tar\\.gz"],"canonical":"tar -tzvf /tmp/skel.tar.gz",
+ "explanation":"-t lists the archive table of contents. Modern tar detects the compression automatically, but naming it with -z is always safe."},
+
+{"id":"ch03-q08","chapter":3,"topic":"Create and Manage Archives","objectives":[6],"type":"command","difficulty":3,
+ "prompt":"Extract the bzip2-compressed archive /tmp/skel.tar.bz2 into /tmp rather than the current directory.","options":[],"answer":[],
+ "accept":["tar -?[xjvf]*x[xjvf]*f? ?/tmp/skel\\.tar\\.bz2 -C /tmp","tar -C /tmp -?[xjvf]*x[xjvf]*f? ?/tmp/skel\\.tar\\.bz2"],"canonical":"tar -xjvf /tmp/skel.tar.bz2 -C /tmp",
+ "explanation":"-x extracts, -j selects bzip2, and -C changes to the target directory before extracting. Note the case distinction: lowercase -c creates an archive, uppercase -C changes directory."},
+
+{"id":"ch03-q09","chapter":3,"topic":"Create and Manage Archives","objectives":[6],"type":"multi","difficulty":3,
+ "prompt":"Which statements about tar are correct? (Select all that apply.)","options":["-r appends files to an existing uncompressed tarball","-p preserves permissions and should be given when a normal user creates an archive","tar can preserve SELinux contexts and ownership","-r and -u work on gzip-compressed tarballs","-x creates the archive"],"answer":[0,1,2],"accept":[],"canonical":null,
+ "explanation":"-r and -u cannot append to a compressed tarball — only to an uncompressed one. -x extracts; -c creates. tar does preserve ownership, timestamps and extended attributes such as SELinux contexts."},
+
+{"id":"ch03-q10","chapter":3,"topic":"Edit Text Files using the vim Editor","objectives":[7],"type":"mcq","difficulty":1,
+ "prompt":"Which vim command opens a new line below the current one and switches to insert mode?","options":["o","O","a","I"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"Lowercase o opens a line below; uppercase O opens one above. i inserts before the cursor, I at the start of the line, a after the cursor, and A at the end of the line."},
+
+{"id":"ch03-q11","chapter":3,"topic":"Edit Text Files using the vim Editor","objectives":[7],"type":"mcq","difficulty":2,
+ "prompt":"In vim, what does `:%s/profile/Profile/g` do?","options":["Replaces every occurrence of profile with Profile throughout the file","Replaces only the first occurrence on each line","Replaces occurrences only on the current line","Searches for profile without replacing anything"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"% applies the substitution to every line and the trailing /g makes it replace all occurrences per line. Without /g, only the first match on each line is replaced. :u undoes a last-line-mode command."},
+
+{"id":"ch03-q12","chapter":3,"topic":"Edit Text Files using the vim Editor","objectives":[7],"type":"multi","difficulty":2,
+ "prompt":"Which vim commands write the file to disk? (Select all that apply.)","options":[":w",":wq",":x",":q!",":set nu"],"answer":[0,1,2],"accept":[],"canonical":null,
+ "explanation":":w writes without quitting, :wq writes and quits, and :x is the common equivalent of :wq. :q! quits and discards changes, while :set nu only toggles on-screen line numbering (never saved into the file)."},
+
+{"id":"ch03-q13","chapter":3,"topic":"Edit Text Files using the vim Editor","objectives":[7],"type":"mcq","difficulty":3,
+ "prompt":"In vim command mode, what does `3dd` do?","options":["Deletes the current line and the two below it","Deletes the third line of the file","Deletes three characters","Duplicates the current line three times"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"Most command-mode operations accept a leading repeat count, so 3dd deletes three lines starting at the cursor. Likewise 2yy yanks two lines and 2p pastes twice. Last-line-mode commands like :6,12d do not take a repeat prefix."},
+
+{"id":"ch03-q14","chapter":3,"topic":"Perform Essential File and Directory Operations","objectives":[8],"type":"command","difficulty":2,
+ "prompt":"Create the nested directory hierarchy dir2/perl/perl5 in one command, creating any missing parent directories.","options":[],"answer":[],
+ "accept":["mkdir -p v?dir2/perl/perl5","mkdir --parents dir2/perl/perl5","mkdir -pv dir2/perl/perl5","mkdir -vp dir2/perl/perl5"],"canonical":"mkdir -p dir2/perl/perl5",
+ "explanation":"-p creates intermediate parent directories as needed and does not error if they already exist. Add -v to have mkdir report what it created."},
+
+{"id":"ch03-q15","chapter":3,"topic":"Perform Essential File and Directory Operations","objectives":[8],"type":"mcq","difficulty":2,
+ "prompt":"Why does `cp` prompt root before overwriting a file, but not a normal user?","options":["A predefined alias adds -i for the root user","Root's umask forces interactive mode","cp always prompts; normal users simply do not see it","The kernel enforces confirmation for UID 0"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"Root's shell environment aliases cp, mv and rm to include -i. For a normal user the copy silently overwrites unless -i is given explicitly."},
+
+{"id":"ch03-q16","chapter":3,"topic":"Perform Essential File and Directory Operations","objectives":[8],"type":"command","difficulty":2,
+ "prompt":"Copy file1 into /tmp keeping its original timestamp, permissions and ownership.","options":[],"answer":[],
+ "accept":["cp -p file1 /tmp/?","cp --preserve file1 /tmp/?"],"canonical":"cp -p file1 /tmp",
+ "explanation":"-p preserves the attributes. Use -r (or -R) to copy a directory tree, and -i to be prompted before overwriting."},
+
+{"id":"ch03-q17","chapter":3,"topic":"Perform Essential File and Directory Operations","objectives":[8],"type":"mcq","difficulty":3,
+ "prompt":"A file literally named * exists in /tmp. Which command removes only that file?","options":["rm /tmp/\\*","rm /tmp/*","rm -r /tmp/*","rmdir /tmp/*"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"The backslash escapes the asterisk so the shell passes it literally instead of expanding it. `rm /tmp/*` would glob and delete every file in /tmp — an expensive mistake with root privileges."},
+
+{"id":"ch03-q18","chapter":3,"topic":"Perform Essential File and Directory Operations","objectives":[8],"type":"mcq","difficulty":2,
+ "prompt":"Which command monitors /var/log/messages as new entries are written to it?","options":["tail -f /var/log/messages","head -f /var/log/messages","cat -f /var/log/messages","less -n /var/log/messages"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"tail -f follows the file and prints new lines as they arrive; Ctrl+c stops it. tail shows the last ten lines by default and head the first ten."},
+
+{"id":"ch03-q19","chapter":3,"topic":"Create Hard and Soft Links","objectives":[9],"type":"command","difficulty":2,
+ "prompt":"Create a soft link named soft10 that points to the file file10 in the current directory.","options":[],"answer":[],
+ "accept":["ln -s v?file10 soft10","ln -sv file10 soft10","ln --symbolic file10 soft10"],"canonical":"ln -s file10 soft10",
+ "explanation":"-s makes a symbolic link. Without -s, ln creates a hard link instead — a second name for the same inode."},
+
+{"id":"ch03-q20","chapter":3,"topic":"Create Hard and Soft Links","objectives":[9],"type":"multi","difficulty":3,
+ "prompt":"Which statements about hard links are true? (Select all that apply.)","options":["All hard-linked names share one inode and identical metadata","Creating one increases the target's link count","They cannot cross file system boundaries","They can be created for directories","They store the pathname of the target"],"answer":[0,1,2],"accept":[],"canonical":null,
+ "explanation":"Hard links to directories are not permitted, and it is soft links that store a pathname. A hard link is simply another filename mapped to the same inode, so the data survives until the link count reaches zero."},
+
+{"id":"ch03-q21","chapter":3,"topic":"Create Hard and Soft Links","objectives":[9],"type":"mcq","difficulty":2,
+ "prompt":"What happens to a symbolic link when its target file is deleted?","options":["The link remains but now points to a non-existent file","The link is deleted automatically","The link's data is preserved because it holds a copy","The target cannot be deleted while a symlink exists"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"A symlink holds only the target's pathname in its own inode, so deleting the target leaves a dangling link. Deleting the symlink, by contrast, has no effect on the target."},
+
+{"id":"ch03-q22","chapter":3,"topic":"Differentiate between Copying and Linking","objectives":[9],"type":"mcq","difficulty":3,
+ "prompt":"You need several names for one file so that editing through any name changes the same data. Copy or link?","options":["Link — all links reference the same underlying data","Copy — copies stay synchronised automatically","Copy with -p, which keeps the inode","Either; they behave identically"],"answer":[0],"accept":[],"canonical":null,
+ "explanation":"A copy duplicates the data at a new location with its own inode, so edits diverge. A link is an additional reference to the same data, which is what you want when the names must stay in sync."}
+]
