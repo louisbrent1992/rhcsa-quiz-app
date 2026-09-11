@@ -79,10 +79,10 @@ jobs:
       - name: Test
         run: flutter test
 
-      # A full unsigned build first, because the repo has no ios/Podfile: the
-      # Flutter tool generates it (and runs pod install) only during a real
-      # build, and xcodebuild cannot open Runner.xcworkspace without the Pods
-      # project. This also writes Generated.xcconfig for the archive.
+      # A full unsigned build first: it writes Generated.xcconfig and resolves
+      # the plugins the archive needs. There is no Podfile and no pod install
+      # here -- Flutter integrates this project's plugins through Swift
+      # Package Manager, so CocoaPods is not in the picture at all.
       #
       # --no-codesign is required even though the archive IS signed: the
       # keychain is still empty here, and Flutter aborts up front on "no valid
@@ -90,10 +90,7 @@ jobs:
       # the API key lets Xcode mint the certificate and profile via
       # cloud-managed signing.
       - name: Prepare Xcode project
-        run: |
-          flutter build ios --release --no-codesign
-          test -f ios/Podfile || { echo "::error::ios/Podfile was not generated"; exit 1; }
-          ls ios/Pods >/dev/null
+        run: flutter build ios --release --no-codesign
 
       - name: Archive
         run: |
