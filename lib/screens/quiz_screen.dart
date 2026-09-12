@@ -5,11 +5,33 @@ import 'package:flutter/material.dart';
 import '../app_scope.dart';
 import '../models/question.dart';
 import '../models/quiz.dart';
+import '../services/progress_store.dart';
 import '../theme.dart';
 import '../widgets/answer_option.dart';
 import '../widgets/command_field.dart';
 import '../widgets/explanation_panel.dart';
 import 'results_screen.dart';
+
+/// Elapsed-time source for the countdown and the session timing.
+///
+/// Production uses a real [Stopwatch]. Widget tests inject their own, because
+/// Flutter's fake-async clock advances timers but leaves `Stopwatch` reading
+/// the wall clock — which makes the auto-submit-on-expiry path unreachable in
+/// a test unless the source can be swapped.
+abstract class QuizClock {
+  Duration get elapsed;
+  void stop();
+}
+
+class _StopwatchClock implements QuizClock {
+  final Stopwatch _stopwatch = Stopwatch()..start();
+
+  @override
+  Duration get elapsed => _stopwatch.elapsed;
+
+  @override
+  void stop() => _stopwatch.stop();
+}
 
 class QuizScreen extends StatefulWidget {
   const QuizScreen({
@@ -17,11 +39,15 @@ class QuizScreen extends StatefulWidget {
     required this.items,
     required this.config,
     required this.label,
+    this.clock,
   });
 
   final List<QuizItem> items;
   final QuizConfig config;
   final String label;
+
+  /// Overrides the elapsed-time source; tests only.
+  final QuizClock? clock;
 
   @override
   State<QuizScreen> createState() => _QuizScreenState();
@@ -34,7 +60,24 @@ class _QuizScreenState extends State<QuizScreen> {
   /// its answer + explanation are revealed. Exam mode never sets this.
   bool _revealed = false;
 
-  final _stopwatch = Stopwatch()..start();
+  /// Question ids already written to the progress store. Answers are committed
+  /// as they are locked in rather than in one batch at the end, so a kill or a
+  /// force-quit part-way through keeps everything answered so far. The set
+  /// stops the end-of-session sweep from counting a question twice.
+  final _committed = <String>{};
+
+  /// Guards against [_finish] running twice — the countdown timer and the
+  /// Finish button can both reach it.
+  bool _finishing = false;
+
+  /// Highest question index actually displayed. When an exam's countdown
+  /// expires at question 5 of 40, the 35 questions never put on screen must
+  /// not be recorded as answers the user got wrong — they would flood the
+  /// weak-areas list with material never seen. The session score still counts
+  /// them against you, which is what the real exam does.
+  int _furthest = 0;
+
+  late final QuizClock _clock = widget.clock ?? _StopwatchClock();
   Timer? _ticker;
 
   bool get _isExam => widget.config.mode == QuizMode.exam;
@@ -43,7 +86,7 @@ class _QuizScreenState extends State<QuizScreen> {
   Duration? get _remaining {
     final limit = widget.config.timeLimit;
     if (limit == null) return null;
-    final left = limit - _stopwatch.elapsed;
+    final left = limit - _clock.elapsed;
     return left.isNegative ? Duration.zero : left;
   }
 
@@ -65,7 +108,7 @@ class _QuizScreenState extends State<QuizScreen> {
   @override
   void dispose() {
     _ticker?.cancel();
-    _stopwatch.stop();
+    _clock.stop();
     super.dispose();
   }
 
@@ -141,7 +184,7 @@ class _QuizScreenState extends State<QuizScreen> {
                 revealed: _revealed,
                 answered: _item.answered,
                 isLast: _index == total - 1,
-                onCheck: () => setState(() => _revealed = true),
+                onCheck: _reveal,
                 onNext: _next,
                 onSkip: _next,
                 onPrevious: _index > 0 && _isExam ? _previous : null,
@@ -164,9 +207,7 @@ class _QuizScreenState extends State<QuizScreen> {
           enabled: !_revealed,
           onChanged: (v) => setState(() => _item.response = v),
           onSubmitted: (_) {
-            if (!_isExam && _item.answered && !_revealed) {
-              setState(() => _revealed = true);
-            }
+            if (!_isExam && _item.answered && !_revealed) _reveal();
           },
         ),
       ];
@@ -204,12 +245,31 @@ class _QuizScreenState extends State<QuizScreen> {
     ];
   }
 
+  /// Writes one answer to the progress store, once. In practice mode this runs
+  /// the moment a question is checked or skipped; in exam mode, where answers
+  /// stay editable until submission, it is deferred to [_finish] / [_quit].
+  Future<void> _commit(ProgressStore store, QuizItem item) {
+    if (!_committed.add(item.question.id)) return Future.value();
+    return store.recordAnswer(item.question, item.correct);
+  }
+
+  /// Locks in the current question as soon as practice mode reveals it, so the
+  /// answer survives the app being killed on the very next question.
+  void _reveal() {
+    setState(() => _revealed = true);
+    _commit(AppScope.progressOf(context), _item);
+  }
+
   void _previous() => setState(() {
         _index -= 1;
         _revealed = false;
       });
 
   void _next() {
+    // A skipped practice question still counts, so commit before moving on
+    // rather than only on reveal.
+    if (!_isExam) _commit(AppScope.progressOf(context), _item);
+
     if (_index == widget.items.length - 1) {
       _finish();
       return;
@@ -217,19 +277,38 @@ class _QuizScreenState extends State<QuizScreen> {
     setState(() {
       _index += 1;
       _revealed = false;
+      if (_index > _furthest) _furthest = _index;
     });
   }
 
   void _finish() {
+    if (_finishing) return;
+    _finishing = true;
     _ticker?.cancel();
-    _stopwatch.stop();
+    _clock.stop();
+
+    final store = AppScope.progressOf(context);
     final result = QuizResult(
       finishedAt: DateTime.now(),
       items: widget.items,
-      elapsed: _stopwatch.elapsed,
+      elapsed: _clock.elapsed,
       config: widget.config,
     );
-    AppScope.progressOf(context).record(result, label: widget.label);
+
+    // Sweep up anything not already committed: every exam answer, and any
+    // practice question reached but never checked. Questions past the furthest
+    // one displayed are left alone unless they somehow carry a response.
+    for (var i = 0; i < widget.items.length; i++) {
+      final item = widget.items[i];
+      if (i <= _furthest || item.answered) _commit(store, item);
+    }
+    store.recordSession(result, label: widget.label);
+
+    // Deliberately not awaited. The store applies the change in memory before
+    // it returns, so the results screen and the progress tab are already
+    // correct; the write drains behind us and is flushed on app pause. Waiting
+    // on the disk here would leave the user stuck on the last question if the
+    // platform channel were slow to answer.
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(
         builder: (_) => ResultsScreen(result: result, label: widget.label),
@@ -237,12 +316,31 @@ class _QuizScreenState extends State<QuizScreen> {
     );
   }
 
+  /// How many questions this session will leave behind in the progress store:
+  /// everything already committed, plus anything answered but not yet locked
+  /// in. Counting `answered` alone would understate it, because a skipped
+  /// practice question has no response yet still counts as a miss.
+  int get _keepCount =>
+      _committed.length +
+      widget.items
+          .where((i) => i.answered && !_committed.contains(i.question.id))
+          .length;
+
   Future<void> _confirmQuit() async {
+    if (_finishing) return;
+    final keep = _keepCount;
     final quit = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('End this quiz?'),
-        content: const Text('Your progress in this session will be discarded.'),
+        content: Text(
+          keep == 0
+              ? 'You have not reached any questions yet, so nothing will be '
+                  'recorded.'
+              : 'The $keep question${keep == 1 ? '' : 's'} you have already '
+                  'worked through ${keep == 1 ? 'is' : 'are'} kept in your '
+                  'progress. The rest of the session is dropped.',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
@@ -255,7 +353,41 @@ class _QuizScreenState extends State<QuizScreen> {
         ],
       ),
     );
-    if ((quit ?? false) && mounted) Navigator.of(context).pop();
+    if (!(quit ?? false) || !mounted) return;
+    _quit();
+  }
+
+  /// Keeps what was actually answered instead of discarding the session.
+  void _quit() {
+    _finishing = true;
+    _ticker?.cancel();
+    _clock.stop();
+
+    final store = AppScope.progressOf(context);
+    // Anything answered but not yet locked in — every exam response, and a
+    // practice question answered without being checked.
+    final reached = widget.items
+        .where((i) => i.answered || _committed.contains(i.question.id))
+        .toList();
+    for (final item in reached) {
+      _commit(store, item);
+    }
+    // Scored over what was reached, not the full draw — an abandoned session
+    // is not a sitting, so it is filed as partial and kept out of the trend.
+    if (reached.isNotEmpty) {
+      store.recordSession(
+        QuizResult(
+          finishedAt: DateTime.now(),
+          items: reached,
+          elapsed: _clock.elapsed,
+          config: widget.config,
+        ),
+        label: widget.label,
+        partial: true,
+      );
+    }
+
+    Navigator.of(context).pop();
   }
 
   static String _formatDuration(Duration d) {

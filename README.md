@@ -23,6 +23,36 @@ Preparation Guide, Fourth Edition* by Asghar Ghori.
 - **Progress tracking** — lifetime accuracy, per-chapter mastery, session
   history, and a "weak areas" drill that re-asks only what you last got wrong.
   Scoring uses the RHCSA 70% pass mark.
+- **Learn mode** — the second tab is for reading, not grading. Open any
+  chapter, topic or objective to get a command reference grouped by program
+  (every `usermod` form in one place), tap-to-flip flashcards, and the chapter
+  notes if you have generated them. Each ends with "Quiz me on this" so the
+  hand-off from reading to being tested is one tap. Quizzes start from the
+  Practice tab only.
+- **Progress is written as you answer**, not when a session ends, so a crash,
+  a force-quit or walking out of a quiet quiz keeps everything answered up to
+  that point. Two resets are available on the Progress tab: clear the
+  weak-areas list on its own, or reset accuracy and history from scratch.
+
+## Study notes (optional, local only)
+
+Learn mode's Notes tab reads `assets/notes/chNN.json`. Those files are **not in
+this repository** — they are the textbook's prose, and this repo is public — so
+they are gitignored and generated locally from your own copy of the book:
+
+```
+python3 tool/extract_notes.py                # uses the repo's epub symlink
+python3 tool/extract_notes.py --epub /path/to/book.epub
+python3 tool/extract_notes.py --dry-run      # report what it would extract
+```
+
+Roughly 89,000 words across the 22 chapters. Prose, headings and bullet lists
+carry over; terminal transcripts do not, because the book renders them as
+images — the Commands tab covers that ground from the question bank instead.
+The app works fine without any of this: the Notes tab just points you at the
+command above.
+
+**Do not commit what it produces.**
 
 ## Platforms
 
@@ -49,15 +79,18 @@ RHCSA_WINDOW_SIZE=320x568 ./build/linux/x64/debug/bundle/rhcsa_quiz
 assets/
   syllabus.json           chapters, topics, and the 62 exam objectives, cross-mapped
   questions/ch01..22.json the question bank, one file per chapter
+  notes/                  study notes, generated locally and gitignored
 lib/
-  models/                 Question, Syllabus, QuizConfig/QuizItem/QuizResult
-  data/repository.dart    loads syllabus + bank from assets
+  models/                 Question, Syllabus, Notes, QuizConfig/QuizItem/QuizResult
+  data/repository.dart    loads syllabus + bank + optional notes from assets
   data/quiz_builder.dart  filters the pool and draws a balanced session
+  data/study_builder.dart turns the bank into a command reference + flashcards
   services/               progress persistence (shared_preferences)
-  screens/                home, syllabus browse, quiz setup, quiz, results, stats
+  screens/                home, learn browse, study, quiz setup, quiz, results, stats
   widgets/                answer option, command field, explanation panel
 tool/validate_bank.py     schema + cross-reference checker for the bank
-test/                     grading logic and app-flow tests
+tool/extract_notes.py     epub -> assets/notes (local only, see above)
+test/                     grading, progress persistence, and app-flow tests
 ```
 
 ## App icon

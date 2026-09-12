@@ -51,3 +51,11 @@ app.*.map.json
 # Source textbook — copyrighted, and a 54MB symlink target. Never commit.
 RHCSA-book-10th-edition.epub
 *.epub
+
+# Study notes extracted from the textbook by tool/extract_notes.py. Same
+# reason as the epub above: the book's prose, and this repo is public.
+assets/notes/*.json
+
+# Locally produced IPA/APK drops. Build artifacts, and a 20MB IPA has no
+# business in git history.
+/dist/

@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:rhcsa_quiz/app_scope.dart';
 import 'package:rhcsa_quiz/data/repository.dart';
 import 'package:rhcsa_quiz/main.dart';
 import 'package:rhcsa_quiz/models/quiz.dart';
 import 'package:rhcsa_quiz/screens/quiz_screen.dart';
 import 'package:rhcsa_quiz/screens/quiz_setup_screen.dart';
 import 'package:rhcsa_quiz/screens/results_screen.dart';
+import 'package:rhcsa_quiz/screens/study_screen.dart';
 import 'package:rhcsa_quiz/services/progress_store.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -106,12 +108,53 @@ void main() {
     );
   });
 
-  testWidgets('a chapter row in the syllabus opens a scoped setup', (t) async {
+  testWidgets('a chapter row in Learn opens study material, not a quiz',
+      (t) async {
     await _boot(t);
 
-    await t.tap(find.text('Syllabus'));
+    await t.tap(find.text('Learn'));
     await t.pumpAndSettle();
     await t.tap(find.byType(ListTile).first);
+    await t.pumpAndSettle();
+
+    expect(t.takeException(), isNull);
+    // Learn is for reading; quizzes belong to the Practice tab.
+    expect(find.byType(StudyScreen), findsOneWidget);
+    expect(find.byType(QuizSetupScreen), findsNothing);
+    expect(find.textContaining('Commands ('), findsOneWidget);
+    expect(find.textContaining('Cards ('), findsOneWidget);
+  });
+
+  testWidgets('the Notes tab reflects whether notes were generated',
+      (t) async {
+    await _boot(t);
+    final repo = AppScope.repositoryOf(t.element(find.text('Learn')));
+
+    await t.tap(find.text('Learn'));
+    await t.pumpAndSettle();
+    await t.tap(find.byType(ListTile).first);
+    await t.pumpAndSettle();
+
+    // assets/notes/ is gitignored, so a fresh clone has none and a machine
+    // that has run tool/extract_notes.py does. Both must read sensibly.
+    if (repo.hasNotes) {
+      expect(find.text('Overview'), findsOneWidget);
+      expect(find.textContaining('Notes ('), findsOneWidget);
+    } else {
+      expect(find.text('No notes for this scope'), findsOneWidget);
+      expect(find.textContaining('extract_notes.py'), findsOneWidget);
+    }
+  });
+
+  testWidgets('study material hands off to a scoped quiz', (t) async {
+    await _boot(t);
+
+    await t.tap(find.text('Learn'));
+    await t.pumpAndSettle();
+    await t.tap(find.byType(ListTile).first);
+    await t.pumpAndSettle();
+
+    await t.tap(find.widgetWithText(FilledButton, 'Quiz me on this'));
     await t.pumpAndSettle();
 
     expect(t.takeException(), isNull);

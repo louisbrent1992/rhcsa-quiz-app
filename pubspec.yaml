@@ -16,7 +16,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 1.0.0+3
+version: 1.1.0+4
 
 environment:
   sdk: ^3.13.1
@@ -62,6 +62,10 @@ flutter:
   assets:
     - assets/syllabus.json
     - assets/questions/
+    # Study notes extracted from the textbook by tool/extract_notes.py. The
+    # directory ships with only a placeholder; the chNN.json files are
+    # generated locally and gitignored, and Learn mode works without them.
+    - assets/notes/
     # Shipped so the Linux runner can set the window/taskbar icon from the
     # bundle; Android and iOS use their own generated launcher icons.
     - icon/icon.png

@@ -41,7 +41,7 @@ class _HomeScreenState extends State<HomeScreen> {
           NavigationDestination(
             icon: Icon(Icons.menu_book_outlined),
             selectedIcon: Icon(Icons.menu_book),
-            label: 'Syllabus',
+            label: 'Learn',
           ),
           NavigationDestination(
             icon: Icon(Icons.insights_outlined),

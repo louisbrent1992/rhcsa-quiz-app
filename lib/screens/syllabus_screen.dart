@@ -1,11 +1,17 @@
 import 'package:flutter/material.dart';
 
 import '../app_scope.dart';
+import '../data/study_builder.dart';
 import '../models/quiz.dart';
-import 'quiz_setup_screen.dart';
+import 'study_screen.dart';
 
-/// Browse the book by chapter, by topic section, or by official exam
-/// objective, and start a quiz scoped to whatever you tap.
+/// Learn mode. Browse the book by chapter, by topic section, or by official
+/// exam objective, and open the study material for whatever you tap.
+///
+/// Quizzes are not started from here — that is the Practice tab's job. Each
+/// study screen ends with a "Quiz me on this" button, so the path from
+/// reading to being tested stays one tap away without making this a second
+/// quiz launcher.
 class SyllabusScreen extends StatelessWidget {
   const SyllabusScreen({super.key});
 
@@ -15,7 +21,7 @@ class SyllabusScreen extends StatelessWidget {
       length: 3,
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Syllabus'),
+          title: const Text('Learn'),
           bottom: const TabBar(
             tabs: [
               Tab(text: 'Chapters'),
@@ -32,10 +38,12 @@ class SyllabusScreen extends StatelessWidget {
   }
 }
 
-void _startFor(BuildContext context, QuizConfig config, String title) {
+/// Opens the study material for [scope]. [config] is handed straight through
+/// to the "Quiz me on this" button at the bottom of the study screen.
+void _study(BuildContext context, StudyScope scope, QuizConfig config) {
   Navigator.of(context).push(
     MaterialPageRoute(
-      builder: (_) => QuizSetupScreen(initial: config, title: title),
+      builder: (_) => StudyScreen(scope: scope, quizConfig: config),
     ),
   );
 }
@@ -101,17 +109,14 @@ class _ChaptersTab extends StatelessWidget {
             '${chapter.objectives.length} objectives',
           ),
           trailing: _CountBadge(count),
-          enabled: count > 0,
-          onTap: count == 0
-              ? null
-              : () => _startFor(
-                    context,
-                    QuizConfig(
-                      chapters: {chapter.num},
-                      questionCount: count.clamp(1, 20),
-                    ),
-                    chapter.title,
-                  ),
+          onTap: () => _study(
+            context,
+            ChapterScope(chapter.num, chapter.title),
+            QuizConfig(
+              chapters: {chapter.num},
+              questionCount: count.clamp(1, 20),
+            ),
+          ),
         );
       },
     );
@@ -141,18 +146,15 @@ class _TopicsTab extends StatelessWidget {
                 contentPadding: const EdgeInsets.only(left: 32, right: 16),
                 title: Text(topic),
                 trailing: _CountBadge(counts[topic] ?? 0),
-                enabled: (counts[topic] ?? 0) > 0,
-                onTap: (counts[topic] ?? 0) == 0
-                    ? null
-                    : () => _startFor(
-                          context,
-                          QuizConfig(
-                            filterMode: FilterMode.topics,
-                            topics: {topic},
-                            questionCount: (counts[topic] ?? 0).clamp(1, 20),
-                          ),
-                          topic,
-                        ),
+                onTap: () => _study(
+                  context,
+                  TopicScope(topic),
+                  QuizConfig(
+                    filterMode: FilterMode.topics,
+                    topics: {topic},
+                    questionCount: (counts[topic] ?? 0).clamp(1, 20),
+                  ),
+                ),
               ),
           ],
         );
@@ -200,19 +202,15 @@ class _ObjectivesTab extends StatelessWidget {
                 '${objective.chapters.join(', ')}',
               ),
               trailing: _CountBadge(counts[objective.id] ?? 0),
-              enabled: (counts[objective.id] ?? 0) > 0,
-              onTap: (counts[objective.id] ?? 0) == 0
-                  ? null
-                  : () => _startFor(
-                        context,
-                        QuizConfig(
-                          filterMode: FilterMode.objectives,
-                          objectives: {objective.id},
-                          questionCount:
-                              (counts[objective.id] ?? 0).clamp(1, 20),
-                        ),
-                        'Objective ${objective.id}',
-                      ),
+              onTap: () => _study(
+                context,
+                ObjectiveScope(objective.id, objective.text),
+                QuizConfig(
+                  filterMode: FilterMode.objectives,
+                  objectives: {objective.id},
+                  questionCount: (counts[objective.id] ?? 0).clamp(1, 20),
+                ),
+              ),
             ),
         ],
       ],

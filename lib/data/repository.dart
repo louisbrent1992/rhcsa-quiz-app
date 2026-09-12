@@ -2,19 +2,26 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart' show FlutterError;
 import 'package:flutter/services.dart' show rootBundle;
 
+import '../models/notes.dart';
 import '../models/question.dart';
 import '../models/syllabus.dart';
 
-/// Loads the syllabus and the per-chapter question bank out of assets.
+/// Loads the syllabus, the per-chapter question bank, and any study notes out
+/// of assets.
 ///
 /// Question files are named `assets/questions/ch01.json` .. `ch22.json`; a
 /// missing file simply means that chapter has no questions authored yet, so
 /// the app degrades to whatever is present rather than failing to start.
+/// `assets/notes/chNN.json` follows the same rule and is absent by default —
+/// those files are generated locally by `tool/extract_notes.py`.
 class Repository {
-  Repository._(this.syllabus, this.questions);
+  Repository._(this.syllabus, this.questions, this.notes);
 
   final Syllabus syllabus;
   final List<Question> questions;
+
+  /// Study notes by chapter number. Empty when none have been generated.
+  final Map<int, ChapterNotes> notes;
 
   static Future<Repository> load() async {
     final syllabus = Syllabus.fromJson(
@@ -23,22 +30,41 @@ class Repository {
     );
 
     final questions = <Question>[];
+    final notes = <int, ChapterNotes>{};
     for (final chapter in syllabus.chapters) {
-      final name =
-          'assets/questions/ch${chapter.num.toString().padLeft(2, '0')}.json';
-      final String raw;
-      try {
-        raw = await rootBundle.loadString(name);
-      } on FlutterError {
-        continue;
+      final stem = 'ch${chapter.num.toString().padLeft(2, '0')}.json';
+
+      final raw = await _tryLoad('assets/questions/$stem');
+      if (raw != null) {
+        questions.addAll(
+          (json.decode(raw) as List)
+              .map((e) => Question.fromJson(e as Map<String, dynamic>)),
+        );
       }
-      final decoded = json.decode(raw) as List;
-      questions.addAll(
-        decoded.map((e) => Question.fromJson(e as Map<String, dynamic>)),
-      );
+
+      final rawNotes = await _tryLoad('assets/notes/$stem');
+      if (rawNotes != null) {
+        notes[chapter.num] = ChapterNotes.fromJson(
+          json.decode(rawNotes) as Map<String, dynamic>,
+        );
+      }
     }
-    return Repository._(syllabus, questions);
+    return Repository._(syllabus, questions, notes);
   }
+
+  /// Reads an optional asset, returning null when it is not in the bundle.
+  static Future<String?> _tryLoad(String name) async {
+    try {
+      return await rootBundle.loadString(name);
+    } on FlutterError {
+      return null;
+    }
+  }
+
+  /// True when study notes have been generated for at least one chapter.
+  bool get hasNotes => notes.isNotEmpty;
+
+  ChapterNotes? notesFor(int chapter) => notes[chapter];
 
   /// Number of authored questions per chapter, used to show coverage in the UI.
   Map<int, int> get countByChapter {

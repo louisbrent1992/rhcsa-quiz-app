@@ -24,10 +24,37 @@ class RhcsaQuizApp extends StatefulWidget {
   State<RhcsaQuizApp> createState() => _RhcsaQuizAppState();
 }
 
-class _RhcsaQuizAppState extends State<RhcsaQuizApp> {
+class _RhcsaQuizAppState extends State<RhcsaQuizApp>
+    with WidgetsBindingObserver {
   late final Future<(Repository, ProgressStore)> _boot = widget.boot ??
       Future.wait([Repository.load(), ProgressStore.load()])
           .then((r) => (r[0] as Repository, r[1] as ProgressStore));
+
+  ProgressStore? _progress;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  /// Answers are already written as they are given, but the very last write
+  /// may still be in flight when the OS backgrounds the app. Draining the
+  /// queue here means a kill from the app switcher cannot drop it.
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.inactive ||
+        state == AppLifecycleState.paused ||
+        state == AppLifecycleState.hidden) {
+      _progress?.flush();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -45,6 +72,7 @@ class _RhcsaQuizAppState extends State<RhcsaQuizApp> {
           );
         }
         final (repository, progress) = snapshot.data!;
+        _progress = progress;
         // AppScope sits ABOVE MaterialApp so it is an ancestor of the
         // Navigator: every pushed route (quiz setup, quiz, results, syllabus
         // detail) can reach the bank and the progress store. Nesting it under
