@@ -13,6 +13,11 @@
 #   APP_STORE_CONNECT_ISSUER_ID   Issuer ID shown above the key list
 #   APP_STORE_CONNECT_PRIVATE_KEY Full contents of the AuthKey_*.p8 file,
 #                                 including the BEGIN/END lines
+#   NOTES_DEPLOY_KEY              Private half of a read-only deploy key on
+#                                 louisbrent1992/rhcsa-quiz-notes, which holds
+#                                 the study notes. They are the textbook's
+#                                 prose and this repository is public, so they
+#                                 are gitignored here and pulled at build time.
 #
 # The key needs the App Manager role to create profiles and upload builds.
 #
@@ -42,6 +47,33 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+
+      # assets/notes/*.json is gitignored in this repository on purpose: it is
+      # the book's text and this repo is public. The files live in a private
+      # repository instead, and are pulled in here so the shipped Learn tab has
+      # them without the prose ever being published.
+      - name: Fetch study notes
+        uses: actions/checkout@v4
+        with:
+          repository: louisbrent1992/rhcsa-quiz-notes
+          ssh-key: ${{ secrets.NOTES_DEPLOY_KEY }}
+          path: .notes-src
+
+      - name: Stage study notes
+        run: |
+          mkdir -p assets/notes
+          cp .notes-src/notes/ch*.json assets/notes/
+          count=$(ls assets/notes/ch*.json | wc -l | tr -d ' ')
+          echo "staged $count chapter note files"
+          # Failing loudly beats shipping a build whose Notes tab is silently
+          # empty -- that looks like a broken feature rather than a missing
+          # checkout.
+          if [ "$count" -ne 22 ]; then
+            echo "::error::expected 22 chapter note files, staged $count"
+            exit 1
+          fi
+          # Not part of the app bundle; drop it before the build reads assets.
+          rm -rf .notes-src
 
       - uses: subosito/flutter-action@v2
         with:

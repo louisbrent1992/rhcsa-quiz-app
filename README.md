@@ -52,7 +52,16 @@ images — the Commands tab covers that ground from the question bank instead.
 The app works fine without any of this: the Notes tab just points you at the
 command above.
 
-**Do not commit what it produces.**
+**Do not commit what it produces.** Release builds get the notes from a
+separate private repository, `rhcsa-quiz-notes`, which the iOS release workflow
+checks out with a read-only deploy key (`NOTES_DEPLOY_KEY`) and copies into
+`assets/notes/` before building. That keeps this repository public and free of
+the book's prose while still shipping the Learn tab complete. After
+regenerating, sync them:
+
+```
+cp assets/notes/*.json <path-to>/rhcsa-quiz-notes/notes/
+```
 
 ## Platforms
 
