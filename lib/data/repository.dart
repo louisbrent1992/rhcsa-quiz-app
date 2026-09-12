@@ -1,6 +1,5 @@
 import 'dart:convert';
-import 'package:flutter/foundation.dart' show FlutterError;
-import 'package:flutter/services.dart' show rootBundle;
+import 'package:flutter/services.dart' show AssetManifest, rootBundle;
 
 import '../models/notes.dart';
 import '../models/question.dart';
@@ -14,6 +13,13 @@ import '../models/syllabus.dart';
 /// the app degrades to whatever is present rather than failing to start.
 /// `assets/notes/chNN.json` follows the same rule and is absent by default —
 /// those files are generated locally by `tool/extract_notes.py`.
+///
+/// Optional assets are discovered through the asset manifest rather than by
+/// calling `loadString` and catching the failure. A missing asset throws
+/// asynchronously from inside the bundle, and that error escapes the zone a
+/// widget test's `runAsync` installs even when the call site catches it: the
+/// test framework then reports it after the test has completed and wedges the
+/// runner. Asking the manifest first means the failing path is never taken.
 class Repository {
   Repository._(this.syllabus, this.questions, this.notes);
 
@@ -29,36 +35,31 @@ class Repository {
           as Map<String, dynamic>,
     );
 
+    final manifest = await AssetManifest.loadFromAssetBundle(rootBundle);
+    final bundled = manifest.listAssets().toSet();
+
     final questions = <Question>[];
     final notes = <int, ChapterNotes>{};
     for (final chapter in syllabus.chapters) {
       final stem = 'ch${chapter.num.toString().padLeft(2, '0')}.json';
 
-      final raw = await _tryLoad('assets/questions/$stem');
-      if (raw != null) {
+      final questionAsset = 'assets/questions/$stem';
+      if (bundled.contains(questionAsset)) {
         questions.addAll(
-          (json.decode(raw) as List)
+          (json.decode(await rootBundle.loadString(questionAsset)) as List)
               .map((e) => Question.fromJson(e as Map<String, dynamic>)),
         );
       }
 
-      final rawNotes = await _tryLoad('assets/notes/$stem');
-      if (rawNotes != null) {
+      final notesAsset = 'assets/notes/$stem';
+      if (bundled.contains(notesAsset)) {
         notes[chapter.num] = ChapterNotes.fromJson(
-          json.decode(rawNotes) as Map<String, dynamic>,
+          json.decode(await rootBundle.loadString(notesAsset))
+              as Map<String, dynamic>,
         );
       }
     }
     return Repository._(syllabus, questions, notes);
-  }
-
-  /// Reads an optional asset, returning null when it is not in the bundle.
-  static Future<String?> _tryLoad(String name) async {
-    try {
-      return await rootBundle.loadString(name);
-    } on FlutterError {
-      return null;
-    }
   }
 
   /// True when study notes have been generated for at least one chapter.
