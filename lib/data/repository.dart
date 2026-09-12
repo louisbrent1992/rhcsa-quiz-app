@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart' show visibleForTesting;
 import 'package:flutter/services.dart' show AssetManifest, rootBundle;
 
 import '../models/notes.dart';
@@ -22,6 +23,20 @@ import '../models/syllabus.dart';
 /// runner. Asking the manifest first means the failing path is never taken.
 class Repository {
   Repository._(this.syllabus, this.questions, this.notes);
+
+  /// Builds a repository with contents pinned by the caller.
+  ///
+  /// Study notes are gitignored, so whether [load] finds any depends on the
+  /// machine: present here, absent on CI. Tests that care about the notes
+  /// path state which case they are exercising instead of branching on what
+  /// happens to be on disk, which is how a no-notes regression reached CI
+  /// unnoticed once already.
+  @visibleForTesting
+  Repository.forTest({
+    required this.syllabus,
+    required this.questions,
+    this.notes = const {},
+  });
 
   final Syllabus syllabus;
   final List<Question> questions;

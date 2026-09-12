@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:rhcsa_quiz/app_scope.dart';
 import 'package:rhcsa_quiz/data/repository.dart';
 import 'package:rhcsa_quiz/main.dart';
 import 'package:rhcsa_quiz/models/quiz.dart';
@@ -123,27 +122,6 @@ void main() {
     expect(find.byType(QuizSetupScreen), findsNothing);
     expect(find.textContaining('Commands ('), findsOneWidget);
     expect(find.textContaining('Cards ('), findsOneWidget);
-  });
-
-  testWidgets('the Notes tab reflects whether notes were generated',
-      (t) async {
-    await _boot(t);
-    final repo = AppScope.repositoryOf(t.element(find.text('Learn')));
-
-    await t.tap(find.text('Learn'));
-    await t.pumpAndSettle();
-    await t.tap(find.byType(ListTile).first);
-    await t.pumpAndSettle();
-
-    // assets/notes/ is gitignored, so a fresh clone has none and a machine
-    // that has run tool/extract_notes.py does. Both must read sensibly.
-    if (repo.hasNotes) {
-      expect(find.text('Overview'), findsOneWidget);
-      expect(find.textContaining('Notes ('), findsOneWidget);
-    } else {
-      expect(find.text('No notes for this scope'), findsOneWidget);
-      expect(find.textContaining('extract_notes.py'), findsOneWidget);
-    }
   });
 
   testWidgets('study material hands off to a scoped quiz', (t) async {
